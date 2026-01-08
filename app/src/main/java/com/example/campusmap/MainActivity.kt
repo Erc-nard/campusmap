@@ -4,12 +4,19 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -20,9 +27,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.example.campusmap.ui.theme.CampusmapTheme
 
 class MainActivity : ComponentActivity() {
@@ -67,11 +78,7 @@ fun CampusmapApp() {
                         modifier = Modifier.padding(innerPadding)
                     )
                 AppDestinations.FACILITIES ->
-                    Facilities(
-                        name = "Hi",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-
+                    Facilities(paddingValues = innerPadding)
                 AppDestinations.SHUTTLE ->
                     Shuttle(
                         name = "Hello, world!",
@@ -99,12 +106,65 @@ fun Map(name: String, modifier: Modifier = Modifier) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Facilities(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = name,
-        modifier = modifier
-    )
+fun Facilities(paddingValues: PaddingValues) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "시설") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                navigationIcon = {
+                    IconButton(onClick = {}) { Text("=") }
+                },
+                actions = {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            imageVector = Icons.Default.Search, // 내장된 검색 아이콘 사용
+                            contentDescription = "검색"
+                        )
+                    }
+                }
+            )
+        },
+        modifier = Modifier.padding(paddingValues)
+    ) { innerPadding ->
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.padding(innerPadding),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(topLevelFacilitiesList.size) { index ->
+                PictureGridView(data = topLevelFacilitiesList[index])
+            }
+        }
+    }
+}
+
+@Composable
+fun PictureGridView(data: PhotoItemData) {
+    Column {
+        AsyncImage(
+            model = data.imageURL,
+            contentDescription = data.title,
+            modifier = Modifier.size(200.dp).clip(RoundedCornerShape(8.dp)),
+            contentScale = ContentScale.Crop // 이미지 비율 유지하며 채우기
+        )
+        Text(
+            text = data.title,
+            modifier = Modifier.padding(8.dp)
+        )
+    }
+}
+
+data class PhotoItemData(val id: Int, val title: String, val imageURL: String)
+val topLevelFacilitiesList = List<PhotoItemData>(16) { index ->
+    PhotoItemData(id = index, title = "Title", imageURL = "https://kaist.ac.kr/kr/img/content/sub05/sub0503_img09.jpg")
 }
 
 @Composable
