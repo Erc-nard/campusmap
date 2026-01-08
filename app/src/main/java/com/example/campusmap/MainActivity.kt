@@ -35,9 +35,6 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.campusmap.ui.theme.CampusmapTheme
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.foundation.clickable
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,29 +48,24 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @PreviewScreenSizes
 @Composable
 fun CampusmapApp() {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.MAP) }
-    var showShuttleSheet by rememberSaveable { mutableStateOf(false) }
-    var showShuttleScreen by rememberSaveable { mutableStateOf(false) }
-    var selectedShuttle by rememberSaveable { mutableStateOf<ShuttleType?>(null) }
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
             AppDestinations.entries.forEach {
                 item(
-                    icon = { Icon(it.icon, contentDescription = it.label) },
+                    icon = {
+                        Icon(
+                            it.icon,
+                            contentDescription = it.label
+                        )
+                    },
                     label = { Text(it.label) },
                     selected = it == currentDestination,
-                    onClick = {
-                        if (it == AppDestinations.SHUTTLE) {
-                            showShuttleSheet = true
-                        } else {
-                            currentDestination = it
-                        }
-                    }
+                    onClick = { currentDestination = it }
                 )
             }
         }
@@ -81,95 +73,17 @@ fun CampusmapApp() {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             when (currentDestination) {
                 AppDestinations.MAP ->
-                    Map("Android", Modifier.padding(innerPadding))
+                    Map(
+                        name = "Android",
+                        modifier = Modifier.padding(innerPadding)
+                    )
                 AppDestinations.FACILITIES ->
                     Facilities(innerPadding)
                 AppDestinations.SHUTTLE -> {}
             }
         }
     }
-
-    //BottomSheet
-    if (showShuttleSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { showShuttleSheet = false },
-            sheetState = rememberModalBottomSheetState()
-        ) {
-            Column (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // 교내
-                    Button(
-                        onClick = {
-                            selectedShuttle = ShuttleType.CAMPUS
-                            showShuttleSheet = false
-                            showShuttleScreen = true
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("교내",style=MaterialTheme.typography.titleLarge) }
-
-// 교외
-                    Button(
-                        onClick = {
-                            selectedShuttle = ShuttleType.OUTSIDE
-                            showShuttleSheet = false
-                            showShuttleScreen = true
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("교외",style=MaterialTheme.typography.titleLarge) }
-
-
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Button(
-                        onClick = {
-                            selectedShuttle = ShuttleType.MUNJI_START
-                            showShuttleSheet = false
-                            showShuttleScreen = true
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) { Text(text="캠퍼스 왕복",style=MaterialTheme.typography.titleLarge) }
-
-                    Button(
-                        onClick = {
-                            selectedShuttle = ShuttleType.COMMUTE
-                            showShuttleSheet = false
-                            showShuttleScreen = true
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("통근",style=MaterialTheme.typography.titleLarge) }
-
-
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-
-            }
-
-        }
-    }
-
-    if (showShuttleScreen && selectedShuttle != null) {
-        ShuttleScreenRoot(
-            startShuttle = selectedShuttle!!,
-            onClose = { showShuttleScreen = false }
-        )
-    }
-
-
 }
-
 
 enum class AppDestinations(
     val label: String,
@@ -179,7 +93,6 @@ enum class AppDestinations(
     FACILITIES("시설", Icons.Default.Place),
     SHUTTLE("셔틀", Icons.Default.ShoppingCart),
 }
-
 
 @Composable
 fun Map(name: String, modifier: Modifier = Modifier) {
