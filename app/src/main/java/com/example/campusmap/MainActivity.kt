@@ -7,9 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
 @PreviewScreenSizes
 @Composable
 fun CampusmapApp() {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
+    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.MAP) }
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
@@ -60,10 +60,24 @@ fun CampusmapApp() {
         }
     ) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                name = "Android",
-                modifier = Modifier.padding(innerPadding)
-            )
+            when (currentDestination) {
+                AppDestinations.MAP ->
+                    Map(
+                        name = "Android",
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                AppDestinations.FACILITIES ->
+                    Facilities(
+                        name = "Hi",
+                        modifier = Modifier.padding(innerPadding)
+                    )
+
+                AppDestinations.SHUTTLE ->
+                    Shuttle(
+                        name = "Hello, world!",
+                        modifier = Modifier.padding(innerPadding)
+                    )
+            }
         }
     }
 }
@@ -72,15 +86,31 @@ enum class AppDestinations(
     val label: String,
     val icon: ImageVector,
 ) {
-    HOME("Home", Icons.Default.Home),
-    FAVORITES("Favorites", Icons.Default.Favorite),
-    PROFILE("Profile", Icons.Default.AccountBox),
+    MAP("지도", Icons.Default.LocationOn),
+    FACILITIES("시설", Icons.Default.Place),
+    SHUTTLE("셔틀", Icons.Default.ShoppingCart),
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun Map(name: String, modifier: Modifier = Modifier) {
     Text(
         text = "Hello $name!",
+        modifier = modifier
+    )
+}
+
+@Composable
+fun Facilities(name: String, modifier: Modifier = Modifier) {
+    Text(
+        text = name,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun Shuttle(name: String, modifier: Modifier = Modifier) {
+    Text(
+        text = name,
         modifier = modifier
     )
 }
@@ -89,6 +119,6 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview() {
     CampusmapTheme {
-        Greeting("Android")
+        Map("Android")
     }
 }
