@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -42,6 +43,19 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.campusmap.ui.theme.CampusmapTheme
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Button
+import androidx.compose.ui.unit.dp
+import com.example.campusmap.ui.map.CampusMapScreen
+
 
 
 class MainActivity : ComponentActivity() {
@@ -56,24 +70,29 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @PreviewScreenSizes
 @Composable
 fun CampusmapApp() {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.MAP) }
+    var showShuttleSheet by rememberSaveable { mutableStateOf(false) }
+    var showShuttleScreen by rememberSaveable { mutableStateOf(false) }
+    var selectedShuttle by rememberSaveable { mutableStateOf<ShuttleType?>(null) }
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
             AppDestinations.entries.forEach {
                 item(
-                    icon = {
-                        Icon(
-                            it.icon,
-                            contentDescription = it.label
-                        )
-                    },
+                    icon = { Icon(it.icon, contentDescription = it.label) },
                     label = { Text(it.label) },
                     selected = it == currentDestination,
-                    onClick = { currentDestination = it }
+                    onClick = {
+                        if (it == AppDestinations.SHUTTLE) {
+                            showShuttleSheet = true
+                        } else {
+                            currentDestination = it
+                        }
+                    }
                 )
             }
         }
@@ -81,12 +100,9 @@ fun CampusmapApp() {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             when (currentDestination) {
                 AppDestinations.MAP ->
-                    Map(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    Map("Android", Modifier.padding(innerPadding))
                 AppDestinations.FACILITIES ->
-                    Facilities(innerPadding)
+                    FacilitiesNavigation(padding = innerPadding)
                 AppDestinations.SHUTTLE ->
                     Shuttle(
                         name = "Hello, world!",
@@ -95,7 +111,88 @@ fun CampusmapApp() {
             }
         }
     }
+
+    //BottomSheet
+    if (showShuttleSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showShuttleSheet = false },
+            sheetState = rememberModalBottomSheetState()
+        ) {
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // 교내
+                    Button(
+                        onClick = {
+                            selectedShuttle = ShuttleType.CAMPUS
+                            showShuttleSheet = false
+                            showShuttleScreen = true
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("교내",style=MaterialTheme.typography.titleLarge) }
+
+// 교외
+                    Button(
+                        onClick = {
+                            selectedShuttle = ShuttleType.OUTSIDE
+                            showShuttleSheet = false
+                            showShuttleScreen = true
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("교외",style=MaterialTheme.typography.titleLarge) }
+
+
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            selectedShuttle = ShuttleType.MUNJI_START
+                            showShuttleSheet = false
+                            showShuttleScreen = true
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) { Text(text="캠퍼스 왕복",style=MaterialTheme.typography.titleLarge) }
+
+                    Button(
+                        onClick = {
+                            selectedShuttle = ShuttleType.COMMUTE
+                            showShuttleSheet = false
+                            showShuttleScreen = true
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("통근",style=MaterialTheme.typography.titleLarge) }
+
+
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+
+            }
+
+        }
+    }
+
+    if (showShuttleScreen && selectedShuttle != null) {
+        ShuttleScreenRoot(
+            startShuttle = selectedShuttle!!,
+            onClose = { showShuttleScreen = false }
+        )
+    }
+
+
 }
+
 
 enum class AppDestinations(
     val label: String,
@@ -106,73 +203,13 @@ enum class AppDestinations(
     SHUTTLE("셔틀", Icons.Default.ShoppingCart),
 }
 
+
 @Composable
 fun Map(name: String, modifier: Modifier = Modifier) {
     Text(
         text = "Hello $name!",
         modifier = modifier
     )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun Facilities(paddingValues: PaddingValues) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "시설") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                navigationIcon = {
-                    IconButton(onClick = {}) { Text("=") }
-                },
-                actions = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            imageVector = Icons.Default.Search, // 내장된 검색 아이콘 사용
-                            contentDescription = "검색"
-                        )
-                    }
-                }
-            )
-        },
-        modifier = Modifier.padding(paddingValues)
-    ) { innerPadding ->
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier.padding(innerPadding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(topLevelFacilitiesList.size) { index ->
-                PictureGridView(data = topLevelFacilitiesList[index])
-            }
-        }
-    }
-}
-
-@Composable
-fun PictureGridView(data: PhotoItemData) {
-    Column {
-        AsyncImage(
-            model = data.imageURL,
-            contentDescription = data.title,
-            modifier = Modifier.size(200.dp).clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop // 이미지 비율 유지하며 채우기
-        )
-        Text(
-            text = data.title,
-            modifier = Modifier.padding(8.dp)
-        )
-    }
-}
-
-data class PhotoItemData(val id: Int, val title: String, val imageURL: String)
-val topLevelFacilitiesList = List<PhotoItemData>(16) { index ->
-    PhotoItemData(id = index, title = "Title", imageURL = "https://kaist.ac.kr/kr/img/content/sub05/sub0503_img09.jpg")
 }
 
 @Composable
