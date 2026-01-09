@@ -38,9 +38,9 @@ data class Station(
 )
 
 val stations = listOf(
-    Station("A역", 60.dp, 400.dp, LocalTime.of(16, 47)),
-    Station("B역", 160.dp, 300.dp, LocalTime.of(16, 48)),
-    Station("C역", 260.dp, 200.dp, LocalTime.of(18, 0))
+    Station("A역", 60.dp, 400.dp, LocalTime.of(17, 19)),
+    Station("B역", 160.dp, 300.dp, LocalTime.of(17, 20)),
+    Station("C역", 260.dp, 200.dp, LocalTime.of(17, 23))
 ) //예시 노선
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,7 +100,7 @@ fun ShuttleTimetableScreen(
                 .align(Alignment.Center)
                 .fillMaxSize()
         )
-
+        BusMovingLayer(stations) //버스이동 레이어!!
 
         // 🔹 메인 콘텐츠
         Box(
