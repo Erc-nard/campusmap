@@ -112,7 +112,7 @@ fun CampusmapApp() {
                             showShuttleScreen = true
                         },
                         modifier = Modifier.weight(1f)
-                    ) { Text("교내") }
+                    ) { Text("교내",style=MaterialTheme.typography.titleLarge) }
 
 // 교외
                     Button(
@@ -122,17 +122,7 @@ fun CampusmapApp() {
                             showShuttleScreen = true
                         },
                         modifier = Modifier.weight(1f)
-                    ) { Text("교외") }
-
-// 본교 출발
-                    Button(
-                        onClick = {
-                            selectedShuttle = ShuttleType.MAIN_START
-                            showShuttleSheet = false
-                            showShuttleScreen = true
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("본교 출발") }
+                    ) { Text("교외",style=MaterialTheme.typography.titleLarge) }
 
 
                 }
@@ -150,16 +140,7 @@ fun CampusmapApp() {
                             showShuttleScreen = true
                         },
                         modifier = Modifier.weight(1f)
-                    ) { Text("문지 출발") }
-
-                    Button(
-                        onClick = {
-                            selectedShuttle = ShuttleType.HWAAM_START
-                            showShuttleSheet = false
-                            showShuttleScreen = true
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("화암 출발") }
+                    ) { Text(text="캠퍼스 왕복",style=MaterialTheme.typography.titleLarge) }
 
                     Button(
                         onClick = {
@@ -168,7 +149,7 @@ fun CampusmapApp() {
                             showShuttleScreen = true
                         },
                         modifier = Modifier.weight(1f)
-                    ) { Text("통근") }
+                    ) { Text("통근",style=MaterialTheme.typography.titleLarge) }
 
 
                 }
