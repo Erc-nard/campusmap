@@ -37,11 +37,40 @@ data class Station(
     val arrivalTime: LocalTime
 )
 
-val stations = listOf(
-    Station("A역", 60.dp, 400.dp, LocalTime.of(17, 19)),
-    Station("B역", 160.dp, 300.dp, LocalTime.of(17, 20)),
-    Station("C역", 260.dp, 200.dp, LocalTime.of(17, 23))
-) //예시 노선
+val testBaseTime = LocalTime.now()
+
+val campusStations = listOf(
+    Station("A", 60.dp, 420.dp, testBaseTime.plusSeconds(0)),
+    Station("B", 180.dp, 320.dp, testBaseTime.plusSeconds(10)),
+    Station("C", 300.dp, 240.dp, testBaseTime.plusSeconds(20))
+)
+
+val outsideStations = listOf(
+    Station("외부1", 40.dp, 480.dp, testBaseTime.plusSeconds(0)),
+    Station("외부2", 120.dp, 360.dp, testBaseTime.plusSeconds(8)),
+    Station("외부3", 260.dp, 180.dp, testBaseTime.plusSeconds(20))
+)
+
+val munjiStations = listOf(
+    Station("문지", 320.dp, 500.dp, testBaseTime.plusSeconds(0)),
+    Station("캠퍼스", 160.dp, 280.dp, testBaseTime.plusSeconds(20))
+)
+
+
+val commuteStations1 = listOf(
+    Station("통근1", 20.dp, 520.dp, testBaseTime.plusSeconds(0)),
+    Station("통근2", 140.dp, 420.dp, testBaseTime.plusSeconds(5)),
+    Station("통근3", 280.dp, 300.dp, testBaseTime.plusSeconds(10)),
+    Station("통근4", 340.dp, 200.dp, testBaseTime.plusSeconds(15))
+)
+
+
+val commuteStations2 = listOf(
+    Station("통근1", 20.dp, 520.dp, testBaseTime.plusSeconds(0)),
+    Station("통근2", 140.dp, 420.dp, testBaseTime.plusSeconds(7)),
+    Station("통근3", 280.dp, 300.dp, testBaseTime.plusSeconds(14)),
+    Station("통근4", 340.dp, 200.dp, testBaseTime.plusSeconds(21))
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,42 +116,40 @@ fun ShuttleTimetableScreen(
     modifier: Modifier = Modifier,
     shuttleType: ShuttleType
 ) {
+    val stations = when (shuttleType) {
+        ShuttleType.CAMPUS -> campusStations
+        ShuttleType.OUTSIDE -> outsideStations
+        ShuttleType.MUNJI_START -> munjiStations
+        ShuttleType.COMMUTE -> {
+            val now = LocalTime.now()
+            if (now.isBefore(LocalTime.of(18, 0))) {
+                commuteStations1
+            } else {
+                commuteStations2
+            }
+        }
+    }
+
     var showSheet by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = modifier.fillMaxSize()
-    ) {
-        // 🔹 배경 이미지
+    Box(modifier = modifier.fillMaxSize()) {
+
         Image(
             painter = painterResource(id = shuttleBackgroundImage(shuttleType)),
             contentDescription = null,
-            modifier = Modifier
-                .align(Alignment.Center)
-                .fillMaxSize()
-        )
-        BusMovingLayer(stations) //버스이동 레이어!!
-
-        // 🔹 메인 콘텐츠
-        Box(
             modifier = Modifier.fillMaxSize()
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-            }
+        )
 
-            // 🔹 우측 하단 버튼
-            Button(
-                onClick = { showSheet = true },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
-                    .width(120.dp)
-            ) {
-                Text("시간표 보기")
-            }
+        // ✅ 탭마다 다른 애니메이션
+        BusMovingLayer(stations)
+
+        Button(
+            onClick = { showSheet = true },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Text("시간표 보기")
         }
     }
 
@@ -133,6 +160,7 @@ fun ShuttleTimetableScreen(
         )
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

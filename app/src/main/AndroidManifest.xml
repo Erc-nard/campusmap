@@ -15,8 +15,8 @@
         android:theme="@style/Theme.Campusmap">
 
         <meta-data
-            android:name="com.kakao.sdk.AppKey"
-            android:value="fca9ed231cef34a2a39ab6293c59720f" />
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
 
         <activity
             android:name=".MainActivity"
