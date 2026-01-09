@@ -9,13 +9,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-/**
- * 셔틀 탭 내부에서만 사용하는 화면 상태
- */
-private enum class ShuttleScreen {
-    MAIN,
-    TIMETABLE
-}
 enum class ShuttleType {
     CAMPUS,        // 교내
     OUTSIDE,       // 교외
@@ -30,7 +23,7 @@ fun ShuttleScreenRoot(
     startShuttle: ShuttleType,
     onClose: () -> Unit
 ) {
-    var currentScreen by rememberSaveable { mutableStateOf(ShuttleScreen.TIMETABLE) }
+    //var currentScreen by rememberSaveable { mutableStateOf(ShuttleScreen.TIMETABLE) }
     var selectedShuttle by rememberSaveable { mutableStateOf(startShuttle) }
 
     Scaffold(
