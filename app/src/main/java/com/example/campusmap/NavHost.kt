@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,6 +53,19 @@ interface FacilityData {
 data class FacilityCategoryRoute(val index: Int)
 @Serializable
 data class FacilityItemRoute(val categoryIndex: Int, val index: Int)
+
+@Composable
+fun DetailView(data: ItemDetail, modifier: Modifier) {
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text = data.title,
+            style = MaterialTheme.typography.titleLarge
+        )
+        data.content()
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -208,16 +223,28 @@ fun FacilitiesNavigation(padding: PaddingValues) {
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background // 시스템 배경색 적용
                     ) {
-                        Column {
-                            AsyncImage(
-                                model = itemData.imageURL,
-                                contentDescription = itemData.title,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Text(
-                                text = itemData.title,
-                                style = MaterialTheme.typography.headlineLarge
-                            )
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            item {
+                                AsyncImage(
+                                    model = itemData.imageURL,
+                                    contentDescription = itemData.title,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentScale = ContentScale.FillWidth
+                                )
+                            }
+                            item {
+                                Text(
+                                    text = itemData.title,
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    modifier = Modifier.padding(horizontal = 10.dp)
+                                )
+                            }
+                            items(items = itemData.details) { detail ->
+                                DetailView(detail, modifier = Modifier.padding(horizontal = 10.dp))
+                            }
                         }
                     }
                 }
