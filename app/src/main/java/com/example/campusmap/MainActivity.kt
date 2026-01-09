@@ -67,7 +67,7 @@ fun CampusmapApp() {
                         modifier = Modifier.padding(innerPadding)
                     )
                 AppDestinations.FACILITIES ->
-                    FacilitiesNavigation()
+                    FacilitiesNavigation(padding = innerPadding)
                 AppDestinations.SHUTTLE ->
                     Shuttle(
                         name = "Hello, world!",
