@@ -57,6 +57,8 @@ class MainActivity : ComponentActivity() {
 fun CampusmapApp() {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.MAP) }
     var showShuttleSheet by rememberSaveable { mutableStateOf(false) }
+    var showShuttleScreen by rememberSaveable { mutableStateOf(false) }
+    var selectedShuttle by rememberSaveable { mutableStateOf<ShuttleType?>(null) }
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
@@ -87,39 +89,104 @@ fun CampusmapApp() {
         }
     }
 
-    // ⭐ BottomSheet는 여기
+    //BottomSheet
     if (showShuttleSheet) {
         ModalBottomSheet(
             onDismissRequest = { showShuttleSheet = false },
             sheetState = rememberModalBottomSheetState()
         ) {
-            Column(
+            Column (
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp)
             ) {
-                Text("Choose your feeling", style = MaterialTheme.typography.titleLarge)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // 교내
+                    Button(
+                        onClick = {
+                            selectedShuttle = ShuttleType.CAMPUS
+                            showShuttleSheet = false
+                            showShuttleScreen = true
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("교내") }
 
-                Spacer(Modifier.height(16.dp))
+// 교외
+                    Button(
+                        onClick = {
+                            selectedShuttle = ShuttleType.OUTSIDE
+                            showShuttleSheet = false
+                            showShuttleScreen = true
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("교외") }
 
-                Text(
-                    "😊 happy",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { showShuttleSheet = false }
-                        .padding(12.dp)
-                )
+// 본교 출발
+                    Button(
+                        onClick = {
+                            selectedShuttle = ShuttleType.MAIN_START
+                            showShuttleSheet = false
+                            showShuttleScreen = true
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("본교 출발") }
 
-                Text(
-                    "😢 sad",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { showShuttleSheet = false }
-                        .padding(12.dp)
-                )
+
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            selectedShuttle = ShuttleType.MUNJI_START
+                            showShuttleSheet = false
+                            showShuttleScreen = true
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("문지 출발") }
+
+                    Button(
+                        onClick = {
+                            selectedShuttle = ShuttleType.HWAAM_START
+                            showShuttleSheet = false
+                            showShuttleScreen = true
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("화암 출발") }
+
+                    Button(
+                        onClick = {
+                            selectedShuttle = ShuttleType.COMMUTE
+                            showShuttleSheet = false
+                            showShuttleScreen = true
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("통근") }
+
+
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+
             }
+
         }
     }
+
+    if (showShuttleScreen && selectedShuttle != null) {
+        ShuttleScreenRoot(
+            startShuttle = selectedShuttle!!,
+            onClose = { showShuttleScreen = false }
+        )
+    }
+
+
 }
 
 
