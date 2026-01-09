@@ -3,9 +3,12 @@ package com.example.campusmap
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -79,13 +82,17 @@ fun Carousel(contents: List<@Composable () -> Unit>) {
     Column() {
         HorizontalPager(
             state = pagerState,
-//            contentPadding = PaddingValues(horizontal = 32.dp),
-//            pageSpacing = 16.dp
+            contentPadding = PaddingValues(horizontal = 30.dp),
+            pageSpacing = 10.dp
         ) { page ->
             val content = contents[page]
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(200.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
             ) {
                 content()
             }
