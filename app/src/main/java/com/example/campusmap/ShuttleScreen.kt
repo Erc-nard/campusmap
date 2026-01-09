@@ -14,18 +14,35 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.util.lerp
+import kotlinx.coroutines.delay
+import java.time.LocalTime
 
 
 enum class ShuttleType {
     CAMPUS,        // 교내
     OUTSIDE,       // 교외
-    MAIN_START,    // 본교 출발
     MUNJI_START,   // 문지 출발
-    HWAAM_START,   // 화암 출발
     COMMUTE        // 통근
 }
+
+data class Station(
+    val name: String,
+    val x: Dp,
+    val y: Dp,
+    val arrivalTime: LocalTime
+)
+
+val stations = listOf(
+    Station("A역", 60.dp, 400.dp, LocalTime.of(16, 47)),
+    Station("B역", 160.dp, 300.dp, LocalTime.of(16, 48)),
+    Station("C역", 260.dp, 200.dp, LocalTime.of(18, 0))
+) //예시 노선
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShuttleScreenRoot(
@@ -38,8 +55,18 @@ fun ShuttleScreenRoot(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("셔틀 시간표") },
-                navigationIcon = {
+                title = {
+                    Text(
+                        text = when (startShuttle) {
+                            ShuttleType.CAMPUS -> "교내 셔틀"
+                            ShuttleType.OUTSIDE -> "교외 셔틀"
+                            ShuttleType.MUNJI_START -> "캠퍼스 왕복"
+                            ShuttleType.COMMUTE -> "통근 셔틀"
+                        },
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    },
+                    navigationIcon = {
                     IconButton(onClick = onClose) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "뒤로가기")
                     }
@@ -71,8 +98,7 @@ fun ShuttleTimetableScreen(
             contentDescription = null,
             modifier = Modifier
                 .align(Alignment.Center)
-                .size(260.dp),
-            alpha = 0.15f
+                .fillMaxSize()
         )
 
 
@@ -85,17 +111,6 @@ fun ShuttleTimetableScreen(
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                Text(
-                    text = when (shuttleType) {
-                        ShuttleType.CAMPUS -> "교내 셔틀"
-                        ShuttleType.OUTSIDE -> "교외 셔틀"
-                        ShuttleType.MAIN_START -> "본교 출발"
-                        ShuttleType.MUNJI_START -> "문지 출발"
-                        ShuttleType.HWAAM_START -> "화암 출발"
-                        ShuttleType.COMMUTE -> "통근 셔틀"
-                    },
-                    style = MaterialTheme.typography.titleLarge
-                )
             }
 
             // 🔹 우측 하단 버튼
@@ -145,7 +160,7 @@ fun ShuttleTimetableBottomSheet(
                     .size(width = 40.dp, height = 4.dp)
                     .align(Alignment.CenterHorizontally)
                     .background(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                        color = MaterialTheme.colorScheme.background,
                         shape = RoundedCornerShape(2.dp)
                     )
             )
@@ -163,13 +178,80 @@ fun ShuttleTimetableBottomSheet(
 }
 
 @Composable
+fun rememberBusState(stations: List<Station>): Pair<Offset?, Boolean> {
+    val now by produceState(initialValue = LocalTime.now()) {
+        while (true) {
+            value = LocalTime.now()
+            delay(1000)
+        }
+    }
+
+    // 운행 종료
+    if (now.isAfter(stations.last().arrivalTime)) {
+        return null to true
+    }
+
+    // 이동 중
+    for (i in 0 until stations.size - 1) {
+        val start = stations[i]
+        val end = stations[i + 1]
+
+        if (now.isAfter(start.arrivalTime) && now.isBefore(end.arrivalTime)) {
+            val total =
+                java.time.Duration.between(start.arrivalTime, end.arrivalTime).toMillis()
+            val passed =
+                java.time.Duration.between(start.arrivalTime, now).toMillis()
+
+            val progress = passed.toFloat() / total
+
+            val x = lerp(start.x.value, end.x.value, progress)
+            val y = lerp(start.y.value, end.y.value, progress)
+
+            return Offset(x, y) to false
+        }
+    }
+
+    // 아직 출발 전
+    val first = stations.first()
+    return Offset(first.x.value, first.y.value) to false
+}
+
+@Composable
+fun BusMovingLayer(
+    stations: List<Station>
+) {
+    val (busOffset, finished) = rememberBusState(stations)
+
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        // 🚍 버스
+        if (busOffset != null) {
+            Image(
+                painter = painterResource(R.drawable.bus),
+                contentDescription = "버스",
+                modifier = Modifier
+                    .offset(busOffset.x.dp, busOffset.y.dp)
+                    .size(40.dp)
+            )
+        }
+
+        // ⛔ 운행 종료
+        if (finished) {
+            Text(
+                "버스 운영 종료",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+    }
+}
+
+@Composable
 fun TimetableImage(shuttleType: ShuttleType) {
     val imageRes = when (shuttleType) {
         ShuttleType.CAMPUS -> R.drawable.timetable_campus
         ShuttleType.OUTSIDE -> R.drawable.timetable_outside
-        ShuttleType.MAIN_START -> R.drawable.timetable_main
         ShuttleType.MUNJI_START -> R.drawable.timetable_munji
-        ShuttleType.HWAAM_START -> R.drawable.timetable_hwaam
         ShuttleType.COMMUTE -> R.drawable.timetable_commute
     }
 
@@ -193,11 +275,10 @@ fun shuttleBackgroundImage(shuttleType: ShuttleType): Int {
     return when (shuttleType) {
         ShuttleType.CAMPUS -> R.drawable.bg_campus_circle
         ShuttleType.OUTSIDE -> R.drawable.bg_outside_circle
-        ShuttleType.MAIN_START -> R.drawable.bg_main_circle
         ShuttleType.MUNJI_START -> R.drawable.bg_munji_circle
-        ShuttleType.HWAAM_START -> R.drawable.bg_hwaam_circle
         ShuttleType.COMMUTE -> R.drawable.bg_commute_circle
     }
 }
+
 
 
