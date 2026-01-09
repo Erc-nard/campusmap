@@ -13,6 +13,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Campusmap">
+
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="fca9ed231cef34a2a39ab6293c59720f" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
