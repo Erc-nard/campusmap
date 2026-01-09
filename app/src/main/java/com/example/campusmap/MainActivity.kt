@@ -35,6 +35,9 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.campusmap.ui.theme.CampusmapTheme
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.foundation.clickable
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,24 +51,27 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @PreviewScreenSizes
 @Composable
 fun CampusmapApp() {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.MAP) }
+    var showShuttleSheet by rememberSaveable { mutableStateOf(false) }
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
             AppDestinations.entries.forEach {
                 item(
-                    icon = {
-                        Icon(
-                            it.icon,
-                            contentDescription = it.label
-                        )
-                    },
+                    icon = { Icon(it.icon, contentDescription = it.label) },
                     label = { Text(it.label) },
                     selected = it == currentDestination,
-                    onClick = { currentDestination = it }
+                    onClick = {
+                        if (it == AppDestinations.SHUTTLE) {
+                            showShuttleSheet = true
+                        } else {
+                            currentDestination = it
+                        }
+                    }
                 )
             }
         }
@@ -73,21 +79,49 @@ fun CampusmapApp() {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             when (currentDestination) {
                 AppDestinations.MAP ->
-                    Map(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    Map("Android", Modifier.padding(innerPadding))
                 AppDestinations.FACILITIES ->
-                    Facilities(paddingValues = innerPadding)
-                AppDestinations.SHUTTLE ->
-                    Shuttle(
-                        name = "Hello, world!",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    Facilities(innerPadding)
+                AppDestinations.SHUTTLE -> {}
+            }
+        }
+    }
+
+    // ⭐ BottomSheet는 여기
+    if (showShuttleSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showShuttleSheet = false },
+            sheetState = rememberModalBottomSheetState()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text("Choose your feeling", style = MaterialTheme.typography.titleLarge)
+
+                Spacer(Modifier.height(16.dp))
+
+                Text(
+                    "😊 happy",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showShuttleSheet = false }
+                        .padding(12.dp)
+                )
+
+                Text(
+                    "😢 sad",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showShuttleSheet = false }
+                        .padding(12.dp)
+                )
             }
         }
     }
 }
+
 
 enum class AppDestinations(
     val label: String,
@@ -97,6 +131,7 @@ enum class AppDestinations(
     FACILITIES("시설", Icons.Default.Place),
     SHUTTLE("셔틀", Icons.Default.ShoppingCart),
 }
+
 
 @Composable
 fun Map(name: String, modifier: Modifier = Modifier) {

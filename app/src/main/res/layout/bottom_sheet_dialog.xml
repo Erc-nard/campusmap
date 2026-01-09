@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardElevation="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!--image view for displaying course image-->
+        <ImageView
+            android:id="@+id/courseImageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!--text view for displaying course name-->
+        <TextView
+            android:id="@+id/courseNameTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="DSA Self Paced Course"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/courseImageView"
+            app:layout_constraintTop_toTopOf="@+id/courseImageView" />
+
+        <!--text view for displaying course tracks-->
+        <TextView
+            android:id="@+id/courseTracksTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Course Tracks : 30"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="@+id/courseDurationTextView"
+            app:layout_constraintStart_toStartOf="@+id/courseNameTextView"
+            app:layout_constraintTop_toBottomOf="@+id/courseDurationTextView" />
+
+        <!--text view for displaying course duration-->
+        <TextView
+            android:id="@+id/courseDurationTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Course Duration : 4 Months"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="@+id/courseNameTextView"
+            app:layout_constraintStart_toStartOf="@+id/courseNameTextView"
+            app:layout_constraintTop_toBottomOf="@+id/courseNameTextView" />
+
+        <!--button for dismissing our dialog-->
+        <Button
+            android:id="@+id/dismissButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/courseImageView"
+            android:layout_margin="10dp"
+            android:text="Dismiss dialog"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/courseImageView"
+            tools:ignore="MissingClass" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
