@@ -1,6 +1,5 @@
 package com.example.campusmap
 
-import androidx.compose.ui.platform.LocalView
 import java.time.LocalDate
 import java.time.LocalTime
 
