@@ -186,7 +186,11 @@ fun FacilitiesNavigation(padding: PaddingValues, onMoveToMap: (LatLng) -> Unit) 
     fun <ItemType : FacilityData> ColumnView(data: List<ItemType>, onItemClick: (Int) -> Unit) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 160.dp),
-            modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+            modifier = if (extendToTopBarArea) {
+                Modifier.padding(start = 10.dp, end = 10.dp).padding(top = 88.dp)
+            } else {
+                Modifier.padding(start = 10.dp, end = 10.dp)
+            }
         ) {
             items(data) { item ->
                 ImageTextView(
@@ -312,13 +316,21 @@ fun FacilitiesNavigation(padding: PaddingValues, onMoveToMap: (LatLng) -> Unit) 
                                                 contentScale = ContentScale.Crop
                                             )
                                         }
-                                    }
-                                    item {
-                                        Text(
-                                            text = itemData.title,
-                                            style = MaterialTheme.typography.headlineLarge,
-                                            modifier = Modifier.padding(horizontal = 16.dp)
-                                        )
+                                        item {
+                                            Text(
+                                                text = itemData.title,
+                                                style = MaterialTheme.typography.headlineLarge,
+                                                modifier = Modifier.padding(horizontal = 16.dp)
+                                            )
+                                        }
+                                    } else {
+                                        item {
+                                            Text(
+                                                text = itemData.title,
+                                                style = MaterialTheme.typography.headlineLarge,
+                                                modifier = Modifier.padding(horizontal = 16.dp).padding(top = 32.dp)
+                                            )
+                                        }
                                     }
                                     item {
                                         DetailView("위치") {
@@ -335,11 +347,7 @@ fun FacilitiesNavigation(padding: PaddingValues, onMoveToMap: (LatLng) -> Unit) 
                                                         )
                                                     }
                                                 }
-                                                if (itemData.details.coordinate != LatLng(
-                                                        0.0,
-                                                        0.0
-                                                    )
-                                                ) {
+                                                if (itemData.details.coordinate != LatLng(0.0, 0.0)) {
                                                     Spacer(modifier = Modifier.weight(1f))
                                                     FilledIconButton(onClick = {
                                                         onMoveToMap(itemData.details.coordinate)
