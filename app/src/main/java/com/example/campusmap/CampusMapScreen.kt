@@ -7,21 +7,17 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 
 @Composable
-fun CampusMapScreen(modifier: Modifier = Modifier) {
-
-    val seoul = LatLng(36.368038, 127.365761)
-
-
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(seoul, 15f)
-    }
-
+fun CampusMapScreen(
+    modifier: Modifier = Modifier,
+    cameraPositionState: CameraPositionState,
+    markerPosition: LatLng
+) {
     GoogleMap(
         modifier = modifier,
         cameraPositionState = cameraPositionState
     ) {
         Marker(
-            state = MarkerState(position = seoul),
+            state = MarkerState(position = markerPosition),
             title = "Marker"
         )
     }

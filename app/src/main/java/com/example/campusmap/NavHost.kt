@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -48,6 +49,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import coil3.compose.AsyncImage
+import com.google.android.gms.maps.model.LatLng
 import java.text.DecimalFormat
 
 interface FacilityData {
@@ -115,7 +117,7 @@ fun Carousel(contents: List<TitledText>) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacilitiesNavigation(padding: PaddingValues) {
+fun FacilitiesNavigation(padding: PaddingValues, onMoveToMap: (LatLng) -> Unit) {
     val navController = rememberNavController()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -287,12 +289,16 @@ fun FacilitiesNavigation(padding: PaddingValues) {
                                                 )
                                             }
                                         }
-                                        Spacer(modifier = Modifier.weight(1f))
-                                        FilledIconButton(onClick = {}) {
-                                            Icon(
-                                                imageVector = Icons.Default.Map,
-                                                contentDescription = "지도에서 보기"
-                                            )
+                                        if (itemData.details.coordinate != LatLng(0.0, 0.0)) {
+                                            Spacer(modifier = Modifier.weight(1f))
+                                            FilledIconButton(onClick = {
+                                                onMoveToMap(itemData.details.coordinate)
+                                            }) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Map,
+                                                    contentDescription = "지도에서 보기"
+                                                )
+                                            }
                                         }
                                     }
                                 }
