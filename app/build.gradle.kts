@@ -63,6 +63,7 @@ dependencies {
     implementation("io.coil-kt.coil3:coil-compose:3.0.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0")
     implementation("androidx.cardview:cardview:1.0.0")
+    implementation("androidx.compose.material:material-icons-extended:1.7.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.maps.android:maps-compose:4.3.3")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
