@@ -141,12 +141,15 @@ fun CampusmapApp() {
         }
     }
 
-    if (showShuttleScreen && selectedShuttle != null) {
-        ShuttleScreenRoot(
-            startShuttle = selectedShuttle!!,
-            onClose = { showShuttleScreen = false }
-        )
+    if (showShuttleScreen) {
+        selectedShuttle?.let { shuttle ->
+            ShuttleScreenFixed(
+                startShuttle = shuttle,
+                onClose = { showShuttleScreen = false }
+            )
+        }
     }
+
 
 
 }
