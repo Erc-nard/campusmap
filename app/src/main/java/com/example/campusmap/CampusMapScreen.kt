@@ -11,11 +11,13 @@ import com.google.maps.android.compose.*
 fun CampusMapScreen(
     modifier: Modifier = Modifier,
     cameraPositionState: CameraPositionState,
+    mapProperties: MapProperties,
     markerPosition: LatLng
 ) {
     GoogleMap(
         modifier = modifier,
-        cameraPositionState = cameraPositionState
+        cameraPositionState = cameraPositionState,
+        properties = mapProperties
     ) {
         Marker(
             state = MarkerState(position = markerPosition),

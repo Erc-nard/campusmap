@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
@@ -43,7 +44,9 @@ import com.example.campusmap.ui.map.CampusMapScreen
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 
@@ -186,7 +189,17 @@ enum class AppDestinations(
 
 @Composable
 fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState, markerPosition: LatLng) {
-    CampusMapScreen(modifier = modifier.fillMaxSize(), cameraPositionState = cameraPositionState, markerPosition = markerPosition)
+    val mapProperties = remember {
+        MapProperties(
+            latLngBoundsForCameraTarget = LatLngBounds(
+                LatLng(36.36244323875914, 127.35429730754099),
+                LatLng(36.37798415287542, 127.3705715881045)
+            ),
+            minZoomPreference = 15f,
+            maxZoomPreference = 18f
+        )
+    }
+    CampusMapScreen(modifier = modifier.fillMaxSize(), cameraPositionState = cameraPositionState, mapProperties = mapProperties, markerPosition = markerPosition)
 }
 
 @Composable
