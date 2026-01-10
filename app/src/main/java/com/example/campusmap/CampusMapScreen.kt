@@ -3,6 +3,7 @@ package com.example.campusmap.ui.map
 import com.google.android.gms.maps.model.CameraPosition
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 
