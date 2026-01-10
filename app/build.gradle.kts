@@ -55,6 +55,7 @@ dependencies {
     implementation("io.coil-kt.coil3:coil-compose:3.0.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.0")
     implementation("androidx.cardview:cardview:1.0.0")
+    implementation("androidx.compose.material:material-icons-extended:1.7.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
