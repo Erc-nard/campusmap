@@ -196,7 +196,7 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                 LatLng(36.37798415287542, 127.3705715881045)
             ),
             minZoomPreference = 15f,
-            maxZoomPreference = 18f
+            maxZoomPreference = 20f
         )
     }
     CampusMapScreen(modifier = modifier.fillMaxSize(), cameraPositionState = cameraPositionState, mapProperties = mapProperties, markerPosition = markerPosition)
