@@ -1,5 +1,6 @@
 package com.example.campusmap
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -72,14 +73,33 @@ val kaiMaruTimes = listOf( //카이마루에서부터~
 )
 
 
-val campusStations = kaiMaruTimes.map { time ->
+val campusStationPositions = listOf(
+    "카이마루", "스컴", "창의관", "의과학센터", "파팔라도",
+    "나노종합", "정문", "신소재공학동", "희망/다솜관", "나눔관", "카이마루"
+)
+val now = LocalTime.now()
+
+
+val campusStations = campusStationPositions.mapIndexed { index, name ->
     Station(
-        name = "카이마루",
-        xRatio = 120f / 360f,
-        yRatio = 30f / 480f,
-        time = time
+        name = name,
+        xRatio = 153f/360f,
+        yRatio = when(index) { //50간격
+            0 -> 0f / 480f
+            1 -> 110f / 480f
+            2 -> 200f / 480f
+            3 -> 290f / 480f
+            4 -> 380f / 480f
+            5 -> 470f / 480f
+            6 -> 560f / 480f
+            7 -> 650f / 480f
+            8 -> 740f / 480f
+            else -> 830f / 480f
+        },
+    time = kaiMaruTimes.getOrElse(index) { LocalTime.of(8,40) } // 대충 첫 번째 시간으로 초기화
     )
 }
+
 
 val kaiMaruWeekdayTimes = listOf(
     "08:40", "08:55", "09:15", "09:35", "09:55",
@@ -125,6 +145,7 @@ val commuterBus2Stations = listOf(
 
 
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShuttleScreenFixed(
@@ -272,14 +293,12 @@ fun rememberBusState(
         }
     }
 
-    if (now.isAfter(stations.last().time)) {
-        return null to true
-    }
+    // ✅ 현재 시간이 포함된 운행 구간이 있는지 검사
     for (i in 0 until stations.size - 1) {
         val start = stations[i]
         val end = stations[i + 1]
 
-        if (now in start.time..end.time) {
+        if (!now.isBefore(start.time) && now.isBefore(end.time)) {
             val total =
                 java.time.Duration.between(start.time, end.time).toMillis()
             val passed =
@@ -290,12 +309,14 @@ fun rememberBusState(
             val xRatio = lerp(start.xRatio, end.xRatio, progress)
             val yRatio = lerp(start.yRatio, end.yRatio, progress)
 
-            return (xRatio to yRatio) to false
+            return (xRatio to yRatio) to false // 운행 중
         }
     }
 
-    return (stations.first().xRatio to stations.first().yRatio) to false
+    // ✅ 어떤 구간에도 속하지 않으면 운행 종료
+    return null to true
 }
+
 
 @Composable
 fun BusMovingLayer(
