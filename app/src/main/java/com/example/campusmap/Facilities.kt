@@ -1,19 +1,5 @@
 package com.example.campusmap
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -79,7 +65,7 @@ data class MealHours(val name: String, val begin: LocalTime, val end: LocalTime)
 }
 data class MealMenu(val date: LocalDate, val mealType: MealType, val price: Int = 0, val menu: List<String>) {
     val title: String
-        get() = date.toString() + " " + mealType.description
+        get() = date.toString() + " · " + mealType.description
 }
 enum class DayClass {
     WEEKDAYS,
@@ -93,7 +79,6 @@ enum class MealType(val description: String) {
     DINNER("석식"),
     DINNERONEDISH("석식 (일품)")
 }
-data class ItemDetailView(val title: String, val content: @Composable () -> Unit)
 data class TitledText(val title: String, val body: String)
 
 val sampleCafeteriaMenuData = listOf(
