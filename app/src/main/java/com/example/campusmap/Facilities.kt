@@ -49,7 +49,7 @@ data class BusinessHours(val days: Set<DayClass>, val includeHolidays: Boolean? 
     val timeDuration: String
         get() = "${this.begin}~${this.end}"
 }
-data class Location(val buildingCode: String = "", val buildingName: String = "", val floor: Int = 1) {
+data class Location(val buildingCode: String = "", val buildingName: String = "", val floor: Int = 1, val annotation: String? = null) {
     val buildingCodeString: String
         get() = if (!this.buildingCode.isEmpty()) {
             "(${this.buildingCode}) "
@@ -141,7 +141,7 @@ val kaimaru = listOf(
             BusinessHours(setOf(DayClass.SATURDAY), false, LocalTime.of(10, 30), LocalTime.of(14, 30))
         ),
         contact = "042-350-0891",
-        location = Location("N11", "카이마루")
+        location = Location("N11", "카이마루", annotation = "정문으로 들어가서 좌측에 있습니다.")
     )),
     FacilityItem(id = 1, title = "더큰식탁", imageURL = "", details = ItemDetail(
         businessHours = listOf(
@@ -149,13 +149,13 @@ val kaimaru = listOf(
             BusinessHours(setOf(DayClass.SATURDAY), false, LocalTime.of(11, 0), LocalTime.of(14, 0))
         ),
         contact = "042-350-0892",
-        location = Location("N11", "카이마루")
+        location = Location("N11", "카이마루", annotation = "정문으로 들어가서 좌측에 있습니다.")
     )),
     FacilityItem(id = 2, title = "리틀하노이", imageURL = "https://postfiles.pstatic.net/MjAyNTAzMjRfMTAz/MDAxNzQyNzk0ODc2NDg5.w1BK0qDz0x9me92XSq7IQprInl9lllUtzmBbOVHkCV0g.T2Svhr5rJzi5K-atLOChmm6TYb_-GOps2sC7VCeVvQkg.JPEG/SE-0D7EDD50-FB6C-4730-8A27-1FB3CBA8D2AE.jpg?type=w773", details = ItemDetail(
         businessHours = listOf(
             BusinessHours(setOf(DayClass.WEEKDAYS), false, LocalTime.of(10, 30), LocalTime.of(19, 30), orderEnd = LocalTime.of(19, 20))
         ),
-        location = Location("N11", "카이마루")
+        location = Location("N11", "카이마루", annotation = "정문으로 들어가서 좌측에 있습니다.")
     )),
     FacilityItem(id = 3, title = "캠토", imageURL = "https://mblogthumb-phinf.pstatic.net/MjAxODA5MDZfMjM5/MDAxNTM2MjM3MTc1MTQ4.7TIGmOGm2RMlwvwSxq3RPXrq6-MV6-cvbpOgSi8Rja4g.tHRPYsMwnENZe9Pq7id-BGxcRlp1oeInvz-YuskM10wg.JPEG.lpon1393/output_1420680672.jpg?type=w800", details = ItemDetail(
         businessHours = listOf(
@@ -163,7 +163,7 @@ val kaimaru = listOf(
             BusinessHours(setOf(DayClass.SATURDAY), false, LocalTime.of(9, 0), LocalTime.of(14, 30))
         ),
         contact = "042-350-0872",
-        location = Location("N11", "카이마루")
+        location = Location("N11", "카이마루", annotation = "정문으로 들어가서 우측에 있습니다.")
     )),
     FacilityItem(id = 4, title = "웰차이", imageURL = "https://postfiles.pstatic.net/MjAyNDEyMjNfMTM4/MDAxNzM0OTUxMDM4MDI5.pElZ0HZbMa62sLOFIkWlTUG4Z7JDwdxqwoBHmCqxRPIg.AKBS0tNb5fSxMGN8C7QRXLPdtl5VV6m0MhbJhK--KOog.JPEG/SE-3EFF47A9-8732-462B-A930-505DCF5549A3.jpg?type=w3840", details = ItemDetail(
         businessHours = listOf(
@@ -171,7 +171,7 @@ val kaimaru = listOf(
             BusinessHours(setOf(DayClass.SATURDAY), false, LocalTime.of(11, 0), LocalTime.of(14, 30))
         ),
         contact = "042-350-0867",
-        location = Location("N11", "카이마루")
+        location = Location("N11", "카이마루", annotation = "정문으로 들어가서 우측에 있습니다.")
     )),
     FacilityItem(id = 5, title = "오니기리와 이규동", imageURL = "https://mblogthumb-phinf.pstatic.net/MjAxOTA3MjdfNzYg/MDAxNTY0MjM0OTUwODQw.Nue2--qxzbswQ51iQZfE5pKV8_6mn8hg7Kq5jnyuumkg.2jHRJYk2a6LsnlOzE9PFVzm5TKCjBK-9ywpSTG1zjRwg.JPEG.ahnsophia/SAM_2134.jpg?type=w800", details = ItemDetail(
         businessHours = listOf(
@@ -179,7 +179,7 @@ val kaimaru = listOf(
             BusinessHours(setOf(DayClass.SATURDAY), false, LocalTime.of(8, 0), LocalTime.of(17, 30))
         ),
         contact = "042-350-0874",
-        location = Location("N11", "카이마루")
+        location = Location("N11", "카이마루", annotation = "정문으로 들어가서 좌측에 있습니다.")
     )),
     FacilityItem(id = 6, title = "롤링파스타", imageURL = "", details = ItemDetail(
         businessHours = listOf(
@@ -221,6 +221,46 @@ val taeulgwan = listOf(
         location = Location("N13", "태울관", 2)
     ))
 )
+val franchise = listOf(
+    FacilityItem(id = 0, title = "써브웨이", imageURL = "https://kaist.ac.kr/kr/img/content/sub05/sub0508_img05.jpg", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS, DayClass.SATURDAY, DayClass.SUNDAY), begin = LocalTime.of(8, 0), end = LocalTime.of(23, 0))
+        ),
+        contact = "042-863-7001",
+        location = Location("E16-1", "정문술빌딩"),
+    )),
+    FacilityItem(id = 1, title = "오샐러드", imageURL = "https://kaist.ac.kr/kr/img/campus/00hou.jpg", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS), begin = LocalTime.of(9, 0), end = LocalTime.of(20, 0), orderEnd = LocalTime.of(19, 30)),
+            BusinessHours(setOf(DayClass.SATURDAY, DayClass.SUNDAY), begin = LocalTime.of(10, 0), end = LocalTime.of(19, 0))
+        ),
+        contact = "0507-1336-3599",
+        location = Location("N7-1", "원자력 및 양자공학과"),
+    )),
+    FacilityItem(id = 2, title = "캘리포니아 베이커리 & 카페", imageURL = "https://kaist.ac.kr/kr/img/campus/00zmp.jpg", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS), begin = LocalTime.of(8, 0), end = LocalTime.of(21, 0)),
+            BusinessHours(setOf(DayClass.SATURDAY, DayClass.SUNDAY), begin = LocalTime.of(8, 0), end = LocalTime.of(20, 0))
+        ),
+        contact = "042-350-0899",
+        location = Location("E16", "자연과학동", annotation = "본 건물과 출입구가 분리되어 있습니다."),
+    )),
+    FacilityItem(id = 3, title = "퀴즈노스", imageURL = "https://kaist.ac.kr/kr/img/campus/00nfy.jpg", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS, DayClass.SATURDAY, DayClass.SUNDAY), begin = LocalTime.of(8, 0), end = LocalTime.of(22, 0))
+        ),
+        contact = "042-861-9987",
+        location = Location("N13-1", "장영신학생회관", 2, annotation = "2층 출입구 우측에 있습니다."),
+    )),
+    FacilityItem(id = 4, title = "던킨도너츠", imageURL = "https://kaist.ac.kr/kr/img/campus/00ofn.png", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS), begin = LocalTime.of(7, 0), end = LocalTime.of(21, 0)),
+            BusinessHours(setOf(DayClass.SATURDAY, DayClass.SUNDAY), begin = LocalTime.of(8, 0), end = LocalTime.of(20, 0))
+        ),
+        contact = "042-350-0866",
+        location = Location("W1", "응용공학동"),
+    )),
+)
 val cafe = listOf(
     FacilityItem(id = 0, title = "그라찌에", imageURL = "https://kaist.ac.kr/kr/img/content/sub05/sub0507_img01.jpg", details = ItemDetail(
         businessHours = listOf(
@@ -251,7 +291,7 @@ val cafe = listOf(
             BusinessHours(setOf(DayClass.SATURDAY, DayClass.SUNDAY), includeHolidays = true, begin = LocalTime.of(11, 30), end = LocalTime.of(18, 30))
         ),
         contact = "042-350-0863",
-        location = Location("E9", "학술문화관", 2)
+        location = Location("E9", "학술문화관", 2, annotation = "문화관 쪽에 있습니다.")
     )),
     FacilityItem(id = 4, title = "카페드림", imageURL = "https://kaist.ac.kr/kr/img/content/sub05/sub0507_img08.jpg", details = ItemDetail(
         businessHours = listOf(
@@ -266,7 +306,7 @@ val cafe = listOf(
             BusinessHours(setOf(DayClass.WEEKDAYS), includeHolidays = false, begin = LocalTime.of(9, 30), end = LocalTime.of(20, 0))
         ),
         contact = "042-350-0855",
-        location = Location("N11", "카이마루")
+        location = Location("N11", "카이마루", annotation = "정문으로 들어가서 좌측에 있습니다.")
     )),
     FacilityItem(id = 6, title = "파스쿠찌", imageURL = "https://kaist.ac.kr/kr/img/content/sub05/sub0507_img10.jpg", details = ItemDetail(
         businessHours = listOf(
@@ -282,7 +322,7 @@ val cafe = listOf(
             BusinessHours(setOf(), includeHolidays = true, begin = LocalTime.of(10, 0), end = LocalTime.of(17, 0))
         ),
         contact = "042-350-0871",
-        location = Location("N1", "김병호IT융합빌딩", 2)
+        location = Location("N1", "김병호IT융합빌딩", 2, annotation = "건물 외부와 연결되어 있습니다.")
     )),
     FacilityItem(id = 8, title = "북카페 앤젤리너스", imageURL = "https://kaist.ac.kr/site/kr/img/campus/00z7p.jpg", details = ItemDetail(
         businessHours = listOf(
@@ -307,7 +347,7 @@ val topLevelFacilitiesList = listOf(
     FacilityCategory(id = 0, title = "학식", items = cafeteria),
     FacilityCategory(id = 1, title = "카이마루 푸드코트", items = kaimaru),
     FacilityCategory(id = 2, title = "태울관 푸드코트", items = taeulgwan),
-    FacilityCategory(id = 3, title = "프렌차이즈", items = cafeteria),
+    FacilityCategory(id = 3, title = "프랜차이즈", items = franchise),
     FacilityCategory(id = 4, title = "카페", items = cafe),
 //    FacilityCategory(id = 5, title = "매점", items = kiosk)
 )
