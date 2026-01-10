@@ -29,6 +29,7 @@ import com.example.campusmap.ui.theme.CampusmapTheme
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -97,7 +98,7 @@ fun CampusmapApp() {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             when (currentDestination) {
                 AppDestinations.MAP ->
-                    Map(Modifier.padding(innerPadding), cameraPositionState, markerPosition)
+                    Map(Modifier.fillMaxHeight(), cameraPositionState, markerPosition)
                 AppDestinations.FACILITIES ->
                     FacilitiesNavigation(padding = innerPadding, onMoveToMap = { coordinate ->
                         currentDestination = AppDestinations.MAP
