@@ -15,11 +15,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.delay
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 
 
 
@@ -156,6 +159,7 @@ fun ShuttleScreenFixed(
     var showTimetable by remember { mutableStateOf(false) }
 
     Scaffold(
+        // 1. 뒤로가기 버튼이 있는 상단 바 (이 부분이 살아있어야 합니다)
         topBar = {
             TopAppBar(
                 title = {
@@ -175,62 +179,68 @@ fun ShuttleScreenFixed(
             )
         }
     ) { innerPadding ->
-
-        BoxWithConstraints(
+        // 전체 화면 컨테이너
+        Box(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize(),
-            contentAlignment = Alignment.TopStart
+                .fillMaxSize()
         ) {
+            // 2. 노선도 이미지 컨테이너 (중앙 정렬)
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                // 이미지의 실제 렌더링 영역 정보를 저장할 변수
+                var imageBounds by remember { mutableStateOf(androidx.compose.ui.geometry.Rect.Zero) }
 
-            val mapWidth = maxWidth
-            val mapHeight = mapWidth * (480f / 360f) // 배경 이미지 비율 유지
-
-            // 1️⃣ 배경 이미지
-            Image(
-                painter = painterResource(id = shuttleBackgroundImage(selectedShuttle)),
-                contentDescription = null,
-                modifier = Modifier
-                    .width(mapWidth)
-                    .height(mapHeight),
-                contentScale = ContentScale.Fit
-            )
-
-            // 2️⃣ 버스 애니메이션 (모든 노선)
-            val stationsList = when (selectedShuttle) {
-                ShuttleType.CAMPUS -> listOf(campusStations)
-                ShuttleType.OUTSIDE -> listOf(commuterBus1Stations, commuterBus2Stations)
-            }
-            stationsList.forEach { stations ->
-                BusMovingLayer(
-                    stations = stations,
-                    mapWidth = mapWidth,
-                    mapHeight = mapHeight
+                Image(
+                    painter = painterResource(id = shuttleBackgroundImage(selectedShuttle)),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth() // 가로를 화면에 맞춤 (비율 유지됨)
+                        .onGloballyPositioned { coordinates ->
+                            // 이미지의 절대 좌표와 크기를 계산해서 저장
+                            imageBounds = coordinates.boundsInParent()
+                        },
+                    contentScale = ContentScale.FillWidth
                 )
+
+                // 3. 버스 레이어 (이미지 좌표가 계산된 후 노출)
+                if (imageBounds != androidx.compose.ui.geometry.Rect.Zero) {
+                    val stationsList = when (selectedShuttle) {
+                        ShuttleType.CAMPUS -> listOf(campusStations)
+                        ShuttleType.OUTSIDE -> listOf(commuterBus1Stations, commuterBus2Stations)
+                    }
+
+                    stationsList.forEach { stations ->
+                        BusMovingLayer(
+                            stations = stations,
+                            parentBounds = imageBounds // 이미지 좌표 전달
+                        )
+                    }
+                }
             }
 
-            // 3️⃣ 시간표 보기 버튼
+            // 4. 시간표 보기 버튼 (화면 최하단에 고정)
             Button(
                 onClick = { showTimetable = true },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(16.dp)
+                    .padding(bottom = 32.dp)
             ) {
-                Text("시간표 보기")
+                Text("시간표 보기", style = MaterialTheme.typography.labelLarge)
             }
+        }
 
-            // 4️⃣ BottomSheet: 시간표
-            if (showTimetable) {
-                ShuttleTimetableBottomSheet(
-                    shuttleType = selectedShuttle,
-                    onDismiss = { showTimetable = false }
-                )
-            }
+        // 5. 바텀 시트
+        if (showTimetable) {
+            ShuttleTimetableBottomSheet(
+                shuttleType = selectedShuttle,
+                onDismiss = { showTimetable = false }
+            )
         }
     }
 }
-
-
 
 
 
@@ -321,41 +331,59 @@ fun rememberBusState(
 @Composable
 fun BusMovingLayer(
     stations: List<Station>,
-    mapWidth: Dp,
-    mapHeight: Dp
+    parentBounds: androidx.compose.ui.geometry.Rect // 이미지의 실제 영역 정보를 받음
 ) {
     val (busRatio, finished) = rememberBusState(stations)
+    val density = LocalDensity.current
 
     Box(
-        modifier = Modifier
-            .width(mapWidth)
-            .height(mapHeight)
+        modifier = Modifier.fillMaxSize() // 화면 전체를 쓰되 내부에서 offset으로 조절
     ) {
-        busRatio?.let { (xRatio, yRatio) ->
+        if (!finished && busRatio != null) {
+            val (xRatio, yRatio) = busRatio
+
+            // 이미지 영역 안에서의 좌표 계산
+            val xPx = parentBounds.left + (parentBounds.width * xRatio)
+            val yPx = parentBounds.top + (parentBounds.height * yRatio)
+
             Image(
                 painter = painterResource(R.drawable.bus),
                 contentDescription = "Bus",
                 modifier = Modifier
+                    .size(30.dp)
                     .offset(
-                        x = (mapWidth.value * xRatio).dp,
-                        y = (mapHeight.value * yRatio).dp
+                        x = with(density) { xPx.toDp() } - 15.dp,
+                        y = with(density) { yPx.toDp() } - 15.dp
                     )
-                    .size(40.dp)
             )
         }
 
+        // 3. 운영 종료 문구 (이미지 중앙에 표시)
         if (finished) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+            // 텍스트를 감싸는 흰색 배경 카드
+            Surface(
+                color = androidx.compose.ui.graphics.Color.White.copy(alpha = 1f), // 약간 투명한 흰색
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp), // 둥근 모서리
+                shadowElevation = 10.dp, // 살짝 떠 있는 효과
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = with(density) { parentBounds.height.toDp() / 2f - 20.dp }) // 중앙 위치 조정
             ) {
-                Text("버스 운영 종료", style = MaterialTheme.typography.titleMedium)
+                Row(
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp), // 내부 여백
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "🚌 현재 운행 중인 버스가 없습니다",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = androidx.compose.ui.graphics.Color.DarkGray,
+                        )
+                    )
+                }
             }
         }
     }
 }
-
-
 
 
 
