@@ -145,38 +145,13 @@ fun CampusmapApp() {
                             showShuttleScreen = true
                         },
                         modifier = Modifier.weight(1f)
-                    ) { Text("교외",style=MaterialTheme.typography.titleLarge) }
+                    ) { Text("출근",style=MaterialTheme.typography.titleLarge) }
 
 
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Button(
-                        onClick = {
-                            selectedShuttle = ShuttleType.MUNJI_START
-                            showShuttleSheet = false
-                            showShuttleScreen = true
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) { Text(text="캠퍼스 왕복",style=MaterialTheme.typography.titleLarge) }
-
-                    Button(
-                        onClick = {
-                            selectedShuttle = ShuttleType.COMMUTE
-                            showShuttleSheet = false
-                            showShuttleScreen = true
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) { Text("통근",style=MaterialTheme.typography.titleLarge) }
-
-
-                }
-                Spacer(modifier = Modifier.height(12.dp))
 
             }
 

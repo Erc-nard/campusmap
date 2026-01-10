@@ -9,7 +9,7 @@ import com.google.maps.android.compose.*
 @Composable
 fun CampusMapScreen(modifier: Modifier = Modifier) {
 
-    val seoul = LatLng(37.5665, 126.9780)
+    val seoul = LatLng(36.368038, 127.365761)
 
 
     val cameraPositionState = rememberCameraPositionState {
