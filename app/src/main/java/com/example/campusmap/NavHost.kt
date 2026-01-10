@@ -270,6 +270,11 @@ fun FacilitiesNavigation(padding: PaddingValues) {
                             }
                             if (itemData.details.businessHours.isNotEmpty()) {
                                 item {
+                                    val allDays = setOf(DayClass.WEEKDAYS, DayClass.SATURDAY, DayClass.SUNDAY)
+                                    val determinedDays = itemData.details.businessHours.map { businessHours -> businessHours.days }.flatten().toSet()
+                                    val undeterminedDays = allDays.subtract(determinedDays)
+                                    val holidays = itemData.details.businessHours.map { businessHours -> businessHours.includeHolidays }
+                                    val isHolidaysDetermined = holidays.contains(true) || holidays.contains(null)
                                     DetailView("영업 시간") {
                                         Column {
                                             itemData.details.businessHours.forEach { businessHours ->
@@ -282,6 +287,38 @@ fun FacilitiesNavigation(padding: PaddingValues) {
                                                         modifier = Modifier.width(120.dp)
                                                     )
                                                     Text(businessHours.timeDuration)
+                                                }
+                                            }
+                                            if (undeterminedDays.isNotEmpty() || !isHolidaysDetermined) {
+                                                Row {
+                                                    val breakDayDescription =
+                                                        if (isHolidaysDetermined) {
+                                                            if (undeterminedDays == setOf(DayClass.SATURDAY)) {
+                                                                "토요일"
+                                                            } else if (undeterminedDays == setOf(
+                                                                    DayClass.SUNDAY
+                                                                )
+                                                            ) {
+                                                                "일요일"
+                                                            } else {
+                                                                "주말"
+                                                            }
+                                                        } else {
+                                                            if (undeterminedDays == setOf(
+                                                                    DayClass.SATURDAY,
+                                                                    DayClass.SUNDAY
+                                                                )
+                                                            ) {
+                                                                "주말·공휴일"
+                                                            } else {
+                                                                "?공휴일"
+                                                            }
+                                                        }
+                                                    Text(
+                                                        text = breakDayDescription,
+                                                        modifier = Modifier.width(120.dp)
+                                                    )
+                                                    Text("휴무")
                                                 }
                                             }
                                         }

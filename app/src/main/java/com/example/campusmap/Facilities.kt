@@ -148,6 +148,30 @@ val cafeteria = listOf(
         )
     )),
 )
+//val kaimaru = listOf()
+val taeulgwan = listOf(
+    FacilityItem(id = 0, title = "제순식당", imageURL = "https://mblogthumb-phinf.pstatic.net/MjAyMzExMTNfMjc1/MDAxNjk5ODgxMzQxMzI5.GzIopBneMFvEeimAaYVB5ocPLCMi99NOgJac2wQCl4gg.LWwPCAl4-KIoJcYHi1ISsgAtz87FzdzU6WjxlFJFfFUg.JPEG.sooblog23/IMG_7926.jpg?type=w400", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS), false, LocalTime.of(10, 30), LocalTime.of(20, 0), LocalTime.of(19, 30))
+        ),
+        contact = "042-350-0398",
+        location = Location("N13", "태울관", 2)
+    )),
+    FacilityItem(id = 1, title = "인생설렁탕", imageURL = "https://mblogthumb-phinf.pstatic.net/MjAyMzExMTNfMTgw/MDAxNjk5ODgxMzczODMx.Rg2EYh536hW0jbKe3E8pWl7jsvfuDMSUH0xCN0bIHZMg.CZIisywUrlYyaxi9oN9crISVLDuMccpjggyt7DOMrzgg.JPEG.sooblog23/output_3722020421.jpg?type=w800", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS), false, LocalTime.of(10, 30), LocalTime.of(20, 0), LocalTime.of(19, 30))
+        ),
+        contact = "042-350-0398",
+        location = Location("N13", "태울관", 2)
+    )),
+    FacilityItem(id = 2, title = "역전우동", imageURL = "https://cdn.times.kaist.ac.kr/news/photo/202402/21566_21227_158.jpg", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS), false, LocalTime.of(10, 30), LocalTime.of(20, 0), LocalTime.of(19, 30))
+        ),
+        contact = "042-350-0398",
+        location = Location("N13", "태울관", 2)
+    ))
+)
 val cafe = listOf(
     FacilityItem(id = 0, title = "그라찌에", imageURL = "https://kaist.ac.kr/kr/img/content/sub05/sub0507_img01.jpg", details = ItemDetail(
         businessHours = listOf(
@@ -232,7 +256,9 @@ val cafe = listOf(
 //)
 val topLevelFacilitiesList = listOf(
     FacilityCategory(id = 0, title = "학식", items = cafeteria),
-    FacilityCategory(id = 1, title = "푸드코트·프렌차이즈", items = cafeteria),
-    FacilityCategory(id = 2, title = "카페", items = cafe),
-//    FacilityCategory(id = 3, title = "매점", items = kiosk)
+    FacilityCategory(id = 1, title = "카이마루 푸드코트", items = cafeteria),
+    FacilityCategory(id = 2, title = "태울관 푸드코트", items = taeulgwan),
+    FacilityCategory(id = 3, title = "프렌차이즈", items = cafeteria),
+    FacilityCategory(id = 4, title = "카페", items = cafe),
+//    FacilityCategory(id = 5, title = "매점", items = kiosk)
 )
