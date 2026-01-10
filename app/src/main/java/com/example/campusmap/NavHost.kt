@@ -1,5 +1,7 @@
 package com.example.campusmap
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -13,21 +15,30 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 import androidx.navigation.compose.composable
@@ -37,6 +48,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import coil3.compose.AsyncImage
+import java.text.DecimalFormat
 
 interface FacilityData {
     val id: Int
@@ -59,7 +71,7 @@ fun DetailView(title: String, modifier: Modifier = Modifier, content: @Composabl
         Text(
             text = title,
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier.padding(16.dp)
         )
         content()
     }
@@ -72,6 +84,7 @@ fun Carousel(contents: List<TitledText>) {
     Column() {
         HorizontalPager(
             state = pagerState,
+            verticalAlignment = Alignment.Top,
             contentPadding = PaddingValues(horizontal = 30.dp),
             pageSpacing = 10.dp
         ) { page ->
@@ -241,6 +254,7 @@ fun FacilitiesNavigation(padding: PaddingValues) {
                     ) {
                         LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(16.dp),
+                            contentPadding = PaddingValues(bottom = 16.dp),
                             modifier = Modifier.fillMaxSize()
                         ) {
                             item {
@@ -255,16 +269,25 @@ fun FacilitiesNavigation(padding: PaddingValues) {
                                 Text(
                                     text = itemData.title,
                                     style = MaterialTheme.typography.headlineLarge,
-                                    modifier = Modifier.padding(horizontal = 10.dp)
+                                    modifier = Modifier.padding(horizontal = 16.dp)
                                 )
                             }
                             item {
                                 DetailView("위치") {
-                                    Row {
-                                        Text(itemData.details.location.description)
-//                                        TextButton(onClick = {}) {
-//                                            Text("지도에서 보기 >")
-//                                        }
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.padding(horizontal = 16.dp)
+                                    ) {
+                                        Text(
+                                            text = itemData.details.location.description
+                                        )
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        FilledIconButton(onClick = {}) {
+                                            Icon(
+                                                imageVector = Icons.Default.Map,
+                                                contentDescription = "지도에서 보기"
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -276,7 +299,9 @@ fun FacilitiesNavigation(padding: PaddingValues) {
                                     val holidays = itemData.details.businessHours.map { businessHours -> businessHours.includeHolidays }
                                     val isHolidaysDetermined = holidays.contains(true) || holidays.contains(null)
                                     DetailView("영업 시간") {
-                                        Column {
+                                        Column(
+                                            modifier = Modifier.padding(horizontal = 16.dp)
+                                        ) {
                                             itemData.details.businessHours.forEach { businessHours ->
                                                 Row(
                                                     modifier = Modifier
@@ -295,23 +320,20 @@ fun FacilitiesNavigation(padding: PaddingValues) {
                                                         if (isHolidaysDetermined) {
                                                             if (undeterminedDays == setOf(DayClass.SATURDAY)) {
                                                                 "토요일"
-                                                            } else if (undeterminedDays == setOf(
-                                                                    DayClass.SUNDAY
-                                                                )
-                                                            ) {
+                                                            } else if (undeterminedDays == setOf(DayClass.SUNDAY)) {
                                                                 "일요일"
                                                             } else {
                                                                 "주말"
                                                             }
                                                         } else {
-                                                            if (undeterminedDays == setOf(
-                                                                    DayClass.SATURDAY,
-                                                                    DayClass.SUNDAY
-                                                                )
-                                                            ) {
+                                                            if (undeterminedDays == setOf(DayClass.SATURDAY, DayClass.SUNDAY)) {
                                                                 "주말·공휴일"
+                                                            } else if (undeterminedDays == setOf(DayClass.SATURDAY)) {
+                                                                "토요일·공휴일"
+                                                            } else if (undeterminedDays == setOf(DayClass.SUNDAY)) {
+                                                                "일요일·공휴일"
                                                             } else {
-                                                                "?공휴일"
+                                                                "공휴일"
                                                             }
                                                         }
                                                     Text(
@@ -327,7 +349,9 @@ fun FacilitiesNavigation(padding: PaddingValues) {
                             } else if (itemData.details.mealHours.isNotEmpty()) {
                                 item {
                                     DetailView("운영 시간") {
-                                        Column {
+                                        Column(
+                                            modifier = Modifier.padding(horizontal = 16.dp)
+                                        ) {
                                             itemData.details.mealHours.forEach { mealHours ->
                                                 Row(
                                                     modifier = Modifier
@@ -350,7 +374,7 @@ fun FacilitiesNavigation(padding: PaddingValues) {
                                         val convertedData = itemData.details.upcomingMenus.map { item ->
                                             var bodyText = item.menu.joinToString("\n")
                                             if (item.price > 0) {
-                                                val priceLine = "₩${item.price}\n"
+                                                val priceLine = "₩${DecimalFormat("#,###").format(item.price)}\n"
                                                 bodyText = priceLine + bodyText
                                             }
                                             TitledText(item.title, bodyText)
@@ -362,11 +386,39 @@ fun FacilitiesNavigation(padding: PaddingValues) {
                             if (itemData.details.contact.isNotEmpty()) {
                                 item {
                                     DetailView("연락처") {
-                                        Row {
+                                        Row(
+                                            modifier = Modifier.padding(horizontal = 16.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
                                             Text(itemData.details.contact)
-//                                            TextButton(onClick = {}) {
-//                                                Text("전화 연결 >")
-//                                            }
+                                            Spacer(modifier = Modifier.weight(1f))
+                                            val context = LocalContext.current
+                                            FilledIconButton(
+                                                onClick = {
+                                                    val intent = Intent(Intent.ACTION_DIAL).apply {
+                                                        data = Uri.parse("tel:${itemData.details.contact}")
+                                                    }
+                                                    context.startActivity(intent)
+                                                },
+//                                                modifier = Modifier.size(32.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Filled.Call,
+                                                    contentDescription = "전화 걸기"
+                                                )
+                                            }
+                                            val clipboardManager = LocalClipboardManager.current
+                                            FilledIconButton(
+                                                onClick = {
+                                                    clipboardManager.setText(AnnotatedString(itemData.details.contact))
+                                                },
+//                                                modifier = Modifier.size(32.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.ContentCopy,
+                                                    contentDescription = "복사"
+                                                )
+                                            }
                                         }
                                     }
                                 }

@@ -126,14 +126,78 @@ val cafeteria = listOf(
             MealHours("석식", LocalTime.of(17, 30), LocalTime.of(19, 0))
         ),
         upcomingMenus = listOf(
-            MealMenu(LocalDate.of(2026, 1, 12), MealType.LUNCH, 5000, listOf("밥", "국", "김치", "주찬", "부찬1", "부찬2", "부찬3")),
-            MealMenu(LocalDate.of(2026, 1, 12), MealType.DINNER, 5000, listOf("밥", "국", "김치", "주찬", "부찬1", "부찬2", "부찬3")),
-            MealMenu(LocalDate.of(2026, 1, 13), MealType.LUNCH, 5000, listOf("밥", "국", "김치", "주찬", "부찬1", "부찬2", "부찬3")),
-            MealMenu(LocalDate.of(2026, 1, 13), MealType.DINNER, 5000, listOf("밥", "국", "김치", "주찬", "부찬1", "부찬2", "부찬3"))
+            MealMenu(LocalDate.of(2026, 1, 8), MealType.LUNCH, 5000, listOf("밥", "국", "김치", "주찬", "부찬1", "부찬2", "부찬3")),
+            MealMenu(LocalDate.of(2026, 1, 8), MealType.DINNER, 5000, listOf("밥", "국", "김치", "주찬", "부찬1", "부찬2", "부찬3")),
+            MealMenu(LocalDate.of(2026, 1, 9), MealType.LUNCH, 6500, listOf("잡곡밥", "맑은순두부국", "삼치무조림", "옛날소시지전", "궁채들깨무침", "석박지", "그린샐러드", "누룽지", "자스민차")),
+            MealMenu(LocalDate.of(2026, 1, 9), MealType.LUNCHONEDISH, 7000, listOf("모듬까스(생선까스*치킨까스)&콘타르*치플레소스", "후리가케밥", "미니온모밀", "단무지유자무침", "석박지", "그린샐러드")),
+            MealMenu(LocalDate.of(2026, 1, 9), MealType.DINNER, 6500, listOf("잡곡밥", "매콤어묵국", "표고버섯불고기", "브로콜리맛살볶음", "매콤콩나물무침", "배추김치", "그린샐러드", "누룽지", "자스민차"))
         )
     )),
 )
-//val kaimaru = listOf()
+val kaimaru = listOf(
+    FacilityItem(id = 0, title = "별리달리", imageURL = "https://postfiles.pstatic.net/MjAyNDA5MjNfMjIz/MDAxNzI3MDg2Nzg2MDMx.jaVP1e5lWzFB8T2iimw7iEVnOxie13iEmXE-qabKF1Eg.-lUK1ybgxaaOLtqEMaUrAryNNDAzrzkEyY6msULTalsg.JPEG/SE-050e2149-4320-40ba-9b9c-d2e59378e737.jpg?type=w3840", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS), false, LocalTime.of(10, 30), LocalTime.of(19, 30)),
+            BusinessHours(setOf(DayClass.SATURDAY), false, LocalTime.of(10, 30), LocalTime.of(14, 30))
+        ),
+        contact = "042-350-0891",
+        location = Location("N11", "카이마루")
+    )),
+    FacilityItem(id = 1, title = "더큰식탁", imageURL = "", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS), false, LocalTime.of(10, 30), LocalTime.of(19, 0)),
+            BusinessHours(setOf(DayClass.SATURDAY), false, LocalTime.of(11, 0), LocalTime.of(14, 0))
+        ),
+        contact = "042-350-0892",
+        location = Location("N11", "카이마루")
+    )),
+    FacilityItem(id = 2, title = "리틀하노이", imageURL = "https://postfiles.pstatic.net/MjAyNTAzMjRfMTAz/MDAxNzQyNzk0ODc2NDg5.w1BK0qDz0x9me92XSq7IQprInl9lllUtzmBbOVHkCV0g.T2Svhr5rJzi5K-atLOChmm6TYb_-GOps2sC7VCeVvQkg.JPEG/SE-0D7EDD50-FB6C-4730-8A27-1FB3CBA8D2AE.jpg?type=w773", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS), false, LocalTime.of(10, 30), LocalTime.of(19, 30), orderEnd = LocalTime.of(19, 20))
+        ),
+        location = Location("N11", "카이마루")
+    )),
+    FacilityItem(id = 3, title = "캠토", imageURL = "https://mblogthumb-phinf.pstatic.net/MjAxODA5MDZfMjM5/MDAxNTM2MjM3MTc1MTQ4.7TIGmOGm2RMlwvwSxq3RPXrq6-MV6-cvbpOgSi8Rja4g.tHRPYsMwnENZe9Pq7id-BGxcRlp1oeInvz-YuskM10wg.JPEG.lpon1393/output_1420680672.jpg?type=w800", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS), false, LocalTime.of(8, 0), LocalTime.of(19, 0)),
+            BusinessHours(setOf(DayClass.SATURDAY), false, LocalTime.of(9, 0), LocalTime.of(14, 30))
+        ),
+        contact = "042-350-0872",
+        location = Location("N11", "카이마루")
+    )),
+    FacilityItem(id = 4, title = "웰차이", imageURL = "https://postfiles.pstatic.net/MjAyNDEyMjNfMTM4/MDAxNzM0OTUxMDM4MDI5.pElZ0HZbMa62sLOFIkWlTUG4Z7JDwdxqwoBHmCqxRPIg.AKBS0tNb5fSxMGN8C7QRXLPdtl5VV6m0MhbJhK--KOog.JPEG/SE-3EFF47A9-8732-462B-A930-505DCF5549A3.jpg?type=w3840", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS), false, LocalTime.of(11, 0), LocalTime.of(19, 0)),
+            BusinessHours(setOf(DayClass.SATURDAY), false, LocalTime.of(11, 0), LocalTime.of(14, 30))
+        ),
+        contact = "042-350-0867",
+        location = Location("N11", "카이마루")
+    )),
+    FacilityItem(id = 5, title = "오니기리와 이규동", imageURL = "https://mblogthumb-phinf.pstatic.net/MjAxOTA3MjdfNzYg/MDAxNTY0MjM0OTUwODQw.Nue2--qxzbswQ51iQZfE5pKV8_6mn8hg7Kq5jnyuumkg.2jHRJYk2a6LsnlOzE9PFVzm5TKCjBK-9ywpSTG1zjRwg.JPEG.ahnsophia/SAM_2134.jpg?type=w800", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS), false, LocalTime.of(8, 0), LocalTime.of(19, 30)),
+            BusinessHours(setOf(DayClass.SATURDAY), false, LocalTime.of(8, 0), LocalTime.of(17, 30))
+        ),
+        contact = "042-350-0874",
+        location = Location("N11", "카이마루")
+    )),
+    FacilityItem(id = 6, title = "롤링파스타", imageURL = "", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS), false, LocalTime.of(10, 30), LocalTime.of(19, 30), orderEnd = LocalTime.of(19, 0)),
+            BusinessHours(setOf(DayClass.SATURDAY), false, LocalTime.of(11, 0), LocalTime.of(14, 0))
+        ),
+        contact = "042-350-0873",
+        location = Location("N11", "카이마루")
+    )),
+    FacilityItem(id = 7, title = "베어스타코", imageURL = "https://instagram.ficn2-2.fna.fbcdn.net/v/t51.2885-15/473759162_18027558935626714_2201949660026488566_n.jpg?stp=dst-jpg_e35_tt6&efg=eyJ2ZW5jb2RlX3RhZyI6InRocmVhZHMuQ0FST1VTRUxfSVRFTS5pbWFnZV91cmxnZW4uMTEyNXgxMTI1LnNkci5mNzU3NjEuZGVmYXVsdF9pbWFnZS5jMiJ9&_nc_ht=instagram.ficn2-2.fna.fbcdn.net&_nc_cat=110&_nc_oc=Q6cZ2QEQKHKGfCUxQXEH46qmZ4NpkTsek7dKTRLlug5Z3lsn1msx9FNQFEejqBbbaLccs0E&_nc_ohc=Dpcn2mx_U4YQ7kNvwEJ8GWP&_nc_gid=YEqdE5Zk60I34GIVWWKE8Q&edm=AKr904kBAAAA&ccb=7-5&ig_cache_key=MzU0NTY3NzA3MTE2OTE1NjA5OQ%3D%3D.3-ccb7-5&oh=00_Afo_UfSUbmh3RUUOJTF39MymLAF4J7oOFXTzeJdVeyA6tQ&oe=69679C01&_nc_sid=23467f", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS), false, LocalTime.of(10, 30), LocalTime.of(19, 30)),
+            BusinessHours(setOf(DayClass.SATURDAY), false, LocalTime.of(10, 30), LocalTime.of(14, 30))
+        ),
+        contact = "0507-1410-1303",
+        location = Location("N11", "카이마루")
+    )),
+)
 val taeulgwan = listOf(
     FacilityItem(id = 0, title = "제순식당", imageURL = "https://mblogthumb-phinf.pstatic.net/MjAyMzExMTNfMjc1/MDAxNjk5ODgxMzQxMzI5.GzIopBneMFvEeimAaYVB5ocPLCMi99NOgJac2wQCl4gg.LWwPCAl4-KIoJcYHi1ISsgAtz87FzdzU6WjxlFJFfFUg.JPEG.sooblog23/IMG_7926.jpg?type=w400", details = ItemDetail(
         businessHours = listOf(
@@ -241,7 +305,7 @@ val cafe = listOf(
 //)
 val topLevelFacilitiesList = listOf(
     FacilityCategory(id = 0, title = "학식", items = cafeteria),
-    FacilityCategory(id = 1, title = "카이마루 푸드코트", items = cafeteria),
+    FacilityCategory(id = 1, title = "카이마루 푸드코트", items = kaimaru),
     FacilityCategory(id = 2, title = "태울관 푸드코트", items = taeulgwan),
     FacilityCategory(id = 3, title = "프렌차이즈", items = cafeteria),
     FacilityCategory(id = 4, title = "카페", items = cafe),
