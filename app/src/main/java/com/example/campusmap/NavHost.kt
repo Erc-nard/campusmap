@@ -278,9 +278,15 @@ fun FacilitiesNavigation(padding: PaddingValues) {
                                         verticalAlignment = Alignment.CenterVertically,
                                         modifier = Modifier.padding(horizontal = 16.dp)
                                     ) {
-                                        Text(
-                                            text = itemData.details.location.description
-                                        )
+                                        Column {
+                                            Text(itemData.details.location.description)
+                                            if (!itemData.details.location.annotation.isNullOrBlank()) {
+                                                Text(
+                                                    text = itemData.details.location.annotation,
+                                                    color = Color.Gray
+                                                )
+                                            }
+                                        }
                                         Spacer(modifier = Modifier.weight(1f))
                                         FilledIconButton(onClick = {}) {
                                             Icon(
