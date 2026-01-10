@@ -148,7 +148,6 @@ val commuterBus2Stations = listOf(
 
 
 
-@SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShuttleScreenFixed(
@@ -159,54 +158,55 @@ fun ShuttleScreenFixed(
     var showTimetable by remember { mutableStateOf(false) }
 
     Scaffold(
-        // 1. 뒤로가기 버튼이 있는 상단 바 (이 부분이 살아있어야 합니다)
+        // 1. TopAppBar: 뒤로가기 버튼 명시적 배치
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = when (selectedShuttle) {
-                            ShuttleType.CAMPUS -> "교내 셔틀"
-                            ShuttleType.OUTSIDE -> "통근 셔틀"
-                        },
+                        text = if (selectedShuttle == ShuttleType.CAMPUS) "교내 셔틀" else "통근 셔틀",
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onClose) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "뒤로가기")
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "뒤로가기"
+                        )
                     }
                 }
             )
         }
     ) { innerPadding ->
-        // 전체 화면 컨테이너
-        Box(
+        // Scaffold의 innerPadding을 적용하여 상단 바 아래부터 시작하게 함
+        Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize()
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 2. 노선도 이미지 컨테이너 (중앙 정렬)
+            // 2. 노선도 영역: 세로를 꽉 채우는 박스
             Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.TopCenter
+                modifier = Modifier
+                    .weight(1f) // 남은 세로 공간 다 차지
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
             ) {
-                // 이미지의 실제 렌더링 영역 정보를 저장할 변수
-                var imageBounds by remember { mutableStateOf(androidx.compose.ui.geometry.Rect.Zero) }
-
-                Image(
-                    painter = painterResource(id = shuttleBackgroundImage(selectedShuttle)),
-                    contentDescription = null,
+                // 실제 이미지와 버스가 위치할 영역 (비율 유지)
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth() // 가로를 화면에 맞춤 (비율 유지됨)
-                        .onGloballyPositioned { coordinates ->
-                            // 이미지의 절대 좌표와 크기를 계산해서 저장
-                            imageBounds = coordinates.boundsInParent()
-                        },
-                    contentScale = ContentScale.FillWidth
-                )
+                        .fillMaxHeight() // 높이 기준 채우기
+                        .aspectRatio(if (selectedShuttle == ShuttleType.CAMPUS) 360f / 830f else 360f / 480f)
+                ) {
+                    // 배경 이미지
+                    Image(
+                        painter = painterResource(id = shuttleBackgroundImage(selectedShuttle)),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Fit
+                    )
 
-                // 3. 버스 레이어 (이미지 좌표가 계산된 후 노출)
-                if (imageBounds != androidx.compose.ui.geometry.Rect.Zero) {
+                    // 버스 레이어 (이미지 영역과 1:1 매칭)
                     val stationsList = when (selectedShuttle) {
                         ShuttleType.CAMPUS -> listOf(campusStations)
                         ShuttleType.OUTSIDE -> listOf(commuterBus1Stations, commuterBus2Stations)
@@ -215,24 +215,24 @@ fun ShuttleScreenFixed(
                     stationsList.forEach { stations ->
                         BusMovingLayer(
                             stations = stations,
-                            parentBounds = imageBounds // 이미지 좌표 전달
+                            modifier = Modifier.fillMaxSize()
                         )
                     }
                 }
             }
 
-            // 4. 시간표 보기 버튼 (화면 최하단에 고정)
+            // 3. 하단 버튼
             Button(
                 onClick = { showTimetable = true },
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 32.dp)
+                    .padding(vertical = 24.dp)
+                    .width(180.dp)
             ) {
-                Text("시간표 보기", style = MaterialTheme.typography.labelLarge)
+                Text("시간표 보기")
             }
         }
 
-        // 5. 바텀 시트
+        // 4. 바텀 시트
         if (showTimetable) {
             ShuttleTimetableBottomSheet(
                 shuttleType = selectedShuttle,
@@ -331,52 +331,50 @@ fun rememberBusState(
 @Composable
 fun BusMovingLayer(
     stations: List<Station>,
-    parentBounds: androidx.compose.ui.geometry.Rect // 이미지의 실제 영역 정보를 받음
+    modifier: Modifier = Modifier
 ) {
     val (busRatio, finished) = rememberBusState(stations)
+    var size by remember { mutableStateOf(IntSize.Zero) }
     val density = LocalDensity.current
 
     Box(
-        modifier = Modifier.fillMaxSize() // 화면 전체를 쓰되 내부에서 offset으로 조절
+        modifier = modifier.onGloballyPositioned { size = it.size }
     ) {
-        if (!finished && busRatio != null) {
+        if (!finished && busRatio != null && size != IntSize.Zero) {
             val (xRatio, yRatio) = busRatio
 
-            // 이미지 영역 안에서의 좌표 계산
-            val xPx = parentBounds.left + (parentBounds.width * xRatio)
-            val yPx = parentBounds.top + (parentBounds.height * yRatio)
+            val xPx = size.width * xRatio
+            val yPx = size.height * yRatio
 
             Image(
                 painter = painterResource(R.drawable.bus),
                 contentDescription = "Bus",
                 modifier = Modifier
-                    .size(30.dp)
+                    .size(24.dp)
                     .offset(
-                        x = with(density) { xPx.toDp() } - 15.dp,
-                        y = with(density) { yPx.toDp() } - 15.dp
+                        x = with(density) { xPx.toDp() } - 12.dp,
+                        y = with(density) { yPx.toDp() } - 12.dp
                     )
             )
         }
 
-        // 3. 운영 종료 문구 (이미지 중앙에 표시)
+        // 🚌 운행 종료 시 뜨는 흰색 네모 알림
         if (finished) {
-            // 텍스트를 감싸는 흰색 배경 카드
             Surface(
-                color = androidx.compose.ui.graphics.Color.White.copy(alpha = 1f), // 약간 투명한 흰색
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp), // 둥근 모서리
-                shadowElevation = 10.dp, // 살짝 떠 있는 효과
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = with(density) { parentBounds.height.toDp() / 2f - 20.dp }) // 중앙 위치 조정
+                color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.95f),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                shadowElevation = 8.dp,
+                modifier = Modifier.align(Alignment.Center)
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp), // 내부 여백
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "🚌 현재 운행 중인 버스가 없습니다",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            color = androidx.compose.ui.graphics.Color.DarkGray,
+                        text = "🚌 현재 운행 정보가 없습니다",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                            color = androidx.compose.ui.graphics.Color.Black
                         )
                     )
                 }
@@ -384,7 +382,6 @@ fun BusMovingLayer(
         }
     }
 }
-
 
 
 @Composable
