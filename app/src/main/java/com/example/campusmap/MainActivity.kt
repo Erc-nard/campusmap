@@ -42,6 +42,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
@@ -79,7 +80,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -158,7 +161,7 @@ fun CampusmapApp() {
     NavigationSuiteScaffold(
         containerColor = Color.White,
         navigationSuiteColors = NavigationSuiteDefaults.colors(
-            navigationBarContainerColor = Color(0xFFFDFDFD),
+            navigationBarContainerColor = Color.White,
             navigationBarContentColor = dark
         ),
         navigationSuiteItems = {
@@ -209,6 +212,7 @@ fun CampusmapApp() {
     if (showShuttleSheet) {
         ModalBottomSheet(
             onDismissRequest = { showShuttleSheet = false },
+            containerColor = Color.White,
             sheetState = rememberModalBottomSheetState()
         ) {
             Column (
@@ -228,9 +232,9 @@ fun CampusmapApp() {
                             showShuttleScreen = true
                         },
                         modifier = Modifier.weight(1f)
-                    ) { Text("교내",style=MaterialTheme.typography.titleLarge) }
+                    ) { Text("교내", style = MaterialTheme.typography.titleLarge) }
 
-// 교외
+                    // 교외
                     Button(
                         onClick = {
                             selectedShuttle = ShuttleType.OUTSIDE
@@ -238,9 +242,7 @@ fun CampusmapApp() {
                             showShuttleScreen = true
                         },
                         modifier = Modifier.weight(1f)
-                    ) { Text("출근",style=MaterialTheme.typography.titleLarge) }
-
-
+                    ) { Text("출근", style = MaterialTheme.typography.titleLarge) }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -264,7 +266,7 @@ enum class AppDestinations(
     val icon: ImageVector,
 ) {
     MAP("지도", Icons.Default.Map),
-    FACILITIES("시설 안내", Icons.Default.Place),
+    FACILITIES("시설", Icons.Default.Place),
     SHUTTLE("셔틀버스", Icons.Default.DirectionsBus),
 }
 
@@ -305,11 +307,6 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
         Row(
             modifier = Modifier
                 .shadow(8.dp, shape = RoundedCornerShape(20.dp))
-                .border(
-                    width = 2.dp,
-                    color = white,
-                    shape = RoundedCornerShape(20.dp)
-                )
                 .clip(RoundedCornerShape(20.dp))
                 .background(white)
                 .clickable {
@@ -346,7 +343,7 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                     }
                 }
                 .fillMaxWidth()
-                .padding(16.dp, 8.dp)
+                .padding(20.dp, 10.dp)
         ) {
             Row {
                 Text(
@@ -367,30 +364,80 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
         }
     }
 
-    Scaffold(
-        topBar = {
+    val searchResult = places.filter { item ->
+        item.title.contains(searchQuery) || item.category == searchQuery
+                || item.location.buildingCode == searchQuery
+                || (searchQuery.contains("-") && item.location.buildingCode == searchQuery.substringBefore('-'))
+                || item.location.buildingName.contains(searchQuery)
+                || item.keywords.contains(searchQuery)
+                || item.description.contains(searchQuery)
+    }
+    val density = LocalDensity.current
+    var mainContentHeight by remember { mutableStateOf(0.dp) }
+
+    BottomSheetScaffold(
+        scaffoldState = sheetScaffoldState,
+        sheetPeekHeight = if (searchQuery.isBlank()) 0.dp else 140.dp,
+        sheetContainerColor = Color.White,
+        sheetContent = {
+            LazyColumn(
+                modifier = if (searchQuery.isBlank()) {
+                    Modifier.heightIn(max = 0.dp)
+                } else {
+                    Modifier.heightIn(
+                        max = mainContentHeight - WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+                    )
+                }
+            ) {
+                if (selectedPlace != null) {
+                    item {
+                        SearchResultRow(selectedPlace!!)
+                    }
+                } else if (searchResult.isNotEmpty()) {
+                    items(searchResult) { resultItem ->
+                        SearchResultRow(resultItem)
+                    }
+                } else {
+                    item {
+                        Text(
+                            text = "검색 결과가 없습니다.",
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
+    ) {
+        Box(
+            modifier = Modifier
+                .onGloballyPositioned { coordinates ->
+                    mainContentHeight = with(density) { coordinates.size.height.toDp() }
+                }
+        ) {
+            CampusMapScreen(
+                modifier = modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                mapProperties = mapProperties,
+                markerState = markerState
+            )
+
             Column() {
                 Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .shadow(elevation = 8.dp, shape = RoundedCornerShape(50.dp))
+                        .shadow(elevation = 5.dp, shape = RoundedCornerShape(50.dp))
                         .clip(RoundedCornerShape(50.dp))
                         .background(Color.White),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (selectedPlace != null) {
-                        BackHandler(enabled = true) {
-                            selectedPlace = null
-                            searchFieldText = searchQuery
-                        }
+                    if (selectedPlace != null ) {
+                        BackHandler(enabled = true) { selectedPlace = null }
                         IconButton(
-                            onClick = {
-                                selectedPlace = null
-                                searchFieldText = searchQuery
-                            },
-                            modifier = Modifier.padding(start = 2.dp)
+                            onClick = { selectedPlace = null }
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Default.ArrowBack,
@@ -404,8 +451,7 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                         }
                         BackHandler(enabled = true) { clearSearchField() }
                         IconButton(
-                            onClick = { clearSearchField() },
-                            modifier = Modifier.padding(start = 2.dp)
+                            onClick = { clearSearchField() }
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Default.ArrowBack,
@@ -475,8 +521,7 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                                     sheetScaffoldState.bottomSheetState.partialExpand()
                                 }
                             }
-                        },
-                        modifier = Modifier.padding(end = 2.dp)
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -495,55 +540,6 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                     }
                 }
             }
-        }
-    ) { innerPadding ->
-        val searchResult = places.filter { item ->
-            item.title.contains(searchQuery) || item.category == searchQuery
-                    || item.location.buildingCode == searchQuery
-                    || (searchQuery.contains("-") && item.location.buildingCode == searchQuery.substringBefore('-'))
-                    || item.location.buildingName.contains(searchQuery)
-                    || item.keywords.contains(searchQuery)
-                    || item.description.contains(searchQuery)
-        }
-        BottomSheetScaffold(
-            scaffoldState = sheetScaffoldState,
-            sheetPeekHeight = if (searchQuery.isBlank()) 0.dp else 140.dp,
-            sheetContent = {
-                LazyColumn(
-                    modifier = Modifier.heightIn(max =
-                        if (searchQuery.isBlank()) {
-                            0.dp
-                        } else {
-                            LocalConfiguration.current.screenHeightDp.dp - innerPadding.calculateTopPadding() - 160.dp
-                        })
-                ) {
-                    if (selectedPlace != null) {
-                        item {
-                            SearchResultRow(selectedPlace!!)
-                        }
-                    } else if (searchResult.isNotEmpty()) {
-                        items(searchResult) { resultItem ->
-                            SearchResultRow(resultItem)
-                        }
-                    } else {
-                        item {
-                            Text(
-                                text = "검색 결과가 없습니다.",
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                }
-            }
-        ) {
-            CampusMapScreen(
-                modifier = modifier.fillMaxSize(),
-                cameraPositionState = cameraPositionState,
-                mapProperties = mapProperties,
-                markerState = markerState
-            )
         }
     }
 }

@@ -3,25 +3,41 @@ package com.example.campusmap
 import androidx.compose.foundation.layout.*
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SecondaryScrollableTabRow
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.serialization.Serializable
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -29,6 +45,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.campusmap.ui.theme.main
 import com.google.android.gms.maps.model.LatLng
 
 interface FacilityData {
@@ -40,21 +57,31 @@ interface FacilityData {
 @Serializable object FacilitiesGraph
 @Serializable object Facilities
 @Serializable
-data class FacilityCategoryRoute(val index: Int)
-@Serializable
 data class FacilityItemRoute(val categoryIndex: Int, val index: Int)
 
 @Composable
-fun DetailView(title: String, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Column(
-        modifier = modifier
+fun DetailView(title: String, modifier: Modifier = Modifier, content: @Composable (Dp) -> Unit) {
+    val padding = 20.dp
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = padding),
+        shape = RoundedCornerShape(padding),
+        color = Color.White,
+//        shadowElevation = 2.dp
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(16.dp)
-        )
-        content()
+        Column(
+            modifier = modifier
+                .padding(vertical = padding)
+        ) {
+            Text(
+                text = title,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 20.sp,
+                modifier = Modifier.padding(horizontal = padding).padding(bottom = 12.dp)
+            )
+            content(padding)
+        }
     }
 }
 
@@ -66,13 +93,6 @@ fun FacilitiesNavigation(padding: PaddingValues, onMoveToMap: (LatLng) -> Unit) 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val title = when (navBackStackEntry?.destination?.route?.substringAfterLast(".")) {
         "Facilities" -> "시설"
-        "FacilityCategoryRoute/{index}" -> {
-            val categoryItem: FacilityCategoryRoute? = navBackStackEntry?.toRoute()
-            val index = categoryItem?.index
-            if (index != null) {
-                topLevelFacilitiesList[index].title
-            } else { "시설" }
-        }
         "FacilityItemRoute/{categoryIndex}/{index}" -> {
             val item: FacilityItemRoute? = navBackStackEntry?.toRoute()
             val categoryIndex = item?.categoryIndex
@@ -81,7 +101,7 @@ fun FacilitiesNavigation(padding: PaddingValues, onMoveToMap: (LatLng) -> Unit) 
                 topLevelFacilitiesList[categoryIndex].items[index].title
             } else { "시설" }
         }
-        else -> "내 앱"
+        else -> "시설"
     }
     val showNavigationIcon: Boolean = navBackStackEntry?.destination?.route?.substringAfterLast(".") != "Facilities"
     val extendToTopBarArea: Boolean = navBackStackEntry?.destination?.route?.substringAfterLast(".") == "FacilityItemRoute/{categoryIndex}/{index}"
@@ -138,34 +158,45 @@ fun FacilitiesNavigation(padding: PaddingValues, onMoveToMap: (LatLng) -> Unit) 
             }
         ) {
             navigation<FacilitiesGraph>(startDestination = Facilities) {
-                // 최상위 탭
+                // 카테고리별 보기
                 composable<Facilities> {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        ColumnView(data = topLevelFacilitiesList, onItemClick = { itemId ->
-                            navController.navigate(FacilityCategoryRoute(index = itemId))
-                        })
-                    }
-                }
-
-                // 카테고리별 시설 화면
-                composable<FacilityCategoryRoute> { backStackEntry ->
-                    val route: FacilityCategoryRoute = backStackEntry.toRoute()
-                    val categoryData = topLevelFacilitiesList[route.index]
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        ColumnView(data = categoryData.items, onItemClick = { itemId ->
-                            navController.navigate(
-                                FacilityItemRoute(
-                                    categoryIndex = route.index,
-                                    index = itemId
+                        var selectedTabIndex by remember { mutableStateOf(0) }
+                        Column {
+                            LazyRow {
+                                items(topLevelFacilitiesList.size) { index ->
+                                    val item = topLevelFacilitiesList[index]
+                                    Text(
+                                        text = item.title,
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = if (selectedTabIndex == index) null else FontWeight.Light,
+                                        modifier = Modifier
+                                            .clickable { selectedTabIndex = index }
+                                            .drawBehind {
+                                                drawLine(
+                                                    color = if (selectedTabIndex == index) main else Color.Transparent, // 테두리 색상
+                                                    start = Offset(0f, size.height),
+                                                    end = Offset(size.width, size.height),
+                                                    strokeWidth = 2.dp.toPx()
+                                                )
+                                            }
+                                            .padding(16.dp, 8.dp)
+                                    )
+                                }
+                            }
+                            HorizontalDivider()
+                            ColumnView(data = topLevelFacilitiesList[selectedTabIndex].items, onItemClick = { itemId ->
+                                navController.navigate(
+                                    FacilityItemRoute(
+                                        categoryIndex = selectedTabIndex,
+                                        index = itemId
+                                    )
                                 )
-                            )
-                        }, extendToTopBarArea = extendToTopBarArea)
+                            }, extendToTopBarArea = extendToTopBarArea)
+                        }
                     }
                 }
 

@@ -2,6 +2,7 @@ package com.example.campusmap
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -17,16 +18,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun ContactView(itemData: FacilityItem) {
-    DetailView("연락처") {
+    DetailView("문의하기") { innerPadding ->
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = innerPadding),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(itemData.details.contact)
+            Column {
+                Text("전화번호", fontWeight = FontWeight.Light)
+                Text(itemData.details.contact)
+            }
             Spacer(modifier = Modifier.weight(1f))
             val context = LocalContext.current
             FilledIconButton(

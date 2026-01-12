@@ -1,5 +1,6 @@
 package com.example.campusmap
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -12,6 +13,7 @@ import androidx.compose.ui.unit.dp
 fun <ItemType : FacilityData> ColumnView(data: List<ItemType>, onItemClick: (Int) -> Unit, extendToTopBarArea: Boolean = false) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 160.dp),
+        contentPadding = PaddingValues(top = 10.dp, bottom = 40.dp),
         modifier = if (extendToTopBarArea) {
             Modifier.padding(start = 10.dp, end = 10.dp).padding(top = 88.dp)
         } else {
