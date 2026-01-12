@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -25,9 +26,9 @@ fun BusinessHoursView(businessHoursData: List<BusinessHours>) {
         businessHoursData.map { businessHours -> businessHours.includeHolidays }
     val isHolidaysDetermined =
         holidays.contains(true) || holidays.contains(null)
-    DetailView("영업 시간") {
+    DetailView("영업 시간") { innerPadding ->
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = innerPadding)
         ) {
             businessHoursData.forEach { businessHours ->
                 Row(
@@ -38,7 +39,10 @@ fun BusinessHoursView(businessHoursData: List<BusinessHours>) {
                         text = businessHours.dayDescription,
                         modifier = Modifier.width(120.dp)
                     )
-                    Text(businessHours.timeDuration)
+                    Text(
+                        text = businessHours.timeDuration,
+                        fontWeight = FontWeight.Light
+                    )
                 }
             }
             if (undeterminedDays.isNotEmpty() || !isHolidaysDetermined) {
@@ -83,7 +87,10 @@ fun BusinessHoursView(businessHoursData: List<BusinessHours>) {
                         text = breakDayDescription,
                         modifier = Modifier.width(120.dp)
                     )
-                    Text("휴무")
+                    Text(
+                        text = "휴무",
+                        fontWeight = FontWeight.Light
+                    )
                 }
             }
         }

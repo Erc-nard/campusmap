@@ -378,7 +378,10 @@ fun ShuttleTimetableBottomSheet(
     shuttleType: ShuttleType,
     onDismiss: () -> Unit
 ) {
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = Color.White
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()

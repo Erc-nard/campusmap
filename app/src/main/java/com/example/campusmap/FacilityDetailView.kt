@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowHeightSizeClass
 import coil3.compose.AsyncImage
@@ -43,8 +44,8 @@ fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng) -> Unit) {
             )
         }
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            contentPadding = PaddingValues(bottom = 40.dp),
             modifier = if (windowSizeClass.windowHeightSizeClass == WindowHeightSizeClass.COMPACT) {
                 Modifier.fillMaxHeight().weight(2f)
             } else {
@@ -64,7 +65,7 @@ fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng) -> Unit) {
                     Text(
                         text = itemData.title,
                         style = MaterialTheme.typography.headlineLarge,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                        modifier = Modifier.padding(horizontal = 20.dp)
                     )
                 }
             } else {
@@ -72,22 +73,23 @@ fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng) -> Unit) {
                     Text(
                         text = itemData.title,
                         style = MaterialTheme.typography.headlineLarge,
-                        modifier = Modifier.padding(horizontal = 16.dp).padding(top = 32.dp)
+                        modifier = Modifier.padding(horizontal = 20.dp).padding(top = 40.dp)
                     )
                 }
             }
             item {
-                DetailView("위치") {
+                DetailView("위치") { innerPadding ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(horizontal = 16.dp)
+                        modifier = Modifier
+                            .padding(horizontal = innerPadding)
                     ) {
                         Column {
                             Text(itemData.details.location.description)
                             if (!itemData.details.location.annotation.isNullOrBlank()) {
                                 Text(
                                     text = itemData.details.location.annotation,
-                                    color = Color.Gray
+                                    fontWeight = FontWeight.Light
                                 )
                             }
                         }
@@ -111,9 +113,9 @@ fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng) -> Unit) {
                 }
             } else if (itemData.details.mealHours.isNotEmpty()) {
                 item {
-                    DetailView("운영 시간") {
+                    DetailView("운영 시간") { innerPadding ->
                         Column(
-                            modifier = Modifier.padding(horizontal = 16.dp)
+                            modifier = Modifier.padding(horizontal = innerPadding)
                         ) {
                             itemData.details.mealHours.forEach { mealHours ->
                                 Row(
@@ -124,7 +126,10 @@ fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng) -> Unit) {
                                         text = mealHours.name,
                                         modifier = Modifier.width(80.dp)
                                     )
-                                    Text(mealHours.timeDuration)
+                                    Text(
+                                        text = mealHours.timeDuration,
+                                        fontWeight = FontWeight.Light
+                                    )
                                 }
                             }
                         }
@@ -133,7 +138,7 @@ fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng) -> Unit) {
             }
             if (itemData.details.upcomingMenus.isNotEmpty()) {
                 item {
-                    DetailView("메뉴") {
+                    DetailView("메뉴") { innerPadding ->
                         val convertedData =
                             itemData.details.upcomingMenus.map { item ->
                                 var bodyText = item.menu.joinToString("\n")
