@@ -4,26 +4,21 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,20 +26,66 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
-import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.example.campusmap.ui.theme.CampusmapTheme
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Coffee
+import androidx.compose.material.icons.filled.DirectionsBus
+import androidx.compose.material.icons.filled.HomeWork
+import androidx.compose.material.icons.filled.LocalCafe
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.NavigationRailItemDefaults
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.window.core.layout.WindowSizeClass
+import androidx.window.layout.WindowMetricsCalculator
+import com.example.campusmap.ui.map.CampusMapScreen
+import com.example.campusmap.ui.theme.black
+import com.example.campusmap.ui.theme.dark
+import com.example.campusmap.ui.theme.white
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -59,23 +100,58 @@ class MainActivity : ComponentActivity() {
 @PreviewScreenSizes
 @Composable
 fun CampusmapApp() {
+    val scope = rememberCoroutineScope()
+
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.MAP) }
     var showShuttleSheet by rememberSaveable { mutableStateOf(false) }
+    var showShuttleScreen by rememberSaveable { mutableStateOf(false) }
+    var selectedShuttle by rememberSaveable { mutableStateOf<ShuttleType?>(null) }
+
+    val initialLatLng = LatLng(36.368038, 127.365761)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(initialLatLng, 16f)
+    }
+    var markerPosition by rememberSaveable { mutableStateOf(initialLatLng) }
+
+    val myItemColors = NavigationSuiteDefaults.itemColors(
+        navigationBarItemColors = NavigationBarItemDefaults.colors(
+            selectedIconColor = Color(0xFF004187),
+            selectedTextColor = Color(0xFF004187),
+            indicatorColor = Color(0xFFD0ECF9),
+            unselectedIconColor = black,
+            unselectedTextColor = black
+        ),
+        navigationRailItemColors = NavigationRailItemDefaults.colors(
+            selectedIconColor = Color(0xFF004187),
+            selectedTextColor = Color(0xFF004187),
+            indicatorColor = Color(0xFFD0ECF9),
+            unselectedIconColor = black,
+            unselectedTextColor = black
+        )
+    )
 
     NavigationSuiteScaffold(
+        containerColor = Color.White,
+        navigationSuiteColors = NavigationSuiteDefaults.colors(
+            navigationBarContainerColor = Color(0xFFFDFDFD),
+            navigationBarContentColor = dark
+        ),
         navigationSuiteItems = {
-            AppDestinations.entries.forEach {
+            AppDestinations.entries.forEach { destination ->
+                // 2. 미리 만들어둔 myItemColors 변수를 그대로 사용합니다.
                 item(
-                    icon = { Icon(it.icon, contentDescription = it.label) },
-                    label = { Text(it.label) },
-                    selected = it == currentDestination,
+                    icon = { Icon(destination.icon, contentDescription = destination.label) },
+                    label = { Text(destination.label) },
+                    selected = destination == currentDestination,
+                    colors = myItemColors,
                     onClick = {
-                        if (it == AppDestinations.SHUTTLE) {
+                        if (destination == AppDestinations.SHUTTLE) {
                             showShuttleSheet = true
                         } else {
-                            currentDestination = it
+                            currentDestination = destination
                         }
                     }
+
                 )
             }
         }
@@ -83,47 +159,83 @@ fun CampusmapApp() {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             when (currentDestination) {
                 AppDestinations.MAP ->
-                    Map("Android", Modifier.padding(innerPadding))
+                    Map(Modifier.fillMaxHeight(), cameraPositionState, markerPosition)
                 AppDestinations.FACILITIES ->
-                    Facilities(innerPadding)
-                AppDestinations.SHUTTLE -> {}
+                    FacilitiesNavigation(padding = innerPadding, onMoveToMap = { coordinate ->
+                        currentDestination = AppDestinations.MAP
+                        markerPosition = coordinate
+                        scope.launch {
+                            cameraPositionState.animate(
+                                update = CameraUpdateFactory.newLatLngZoom(coordinate, 18f)
+                            )
+                        }
+                    })
+                AppDestinations.SHUTTLE ->
+                    Shuttle(
+                        name = "Hello, world!",
+                        modifier = Modifier.padding(innerPadding)
+                    )
             }
         }
     }
 
-    // ⭐ BottomSheet는 여기
+    //BottomSheet
     if (showShuttleSheet) {
         ModalBottomSheet(
             onDismissRequest = { showShuttleSheet = false },
             sheetState = rememberModalBottomSheetState()
         ) {
-            Column(
+            Column (
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp)
             ) {
-                Text("Choose your feeling", style = MaterialTheme.typography.titleLarge)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // 교내
+                    Button(
+                        onClick = {
+                            selectedShuttle = ShuttleType.CAMPUS
+                            showShuttleSheet = false
+                            showShuttleScreen = true
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("교내",style=MaterialTheme.typography.titleLarge) }
 
-                Spacer(Modifier.height(16.dp))
+// 교외
+                    Button(
+                        onClick = {
+                            selectedShuttle = ShuttleType.OUTSIDE
+                            showShuttleSheet = false
+                            showShuttleScreen = true
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) { Text("출근",style=MaterialTheme.typography.titleLarge) }
 
-                Text(
-                    "😊 happy",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { showShuttleSheet = false }
-                        .padding(12.dp)
-                )
 
-                Text(
-                    "😢 sad",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { showShuttleSheet = false }
-                        .padding(12.dp)
-                )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+
             }
+
         }
     }
+
+    if (showShuttleScreen) {
+        selectedShuttle?.let { shuttle ->
+            ShuttleScreenFixed(
+                startShuttle = shuttle,
+                onClose = { showShuttleScreen = false }
+            )
+        }
+    }
+
+
+
 }
 
 
@@ -131,79 +243,126 @@ enum class AppDestinations(
     val label: String,
     val icon: ImageVector,
 ) {
-    MAP("지도", Icons.Default.LocationOn),
-    FACILITIES("시설", Icons.Default.Place),
-    SHUTTLE("셔틀", Icons.Default.ShoppingCart),
+    MAP("지도", Icons.Default.Map),
+    FACILITIES("시설 안내", Icons.Default.Place),
+    SHUTTLE("셔틀버스", Icons.Default.DirectionsBus),
 }
 
-
+data class MapCategory(val icon: ImageVector, val text: String, val color: Color)
+val mapCategories = listOf(
+    MapCategory(Icons.Default.School,"강의동", Color(95,190,235)),
+    MapCategory(Icons.Default.Restaurant,"식당", Color(250, 189, 0, 255)),
+    MapCategory(Icons.Default.LocalCafe,"카페", Color(243, 118, 0, 255)),
+    MapCategory(Icons.Default.ShoppingCart,"매점", Color(0, 203, 27, 255)),
+    MapCategory(Icons.Default.DirectionsBus,"셔틀 정류장", Color.Black),
+    MapCategory(Icons.Default.HomeWork,"기숙사", Color(69, 0, 255, 255)),
+    MapCategory(Icons.Default.Place,"가볼 만한 곳", Color(255, 0, 161, 255)),
+)
 @Composable
-fun Map(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun MapCategoryButton(data: MapCategory) {
+    Row(
+        modifier = Modifier
+            .shadow(3.dp, shape = RoundedCornerShape(20.dp))
+            .border(
+                width = 2.dp,
+                color = white,
+                shape = RoundedCornerShape(20.dp)
+            )
+            .clip(RoundedCornerShape(20.dp))
+            .background(white)
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        // 🔹 아이콘
+        Icon(
+            imageVector = data.icon,
+            contentDescription = data.text,
+            modifier = Modifier.size(16.dp),
+            tint = data.color
+        )
+
+        Spacer(modifier = Modifier.width(6.dp))
+
+        // 🔹 텍스트
+        Text(
+            text = data.text
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Facilities(paddingValues: PaddingValues) {
+fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState, markerPosition: LatLng) {
+    val mapProperties = remember {
+        MapProperties(
+            latLngBoundsForCameraTarget = LatLngBounds(
+                LatLng(36.36244323875914, 127.35429730754099),
+                LatLng(36.37798415287542, 127.3705715881045)
+            ),
+            minZoomPreference = 15f,
+            maxZoomPreference = 20f
+        )
+    }
+    var searchQuery by remember { mutableStateOf("")}
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(text = "시설") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                navigationIcon = {
-                    IconButton(onClick = {}) { Text("=") }
-                },
-                actions = {
-                    IconButton(onClick = {}) {
+            Column() {
+                Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = 16.dp,
+                            end=16.dp,
+                            top = 7.dp
+                        )
+                        .shadow(elevation = 5.dp, shape = RoundedCornerShape(50.dp))
+                        .clip(RoundedCornerShape(50.dp))
+                        .background(Color.White),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextField(
+                        value = searchQuery,
+                        onValueChange = { newValue -> searchQuery = newValue },
+                        modifier = Modifier
+                            .weight(1f),
+                        placeholder = { Text("건물, 식당, 편의시설 검색") },
+                        singleLine = true,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        )
+                    )
+                    IconButton(
+                        onClick = {}
+                    ) {
                         Icon(
-                            imageVector = Icons.Default.Search, // 내장된 검색 아이콘 사용
+                            imageVector = Icons.Default.Search,
                             contentDescription = "검색"
                         )
                     }
                 }
-            )
-        },
-        modifier = Modifier.padding(paddingValues)
-    ) { innerPadding ->
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier.padding(innerPadding),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(topLevelFacilitiesList.size) { index ->
-                PictureGridView(data = topLevelFacilitiesList[index])
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(16.dp, 12.dp)
+                ) {
+                    items(mapCategories) { item ->
+                        MapCategoryButton(item)
+                    }
+                }
             }
         }
-    }
-}
-
-@Composable
-fun PictureGridView(data: PhotoItemData) {
-    Column {
-        AsyncImage(
-            model = data.imageURL,
-            contentDescription = data.title,
-            modifier = Modifier.size(200.dp).clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop // 이미지 비율 유지하며 채우기
-        )
-        Text(
-            text = data.title,
-            modifier = Modifier.padding(8.dp)
+    ) { innerPadding ->
+        CampusMapScreen(
+            modifier = modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState,
+            mapProperties = mapProperties,
+            markerPosition = markerPosition
         )
     }
-}
-
-data class PhotoItemData(val id: Int, val title: String, val imageURL: String)
-val topLevelFacilitiesList = List<PhotoItemData>(16) { index ->
-    PhotoItemData(id = index, title = "Title", imageURL = "https://kaist.ac.kr/kr/img/content/sub05/sub0503_img09.jpg")
 }
 
 @Composable
@@ -212,12 +371,4 @@ fun Shuttle(name: String, modifier: Modifier = Modifier) {
         text = name,
         modifier = modifier
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CampusmapTheme {
-        Map("Android")
-    }
 }
