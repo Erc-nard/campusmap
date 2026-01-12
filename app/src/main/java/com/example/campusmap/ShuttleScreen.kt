@@ -287,7 +287,7 @@ fun calculateCampusBusPositions(now: LocalTime): List<Pair<Float, Float>> {
     val activeBuses = mutableListOf<Pair<Float, Float>>()
 
     // 교내 버스 x좌표 (기본값 중앙 약간 왼쪽, 153/360 비율 참고)
-    val defaultX = 170f / 360f
+    val defaultX = 171f / 360f
 
     kaiMaruWeekdayTimes.forEach { departureTime ->
         // 각 역의 도착 예정 시간 계산
