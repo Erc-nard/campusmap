@@ -312,11 +312,7 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(
-                            start = 16.dp,
-                            end=16.dp,
-                            top = 7.dp
-                        )
+                        .padding(horizontal = 16.dp)
                         .shadow(elevation = 5.dp, shape = RoundedCornerShape(50.dp))
                         .clip(RoundedCornerShape(50.dp))
                         .background(Color.White),
