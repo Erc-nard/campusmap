@@ -4,8 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -32,11 +35,25 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.windowInsetsTopHeight
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.layout.WindowMetricsCalculator
@@ -191,6 +208,34 @@ enum class AppDestinations(
     SHUTTLE("셔틀", Icons.Default.ShoppingCart),
 }
 
+data class MapCategory(val text: String, val color: Color)
+val mapCategories = listOf(
+    MapCategory("강의동", Color.LightGray),
+    MapCategory("식당", Color(251, 198, 18)),
+    MapCategory("카페", Color(140,98, 57)),
+    MapCategory("매점", Color(57, 181, 74)),
+    MapCategory("셔틀 정류장", Color.DarkGray),
+    MapCategory("기숙사", Color(41,171, 226)),
+    MapCategory("가볼 만한 곳", Color(255,153, 218)),
+)
+@Composable
+fun MapCategoryButton(data: MapCategory) {
+    Row(
+        modifier = Modifier
+            .shadow(3.dp, shape = RoundedCornerShape(20.dp))
+            .border(width = 1.dp, color = data.color, shape = RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(20.dp))
+            .background(Color.White)
+    ) {
+        Text(
+            text = data.text,
+            modifier = Modifier
+                .padding(8.dp, 4.dp)
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState, markerPosition: LatLng) {
     val mapProperties = remember {
@@ -203,7 +248,61 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
             maxZoomPreference = 20f
         )
     }
-    CampusMapScreen(modifier = modifier.fillMaxSize(), cameraPositionState = cameraPositionState, mapProperties = mapProperties, markerPosition = markerPosition)
+    var searchQuery by remember { mutableStateOf("")}
+    Scaffold(
+        topBar = {
+            Column() {
+                Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .shadow(elevation = 5.dp, shape = RoundedCornerShape(50.dp))
+                        .clip(RoundedCornerShape(50.dp))
+                        .background(Color.White),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextField(
+                        value = searchQuery,
+                        onValueChange = { newValue -> searchQuery = newValue },
+                        modifier = Modifier
+                            .weight(1f),
+                        placeholder = { Text("건물, 식당, 편의시설 검색") },
+                        singleLine = true,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        )
+                    )
+                    IconButton(
+                        onClick = {}
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "검색"
+                        )
+                    }
+                }
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(16.dp, 12.dp)
+                ) {
+                    items(mapCategories) { item ->
+                        MapCategoryButton(item)
+                    }
+                }
+            }
+        }
+    ) { innerPadding ->
+        CampusMapScreen(
+            modifier = modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState,
+            mapProperties = mapProperties,
+            markerPosition = markerPosition
+        )
+    }
 }
 
 @Composable
