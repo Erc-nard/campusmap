@@ -10,28 +10,44 @@ import com.example.campusmap.R
 
 // Set of Material typography styles to start with
 
-val myCustomFont = FontFamily(
-    Font(R.font.font_style, FontWeight.Normal) // font_style은 실제 파일명
+val PretendardFamily = FontFamily(
+    // Thin (100)
+    Font(R.font.pretendard_thin, FontWeight.Thin),
+    // ExtraLight (200)
+    Font(R.font.pretendard_extralight, FontWeight.ExtraLight),
+    // Light (300)
+    Font(R.font.pretendard_light, FontWeight.Light),
+    // Regular (400)
+    Font(R.font.pretendard_regular, FontWeight.Normal), // FontWeight.Normal은 400입니다
+    // Medium (500)
+    Font(R.font.pretendard_medium, FontWeight.Medium),
+    // SemiBold (600)
+    Font(R.font.pretendard_semibold, FontWeight.SemiBold),
+    // Bold (700)
+    Font(R.font.pretendard_bold, FontWeight.Bold),
+    // ExtraBold (800)
+    Font(R.font.pretendard_extrabold, FontWeight.ExtraBold),
+    // Black (900)
+    Font(R.font.pretendard_black, FontWeight.Black)
 )
 
 val Typography = Typography(
     bodyLarge = TextStyle(
-        fontFamily = myCustomFont,
+        fontFamily = PretendardFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     ),
-
     titleLarge = TextStyle(
-        fontFamily = myCustomFont,
+        fontFamily = PretendardFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 22.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
     labelSmall = TextStyle(
-        fontFamily = myCustomFont,
+        fontFamily = PretendardFamily,
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
         lineHeight = 16.sp,
