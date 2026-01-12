@@ -1,152 +1,109 @@
 package com.example.campusmap
 
-import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.boundsInParent
-import androidx.compose.ui.util.lerp
-import kotlinx.coroutines.delay
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
+import kotlinx.coroutines.delay
+import java.time.Duration
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
+// ------------------------------------------------------------------------
+// [데이터 구역] 요청하신 데이터로 교체 완료
+// ------------------------------------------------------------------------
 
+enum class ShuttleType { CAMPUS, OUTSIDE }
 
-enum class ShuttleType {
-    CAMPUS,        // 교내
-    OUTSIDE     // 통근
-}
-
-data class Station(
+data class StationNode(
     val name: String,
     val xRatio: Float,
     val yRatio: Float,
-    val time: LocalTime
+    val time: LocalTime? = null // 통근용 절대 시간
 )
 
-
-
-val kaiMaruTimes = listOf( //카이마루에서부터~
-    LocalTime.of(8, 40),
-    LocalTime.of(8, 55),
-    LocalTime.of(9, 10),
-    LocalTime.of(9, 25),
-    LocalTime.of(9, 40),
-    LocalTime.of(9, 55),
-    LocalTime.of(10, 10),
-    LocalTime.of(10, 25),
-    LocalTime.of(10, 40),
-    LocalTime.of(10, 55),
-    LocalTime.of(11, 10),
-    LocalTime.of(11, 25),
-    LocalTime.of(11, 40),
-
-    // 점심 공백 있음 (11:40 → 12:55)
-    LocalTime.of(12, 55),
-    LocalTime.of(13, 10),
-    LocalTime.of(13, 25),
-    LocalTime.of(13, 40),
-    LocalTime.of(13, 55),
-    LocalTime.of(14, 10),
-    LocalTime.of(14, 25),
-    LocalTime.of(14, 40),
-    LocalTime.of(14, 55),
-    LocalTime.of(15, 10),
-    LocalTime.of(15, 25),
-    LocalTime.of(15, 40),
-    LocalTime.of(15, 55),
-    LocalTime.of(16, 10),
-    LocalTime.of(16, 25),
-    LocalTime.of(16, 40),
-    LocalTime.of(16, 55)
-)
-
-
-val campusStationPositions = listOf(
-    "카이마루", "스컴", "창의관", "의과학센터", "파팔라도",
-    "나노종합", "정문", "신소재공학동", "희망/다솜관", "나눔관", "카이마루"
-)
-val now = LocalTime.now()
-
-
-val campusStations = campusStationPositions.mapIndexed { index, name ->
-    Station(
-        name = name,
-        xRatio = 153f/360f,
-        yRatio = when(index) { //50간격
-            0 -> 0f / 480f
-            1 -> 110f / 480f
-            2 -> 200f / 480f
-            3 -> 290f / 480f
-            4 -> 380f / 480f
-            5 -> 470f / 480f
-            6 -> 560f / 480f
-            7 -> 650f / 480f
-            8 -> 740f / 480f
-            else -> 830f / 480f
-        },
-    time = kaiMaruTimes.getOrElse(index) { LocalTime.of(8,40) } // 대충 첫 번째 시간으로 초기화
-    )
-}
-
-
+// 1. 교내 셔틀 출발 시간표 (String -> LocalTime 변환)
 val kaiMaruWeekdayTimes = listOf(
     "08:40", "08:55", "09:15", "09:35", "09:55",
     "10:10", "10:25", "10:45",
     "11:05", "11:25", "11:45",
-    "12:40","12:55",
+    "12:40", "12:55",
     "13:15", "13:35", "13:55",
     "14:10", "14:25", "14:45",
     "15:05", "15:25", "15:40", "15:55",
     "16:15", "16:35", "16:55"
+).map { LocalTime.parse(it, DateTimeFormatter.ofPattern("HH:mm")) }
+
+// 2. 교내 셔틀 정류장 오프셋 및 좌표
+// 좌표는 화면상의 대략적인 위치를 잡았습니다 (교내 노선은 보통 가운데나 특정 라인을 따르므로)
+val campusStationOffsets = listOf( //0.12f 출발
+    Triple("카이마루", 0, 0.12f), //시간,위치 (x축은 고정)
+    Triple("스컴", 2, 0.20f),
+    Triple("창의관", 4, 0.28f),
+    Triple("의과학센터", 6, 0.36f),
+    Triple("클리닉", 8, 0.44f),
+    Triple("나노종합", 10, 0.52f),
+    Triple("정문", 12, 0.60f),
+    Triple("신소재공학동", 14, 0.68f),
+    Triple("kisti", 16, 0.74f),
+    Triple("희망다솜", 18, 0.82f),
+    Triple("외국인아파트", 20, 0.90f)
 )
 
-
+// 3. 통근 1호차 데이터
 val commuterBus1Stations = listOf(
-    Station("대전복합터미널", 38f / 360f,  30f / 480f, LocalTime.of(7, 42)),
-    Station("홍도동",       38f / 360f,  80f / 480f, LocalTime.of(7, 44)),
-    Station("목동",         38f / 360f, 130f / 480f, LocalTime.of(7, 50)),
-    Station("태평동 오거리", 38f / 360f, 180f / 480f, LocalTime.of(8, 0)),
-    Station("가장동 래미안", 38f / 360f, 230f / 480f, LocalTime.of(8, 5)),
-    Station("갈마동(성심)",  38f / 360f, 280f / 480f, LocalTime.of(8, 15)),
-    Station("갈마동(바다)",  38f / 360f, 330f / 480f, LocalTime.of(8, 20)),
-    Station("유성온천역",   38f / 360f, 380f / 480f, LocalTime.of(8, 28)),
-    Station("KAIST",        38f / 360f, 430f / 480f, LocalTime.of(8, 35))
+    StationNode("대전복합터미널", 58f / 360f,  37f / 480f, LocalTime.of(7, 42)),
+    StationNode("홍도동",       58f / 360f,  90f / 480f, LocalTime.of(7, 44)),
+    StationNode("목동",         58f / 360f, 145f / 480f, LocalTime.of(7, 50)),
+    StationNode("태평동 오거리", 58f / 360f, 185f / 480f, LocalTime.of(8, 0)),
+    StationNode("가장동 래미안", 58f / 360f, 230f / 480f, LocalTime.of(8, 5)),
+    StationNode("갈마동(성심)",  58f / 360f, 275f / 480f, LocalTime.of(8, 15)),
+    StationNode("갈마동(바다)",  58f / 360f, 313f / 480f, LocalTime.of(8, 20)),
+    StationNode("유성온천역",   58f / 360f, 370f / 480f, LocalTime.of(8, 28)),
+    StationNode("KAIST",        58f / 360f, 405f / 480f, LocalTime.of(8, 35))
 )
 
-
+// 4. 통근 2호차 데이터
 val commuterBus2Stations = listOf(
-    Station("대동",      190f / 360f,  30f / 480f, LocalTime.of(7, 40)),
-    Station("문창동",    190f / 360f,  75f / 480f, LocalTime.of(7, 45)),
-    Station("부사동",    190f / 360f, 120f / 480f, LocalTime.of(7, 48)),
-    Station("대흥동",    190f / 360f, 165f / 480f, LocalTime.of(7, 52)),
-    Station("중촌동",    190f / 360f, 210f / 480f, LocalTime.of(7, 57)),
-    Station("둔산동",    190f / 360f, 255f / 480f, LocalTime.of(8, 7)),
-    Station("정부청사역",190f / 360f, 300f / 480f, LocalTime.of(8, 15)),
-    Station("월평역",    190f / 360f, 345f / 480f, LocalTime.of(8, 25)),
-    Station("궁동",      190f / 360f, 390f / 480f, LocalTime.of(8, 27)),
-    Station("KAIST",     190f / 360f, 435f / 480f, LocalTime.of(8, 40))
+    StationNode("대동",      206f / 360f,  35f / 480f, LocalTime.of(7, 40)),
+    StationNode("문창동",    206f / 360f,  82f / 480f, LocalTime.of(7, 45)),
+    StationNode("부사동",    206f / 360f, 127f / 480f, LocalTime.of(7, 48)),
+    StationNode("대흥동",    206f / 360f, 172f / 480f, LocalTime.of(7, 52)),
+    StationNode("중촌동",    206f / 360f, 218f / 480f, LocalTime.of(7, 57)),
+    StationNode("둔산동",    206f / 360f, 264f / 480f, LocalTime.of(8, 7)),
+    StationNode("정부청사역",206f / 360f, 310f / 480f, LocalTime.of(8, 15)),
+    StationNode("월평역",    206f / 360f, 355f / 480f, LocalTime.of(8, 25)),
+    StationNode("궁동",      206f / 360f, 400f / 480f, LocalTime.of(8, 27)),
+    StationNode("KAIST",     206f / 360f, 442f / 480f, LocalTime.of(8, 40))
 )
-//테스트용
+
+// 막차 시간 설정
+val campusEndTime = LocalTime.of(17, 30) // 교내 마지막 도착 대략 17:15 + 여유
+val commuter1EndTime = LocalTime.of(10, 0)
+val commuter2EndTime = LocalTime.of(10, 0)
 
 
-
-
-
+// ------------------------------------------------------------------------
+// [UI 컴포저블]
+// ------------------------------------------------------------------------
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -157,71 +114,84 @@ fun ShuttleScreenFixed(
     var selectedShuttle by rememberSaveable { mutableStateOf(startShuttle) }
     var showTimetable by remember { mutableStateOf(false) }
 
+    // =================================================================
+    // [⏰ 시간 제어 및 테스트 코드]
+    // =================================================================
+    // =================================================================
+    // [⏰ 시간 제어 및 테스트 코드]
+    // =================================================================
+    val currentTimeState = produceState(initialValue = LocalTime.of(8, 40, 0)) {
+        // 1. 시작 시간을 루프 '밖'에서 변수로 선언합니다.
+        var virtualTime = LocalTime.of(8, 40, 0) // 테스트 시작 시간 (아침 8시)
+
+        while (true) {
+            // 2. 현재 가상 시간을 UI에 반영
+            value = virtualTime
+
+            // 3. 시간을 흐르게 함 (속도 조절은 여기서!)
+            // 예: 0.1초(100ms)마다 실제 시간 10초씩 흐르게 설정 (100배속)
+            virtualTime = virtualTime.plusSeconds(2)
+            delay(100)
+
+            // [참고] 만약 실제 속도(1초에 1초)로 보고 싶다면:
+            // virtualTime = virtualTime.plusSeconds(1)
+            // delay(1000)
+        }
+    }
+    val now = currentTimeState.value
+    // =================================================================
+    // =================================================================
+
     Scaffold(
-        // 1. TopAppBar: 뒤로가기 버튼 명시적 배치
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        text = if (selectedShuttle == ShuttleType.CAMPUS) "교내 셔틀" else "통근 셔틀",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                },
+                title = { Text(if (selectedShuttle == ShuttleType.CAMPUS) "교내 셔틀" else "통근 셔틀") },
                 navigationIcon = {
                     IconButton(onClick = onClose) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "뒤로가기"
-                        )
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
         }
     ) { innerPadding ->
-        // Scaffold의 innerPadding을 적용하여 상단 바 아래부터 시작하게 함
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 2. 노선도 영역: 세로를 꽉 채우는 박스
             Box(
                 modifier = Modifier
-                    .weight(1f) // 남은 세로 공간 다 차지
-                    .fillMaxWidth(),
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                // 실제 이미지와 버스가 위치할 영역 (비율 유지)
+                // ✅ 수정됨: 배경 사진 세로 채우기 (FillHeight)
+                // 이미지가 잘리더라도 세로 길이를 꽉 채웁니다.
                 Box(
                     modifier = Modifier
-                        .fillMaxHeight() // 높이 기준 채우기
-                        .aspectRatio(if (selectedShuttle == ShuttleType.CAMPUS) 360f / 830f else 360f / 480f)
+                        .fillMaxHeight() // 부모 높이에 맞춤
+                        .aspectRatio(360f / 480f, matchHeightConstraintsFirst = true) // 비율 유지하되 높이 기준
                 ) {
-                    // 배경 이미지
                     Image(
-                        painter = painterResource(id = shuttleBackgroundImage(selectedShuttle)),
+                        painter = painterResource(
+                            id = if (selectedShuttle == ShuttleType.CAMPUS) R.drawable.bg_campus_circle
+                            else R.drawable.bg_outside_circle
+                        ),
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit
+                        contentScale = ContentScale.FillHeight // ✅ 세로 꽉 채우기 설정
                     )
 
-                    // 버스 레이어 (이미지 영역과 1:1 매칭)
-                    val stationsList = when (selectedShuttle) {
-                        ShuttleType.CAMPUS -> listOf(campusStations)
-                        ShuttleType.OUTSIDE -> listOf(commuterBus1Stations, commuterBus2Stations)
-                    }
-
-                    stationsList.forEach { stations ->
-                        BusMovingLayer(
-                            stations = stations,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
+                    // 움직이는 버스 레이어
+                    BusMovingLayer(
+                        shuttleType = selectedShuttle,
+                        currentTime = now
+                    )
                 }
             }
 
-            // 3. 하단 버튼
             Button(
                 onClick = { showTimetable = true },
                 modifier = Modifier
@@ -232,17 +202,175 @@ fun ShuttleScreenFixed(
             }
         }
 
-        // 4. 바텀 시트
         if (showTimetable) {
-            ShuttleTimetableBottomSheet(
-                shuttleType = selectedShuttle,
-                onDismiss = { showTimetable = false }
-            )
+            ShuttleTimetableBottomSheet(selectedShuttle) { showTimetable = false }
         }
     }
 }
 
+@Composable
+fun BusMovingLayer(
+    shuttleType: ShuttleType,
+    currentTime: LocalTime
+) {
+    val busPositions = remember(shuttleType, currentTime) {
+        if (shuttleType == ShuttleType.CAMPUS) {
+            calculateCampusBusPositions(currentTime)
+        } else {
+            calculateCommuterBusPositions(currentTime)
+        }
+    }
 
+    // 운행 중인지 체크 (막차 시간 이후인지)
+    val isServiceRunning = remember(shuttleType, currentTime) {
+        if (shuttleType == ShuttleType.CAMPUS) {
+            !currentTime.isAfter(campusEndTime) && !currentTime.isBefore(LocalTime.of(8, 30))
+        } else {
+            // 통근은 아침에만 운행하므로 10시 이전까지만 체크
+            !currentTime.isAfter(LocalTime.of(10, 0)) && !currentTime.isBefore(LocalTime.of(7, 30))
+        }
+    }
+
+    var size by remember { mutableStateOf(IntSize.Zero) }
+    val density = LocalDensity.current
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .onGloballyPositioned { size = it.size }
+    ) {
+        // 운행 시간이고 버스 위치가 있으면 렌더링
+        if (isServiceRunning) {
+            busPositions.forEach { (xRatio, yRatio) ->
+                val xPx = size.width * xRatio
+                val yPx = size.height * yRatio
+
+                Image(
+                    painter = painterResource(R.drawable.bus),
+                    contentDescription = "Bus",
+                    modifier = Modifier
+                        .size(32.dp)
+                        .offset(
+                            x = with(density) { xPx.toDp() } - 16.dp,
+                            y = with(density) { yPx.toDp() } - 16.dp
+                        )
+                )
+            }
+        }
+
+        // 팝업 표시 조건:
+        // 1. 아예 운행 시간이 지났거나 (isServiceRunning == false)
+        // 2. 운행 시간 내지만 현재 떠있는 버스가 없을 때 (배차 간격 사이 or 점심시간)
+        if (!isServiceRunning || busPositions.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .shadow(8.dp, RoundedCornerShape(12.dp))
+                    .background(Color.White, RoundedCornerShape(12.dp))
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "현재 운행 중인 버스가 없습니다.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Black
+                )
+            }
+        }
+    }
+}
+
+// ------------------------------------------------------------------------
+// [로직 함수]
+// ------------------------------------------------------------------------
+
+fun calculateCampusBusPositions(now: LocalTime): List<Pair<Float, Float>> {
+    val activeBuses = mutableListOf<Pair<Float, Float>>()
+
+    // 교내 버스 x좌표 (기본값 중앙 약간 왼쪽, 153/360 비율 참고)
+    val defaultX = 170f / 360f
+
+    kaiMaruWeekdayTimes.forEach { departureTime ->
+        // 각 역의 도착 예정 시간 계산
+        val routeTimes = campusStationOffsets.map { (_, offset, yRatio) ->
+            departureTime.plusMinutes(offset.toLong()) to yRatio
+        }
+
+        val startTime = routeTimes.first().first
+        val endTime = routeTimes.last().first
+
+        // 현재 이 버스가 운행 중인가?
+        if (!now.isBefore(startTime) && now.isBefore(endTime)) {
+            // 현재 어떤 역 사이를 지나가고 있나?
+            for (i in 0 until routeTimes.size - 1) {
+                val (sTime, sY) = routeTimes[i]
+                val (eTime, eY) = routeTimes[i + 1]
+
+                if (!now.isBefore(sTime) && now.isBefore(eTime)) {
+                    val totalMillis = Duration.between(sTime, eTime).toMillis()
+                    val passedMillis = Duration.between(sTime, now).toMillis()
+                    val progress = if (totalMillis > 0) passedMillis.toFloat() / totalMillis else 0f
+
+                    // Y축만 이동 (X축은 고정 혹은 필요시 변경)
+                    val currentY = lerp(sY, eY, progress)
+
+                    activeBuses.add(defaultX to currentY)
+                    break
+                }
+            }
+        }
+    }
+    return activeBuses
+}
+
+fun calculateCommuterBusPositions(now: LocalTime): List<Pair<Float, Float>> {
+    val positions = mutableListOf<Pair<Float, Float>>()
+
+    // 1호차 계산
+    calculateSingleBusPosition(now, commuterBus1Stations)?.let {
+        if (now.isBefore(commuter1EndTime)) positions.add(it)
+    }
+
+    // 2호차 계산
+    calculateSingleBusPosition(now, commuterBus2Stations)?.let {
+        if (now.isBefore(commuter2EndTime)) positions.add(it)
+    }
+
+    return positions
+}
+
+fun calculateSingleBusPosition(
+    now: LocalTime,
+    stations: List<StationNode>
+): Pair<Float, Float>? {
+    val startTime = stations.first().time ?: return null
+    val endTime = stations.last().time ?: return null
+
+    if (now.isBefore(startTime) || now.isAfter(endTime)) return null
+
+    for (i in 0 until stations.size - 1) {
+        val startNode = stations[i]
+        val endNode = stations[i + 1]
+
+        val sTime = startNode.time ?: continue
+        val eTime = endNode.time ?: continue
+
+        if (!now.isBefore(sTime) && now.isBefore(eTime)) {
+            val totalMillis = Duration.between(sTime, eTime).toMillis()
+            val passedMillis = Duration.between(sTime, now).toMillis()
+            val progress = if (totalMillis > 0) passedMillis.toFloat() / totalMillis else 0f
+
+            val currentX = lerp(startNode.xRatio, endNode.xRatio, progress)
+            val currentY = lerp(startNode.yRatio, endNode.yRatio, progress)
+
+            return currentX to currentY
+        }
+    }
+    return null
+}
+
+// ------------------------------------------------------------------------
+// [시간표 UI]
+// ------------------------------------------------------------------------
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -250,224 +378,47 @@ fun ShuttleTimetableBottomSheet(
     shuttleType: ShuttleType,
     onDismiss: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = false
-    )
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState
-    ) {
-        Box(
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 300.dp)
+                .padding(bottom = 56.dp)
+                .verticalScroll(rememberScrollState())
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 56.dp) // 버튼 공간 확보
-            ) {
-                // 드래그 바
-
-
-                Text(
-                    text = when (shuttleType) {
-                        ShuttleType.CAMPUS -> "교내 셔틀 시간표"
-                        ShuttleType.OUTSIDE -> "통근 셔틀 시간표"
-                    },
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(16.dp)
-                )
-
-                when (shuttleType) {
-                    ShuttleType.CAMPUS -> KaiMaruTimetableContent()
-                    ShuttleType.OUTSIDE -> CommuterTimetableContent()
-                }
-            }
-        }
-    }
-}
-
-
-
-@Composable
-fun rememberBusState(
-    stations: List<Station>
-): Pair<Pair<Float, Float>?, Boolean> {
-
-    val now by produceState(initialValue = LocalTime.now()) {
-        while (true) {
-            value = LocalTime.now()
-            delay(1000)
-        }
-    }
-
-    // ✅ 현재 시간이 포함된 운행 구간이 있는지 검사
-    for (i in 0 until stations.size - 1) {
-        val start = stations[i]
-        val end = stations[i + 1]
-
-        if (!now.isBefore(start.time) && now.isBefore(end.time)) {
-            val total =
-                java.time.Duration.between(start.time, end.time).toMillis()
-            val passed =
-                java.time.Duration.between(start.time, now).toMillis()
-
-            val progress = passed.toFloat() / total
-
-            val xRatio = lerp(start.xRatio, end.xRatio, progress)
-            val yRatio = lerp(start.yRatio, end.yRatio, progress)
-
-            return (xRatio to yRatio) to false // 운행 중
-        }
-    }
-
-    // ✅ 어떤 구간에도 속하지 않으면 운행 종료
-    return null to true
-}
-
-
-@Composable
-fun BusMovingLayer(
-    stations: List<Station>,
-    modifier: Modifier = Modifier
-) {
-    val (busRatio, finished) = rememberBusState(stations)
-    var size by remember { mutableStateOf(IntSize.Zero) }
-    val density = LocalDensity.current
-
-    Box(
-        modifier = modifier.onGloballyPositioned { size = it.size }
-    ) {
-        if (!finished && busRatio != null && size != IntSize.Zero) {
-            val (xRatio, yRatio) = busRatio
-
-            val xPx = size.width * xRatio
-            val yPx = size.height * yRatio
-
-            Image(
-                painter = painterResource(R.drawable.bus),
-                contentDescription = "Bus",
-                modifier = Modifier
-                    .size(24.dp)
-                    .offset(
-                        x = with(density) { xPx.toDp() } - 12.dp,
-                        y = with(density) { yPx.toDp() } - 12.dp
-                    )
+            Text(
+                text = if (shuttleType == ShuttleType.CAMPUS) "교내 셔틀 시간표" else "통근 셔틀 시간표",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(16.dp)
             )
-        }
 
-        // 🚌 운행 종료 시 뜨는 흰색 네모 알림
-        if (finished) {
-            Surface(
-                color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.95f),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
-                shadowElevation = 8.dp,
-                modifier = Modifier.align(Alignment.Center)
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "🚌 현재 운행 정보가 없습니다",
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                            color = androidx.compose.ui.graphics.Color.Black
-                        )
-                    )
+            if (shuttleType == ShuttleType.CAMPUS) {
+                kaiMaruWeekdayTimes.forEach { time ->
+                    TimeRow("카이마루 출발", time)
+                }
+            } else {
+                Text("1호차", Modifier.padding(16.dp), style = MaterialTheme.typography.titleSmall)
+                commuterBus1Stations.forEach { node ->
+                    node.time?.let { TimeRow(node.name, it) }
+                }
+                Divider(Modifier.padding(vertical = 8.dp))
+                Text("2호차", Modifier.padding(16.dp), style = MaterialTheme.typography.titleSmall)
+                commuterBus2Stations.forEach { node ->
+                    node.time?.let { TimeRow(node.name, it) }
                 }
             }
         }
     }
 }
 
-
 @Composable
-fun shuttleBackgroundImage(shuttleType: ShuttleType): Int {
-    return when (shuttleType) {
-        ShuttleType.CAMPUS -> R.drawable.bg_campus_circle
-        ShuttleType.OUTSIDE -> R.drawable.bg_outside_circle
-    }
-}
-@Composable
-fun KaiMaruTimetableContent() {
-    Column(
+fun TimeRow(name: String, time: LocalTime) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = "카이마루 (KAIST 학생식당) 출발 시간",
-            style = MaterialTheme.typography.titleMedium
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "배차간격 15분 · 평일 전용",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // 헤더
-
-        Divider(modifier = Modifier.padding(vertical = 8.dp))
-
-        // 시간표 목록
-        kaiMaruWeekdayTimes.forEach { time ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 6.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("${time.replace(":", "시 ")}분")
-            }
-        }
+        Text(name)
+        Text(time.format(DateTimeFormatter.ofPattern("HH:mm")))
     }
 }
-
-@Composable
-fun CommuterTimetableContent() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
-    ) {
-        // 1호차
-        Text("1호차", style = MaterialTheme.typography.titleSmall)
-        Spacer(modifier = Modifier.height(4.dp))
-        commuterBus1Stations.forEach { station ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(station.time.format(DateTimeFormatter.ofPattern("HH시 mm분")))
-                Text(station.name)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 2호차
-        Text("2호차", style = MaterialTheme.typography.titleSmall)
-        Spacer(modifier = Modifier.height(4.dp))
-        commuterBus2Stations.forEach { station ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(station.time.format(DateTimeFormatter.ofPattern("HH시 mm분")))
-                Text(station.name)
-            }
-        }
-    }
-}
-
-
-
-
-
