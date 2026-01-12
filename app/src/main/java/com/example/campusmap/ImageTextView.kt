@@ -38,7 +38,7 @@ fun ImageTextView(id: Int, imageURL: String, title: String, onItemClick: (Int) -
                 model = imageURL,
                 contentDescription = title,
                 modifier = Modifier
-                    .heightIn(max = screenHeight * 0.4f)
+                    .heightIn(max = screenHeight * 0.35f)
                     .height(200.dp),
                 contentScale = ContentScale.Crop
             )

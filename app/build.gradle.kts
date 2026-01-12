@@ -79,6 +79,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("dev.chrisbanes.haze:haze:0.6.0") // Blur
 
     // Used to implement navigation
     val nav_version = "2.9.6"

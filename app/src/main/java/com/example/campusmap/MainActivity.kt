@@ -12,6 +12,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -94,6 +95,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.layout.WindowMetricsCalculator
 import com.example.campusmap.ui.map.CampusMapScreen
+import com.example.campusmap.ui.theme.appBackground
 import com.example.campusmap.ui.theme.black
 import com.example.campusmap.ui.theme.dark
 import com.example.campusmap.ui.theme.white
@@ -138,7 +140,6 @@ fun CampusmapApp() {
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(initialLatLng, 16f)
     }
-    var markerPosition by rememberSaveable { mutableStateOf(initialLatLng) }
     var markerState = rememberMarkerState(position = initialLatLng)
 
     val myItemColors = NavigationSuiteDefaults.itemColors(
@@ -188,17 +189,20 @@ fun CampusmapApp() {
             when (currentDestination) {
                 AppDestinations.MAP ->
                     Map(Modifier.fillMaxHeight(), cameraPositionState, markerState)
-                AppDestinations.FACILITIES ->
+                AppDestinations.FACILITIES -> {
+                    BackHandler(enabled = true) {
+                        currentDestination = AppDestinations.MAP
+                    }
                     FacilitiesNavigation(padding = innerPadding, onMoveToMap = { coordinate ->
                         currentDestination = AppDestinations.MAP
                         markerState.position = coordinate
-                        markerPosition = coordinate
                         scope.launch {
                             cameraPositionState.animate(
                                 update = CameraUpdateFactory.newLatLngZoom(coordinate, 18f)
                             )
                         }
                     })
+                }
                 AppDestinations.SHUTTLE ->
                     Shuttle(
                         name = "Hello, world!",
@@ -276,9 +280,9 @@ val mapCategories = listOf(
     MapCategory(Icons.Default.Restaurant,"식당", Color(250, 189, 0, 255)),
     MapCategory(Icons.Default.LocalCafe,"카페", Color(243, 118, 0, 255)),
     MapCategory(Icons.Default.ShoppingCart,"매점", Color(0, 203, 27, 255)),
-    MapCategory(Icons.Default.DirectionsBus,"셔틀 정류장", Color.Black),
+    MapCategory(Icons.Default.DirectionsBus,"셔틀", Color.Black),
     MapCategory(Icons.Default.HomeWork,"기숙사", Color(69, 0, 255, 255)),
-    MapCategory(Icons.Default.Place,"가볼 만한 곳", Color(255, 0, 161, 255)),
+//    MapCategory(Icons.Default.Place,"가볼 만한 곳", Color(255, 0, 161, 255)),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -329,10 +333,10 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
         }
     }
     @Composable
-    fun SearchResultRow(data: PlaceData) {
+    fun SearchResultRow(data: PlaceData, clickable: Boolean = true) {
         Column(
             modifier = Modifier
-                .clickable {
+                .clickable(enabled = clickable) {
                     searchFieldText = data.title
                     selectedPlace = data
                     scope.launch {
@@ -373,103 +377,159 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                 || item.description.contains(searchQuery)
     }
     val density = LocalDensity.current
-    var mainContentHeight by remember { mutableStateOf(0.dp) }
 
-    BottomSheetScaffold(
-        scaffoldState = sheetScaffoldState,
-        sheetPeekHeight = if (searchQuery.isBlank()) 0.dp else 140.dp,
-        sheetContainerColor = Color.White,
-        sheetContent = {
-            LazyColumn(
-                modifier = if (searchQuery.isBlank()) {
-                    Modifier.heightIn(max = 0.dp)
-                } else {
-                    Modifier.heightIn(
-                        max = mainContentHeight - WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-                    )
-                }
-            ) {
+    BoxWithConstraints {
+        val containerHeight = maxHeight
+        val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+        val handleHeight = 48.dp
+        val maxSheetHeight = containerHeight - statusBarHeight - handleHeight
+
+        BottomSheetScaffold(
+            scaffoldState = sheetScaffoldState,
+            sheetPeekHeight = if (searchQuery.isBlank()) 0.dp else 160.dp,
+            sheetContainerColor = appBackground,
+            sheetContent = {
                 if (selectedPlace != null) {
-                    item {
-                        SearchResultRow(selectedPlace!!)
+                    LazyColumn(
+                        modifier = Modifier
+                            .heightIn(max = if (searchQuery.isBlank()) 0.dp else maxSheetHeight)
+                            .padding(horizontal = 20.dp)
+                            .padding(bottom = 20.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(white)
+                    ) {
+                        item {
+                            SearchResultRow(selectedPlace!!, clickable = false)
+                        }
                     }
                 } else if (searchResult.isNotEmpty()) {
-                    items(searchResult) { resultItem ->
-                        SearchResultRow(resultItem)
+                    Text(
+                        text = "검색 결과 ${searchResult.size}개",
+                        modifier = Modifier
+                            .padding(horizontal = 40.dp)
+                            .padding(bottom = 10.dp)
+                    )
+                    LazyColumn(
+                        modifier = Modifier
+                            .heightIn(max = if (searchQuery.isBlank()) 0.dp else maxSheetHeight)
+                            .padding(horizontal = 20.dp)
+                            .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                            .background(white)
+                    ) {
+                        items(searchResult) { resultItem ->
+                            SearchResultRow(resultItem)
+                        }
                     }
                 } else {
-                    item {
-                        Text(
-                            text = "검색 결과가 없습니다.",
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            textAlign = TextAlign.Center
-                        )
-                    }
+                    Text(
+                        text = "검색 결과가 없습니다.",
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
-        }
-    ) {
-        Box(
-            modifier = Modifier
-                .onGloballyPositioned { coordinates ->
-                    mainContentHeight = with(density) { coordinates.size.height.toDp() }
-                }
-        ) {
-            CampusMapScreen(
-                modifier = modifier.fillMaxSize(),
-                cameraPositionState = cameraPositionState,
-                mapProperties = mapProperties,
-                markerState = markerState
-            )
+        ) { innerPadding ->
+            Box {
+                CampusMapScreen(
+                    modifier = modifier.fillMaxSize(),
+                    cameraPositionState = cameraPositionState,
+                    mapProperties = mapProperties,
+                    markerState = markerState
+                )
 
-            Column() {
-                Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .shadow(elevation = 5.dp, shape = RoundedCornerShape(50.dp))
-                        .clip(RoundedCornerShape(50.dp))
-                        .background(Color.White),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (selectedPlace != null ) {
-                        BackHandler(enabled = true) { selectedPlace = null }
-                        IconButton(
-                            onClick = { selectedPlace = null }
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                                contentDescription = "뒤로"
-                            )
-                        }
-                    } else if (searchQuery.isNotBlank()) {
-                        fun clearSearchField() {
-                            searchFieldText = ""
-                            searchQuery = ""
-                        }
-                        BackHandler(enabled = true) { clearSearchField() }
-                        IconButton(
-                            onClick = { clearSearchField() }
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                                contentDescription = "뒤로"
-                            )
-                        }
-                    }
-                    BasicTextField(
-                        value = searchFieldText,
-                        onValueChange = { newValue -> searchFieldText = newValue },
-                        interactionSource = interactionSource,
+                Column() {
+                    Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
+                    Row(
                         modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = if (selectedPlace == null && searchQuery.isBlank()) 20.dp else 0.dp),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                        keyboardActions = KeyboardActions(
-                            onSearch = {
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .shadow(elevation = 5.dp, shape = RoundedCornerShape(50.dp))
+                            .clip(RoundedCornerShape(50.dp))
+                            .background(Color.White),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (selectedPlace != null) {
+                            BackHandler(enabled = true) { selectedPlace = null }
+                            IconButton(
+                                onClick = { selectedPlace = null }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                                    contentDescription = "뒤로"
+                                )
+                            }
+                        } else if (searchQuery.isNotBlank()) {
+                            fun clearSearchField() {
+                                searchFieldText = ""
+                                searchQuery = ""
+                            }
+                            BackHandler(enabled = true) { clearSearchField() }
+                            IconButton(
+                                onClick = { clearSearchField() }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                                    contentDescription = "뒤로"
+                                )
+                            }
+                        }
+                        BasicTextField(
+                            value = searchFieldText,
+                            onValueChange = { newValue -> searchFieldText = newValue },
+                            interactionSource = interactionSource,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = if (selectedPlace == null && searchQuery.isBlank()) 20.dp else 0.dp),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                            keyboardActions = KeyboardActions(
+                                onSearch = {
+                                    keyboardController?.hide()
+                                    selectedPlace = null
+                                    searchQuery = searchFieldText.trimEnd()
+                                    if (searchQuery.isBlank()) {
+                                        scope.launch {
+                                            sheetScaffoldState.bottomSheetState.partialExpand()
+                                        }
+                                    }
+                                }
+                            ),
+                        ) { innerTextField ->
+                            TextFieldDefaults.DecorationBox(
+                                value = searchFieldText,
+                                innerTextField = innerTextField,
+                                enabled = true,
+                                singleLine = true,
+                                visualTransformation = VisualTransformation.None,
+                                interactionSource = interactionSource,
+                                contentPadding = PaddingValues(0.dp),
+                                container = {
+                                    Box {
+                                        if (searchFieldText.isEmpty()) {
+                                            Text(
+                                                text = "검색",
+                                                fontSize = 16.sp,
+                                                color = Color.Gray
+                                            )
+                                        }
+                                        TextFieldDefaults.Container(
+                                            enabled = true,
+                                            isError = false,
+                                            interactionSource = interactionSource,
+                                            colors = TextFieldDefaults.colors(
+                                                focusedContainerColor = Color.Transparent,
+                                                unfocusedContainerColor = Color.Transparent,
+                                                focusedIndicatorColor = Color.Transparent,
+                                                unfocusedIndicatorColor = Color.Transparent
+                                            )
+                                        )
+                                    }
+                                }
+                            )
+                        }
+                        IconButton(
+                            onClick = {
                                 keyboardController?.hide()
                                 searchQuery = searchFieldText.trimEnd()
                                 if (searchQuery.isBlank()) {
@@ -478,64 +538,21 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                                     }
                                 }
                             }
-                        ),
-                    ) { innerTextField ->
-                        TextFieldDefaults.DecorationBox(
-                            value = searchFieldText,
-                            innerTextField = innerTextField,
-                            enabled = true,
-                            singleLine = true,
-                            visualTransformation = VisualTransformation.None,
-                            interactionSource = interactionSource,
-                            contentPadding = PaddingValues(0.dp),
-                            container = {
-                                Box {
-                                    if (searchFieldText.isEmpty()) {
-                                        Text(
-                                            text = "검색",
-                                            fontSize = 16.sp,
-                                            color = Color.Gray
-                                        )
-                                    }
-                                    TextFieldDefaults.Container(
-                                        enabled = true,
-                                        isError = false,
-                                        interactionSource = interactionSource,
-                                        colors = TextFieldDefaults.colors(
-                                            focusedContainerColor = Color.Transparent,
-                                            unfocusedContainerColor = Color.Transparent,
-                                            focusedIndicatorColor = Color.Transparent,
-                                            unfocusedIndicatorColor = Color.Transparent
-                                        )
-                                    )
-                                }
-                            }
-                        )
-                    }
-                    IconButton(
-                        onClick = {
-                            keyboardController?.hide()
-                            searchQuery = searchFieldText.trimEnd()
-                            if (searchQuery.isBlank()) {
-                                scope.launch {
-                                    sheetScaffoldState.bottomSheetState.partialExpand()
-                                }
-                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "검색"
+                            )
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "검색"
-                        )
                     }
-                }
-                if (searchQuery.isBlank()) {
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        contentPadding = PaddingValues(16.dp, 12.dp)
-                    ) {
-                        items(mapCategories) { item ->
-                            MapCategoryButton(item)
+                    if (searchQuery.isBlank()) {
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            contentPadding = PaddingValues(16.dp, 12.dp)
+                        ) {
+                            items(mapCategories) { item ->
+                                MapCategoryButton(item)
+                            }
                         }
                     }
                 }
