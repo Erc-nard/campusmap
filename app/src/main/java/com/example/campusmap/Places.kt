@@ -121,12 +121,14 @@ val places = listOf(
         category = "식당",
         location = Location("N11", "카이마루"),
         keywords = listOf("카마", "북측식당", "북측"),
+        coordinates = LatLng(36.373750, 127.359234),
         description = "학식, 푸드코트"
     ),
     PlaceData(
         title = "리틀하노이",
         category = "식당",
         location = Location("N11", "카이마루"),
+        coordinates = LatLng(36.373750, 127.359234),
         keywords = listOf("카마", "북측식당", "북측"),
         description = "베트남음식, 쌀국수"
     ),
@@ -134,6 +136,7 @@ val places = listOf(
         title = "별리달리",
         category = "식당",
         location = Location("N11", "카이마루"),
+        coordinates = LatLng(36.373750, 127.359234),
         keywords = listOf("카마", "북측식당", "북측"),
         description = "돈까스, 볶음밥"
     ),
@@ -141,6 +144,7 @@ val places = listOf(
         title = "웰차이",
         category = "식당",
         location = Location("N11", "카이마루"),
+        coordinates = LatLng(36.373750, 127.359234),
         keywords = listOf("카마", "북측식당", "북측"),
         description = "중식, 짜장면, 짬뽕, 탕수육"
     ),
@@ -148,25 +152,26 @@ val places = listOf(
         title = "롤링파스타",
         category = "식당",
         location = Location("N11", "카이마루"),
+        coordinates = LatLng(36.373750, 127.359234),
         keywords = listOf("카마", "북측식당", "북측"),
         description = "양식, 파스타"
     ),
     PlaceData(
         title = "인생설렁탕",
         category = "식당",
-        location = Location("N13", "카이마루", 2),
+        location = Location("N13", "태울관", 2),
         description = "설렁탕, 해장국"
     ),
     PlaceData(
         title = "제순식당",
         category = "식당",
-        location = Location("N13", "카이마루", 2),
+        location = Location("N13", "태울관", 2),
         description = "제육볶음"
     ),
     PlaceData(
         title = "역전우동",
         category = "식당",
-        location = Location("N13", "카이마루", 2),
+        location = Location("N13", "태울관", 2),
         description = "우동"
     ),
 
