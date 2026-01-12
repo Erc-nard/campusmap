@@ -218,7 +218,7 @@ fun FacilitiesNavigation(padding: PaddingValues, onMoveToMap: (LatLng) -> Unit) 
                                 navController.popBackStack()
                             }
                         ) {
-                            Icon(imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Back")
+                            Icon(imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "뒤로")
                         }
                     }
                 },
