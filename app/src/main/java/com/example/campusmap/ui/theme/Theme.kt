@@ -17,24 +17,24 @@ import com.example.campusmap.ui.theme.*
 
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = black,
-    tertiary = Pink80,
-    background = Color(0xFF1E1E1E),   // 다크 모드 배경
-    surface = Color(0xFF1E1E1E),      // 카드, 표면
-    onPrimary = white,           // primary 위 텍스트
-    onSecondary = white,
-    onBackground = white,        // 배경 위 텍스트
-    onSurface = white
+    primary = main, //다크모드따위는없다
+    secondary = white,
+    tertiary = dark,
+    background = white,   // 밝은 배경
+    surface = white,      // 카드, 표면
+    onPrimary = main, //primary 위 텍스트색
+    onSecondary = black,
+    onBackground = black,       // 배경 위 텍스트
+    onSurface = black
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
+    primary = main,
     secondary = white,
-    tertiary = Pink40,
-    background = Color(0xFFFFFFFF),   // 밝은 배경
-    surface = Color(0xFFFFFFFF),      // 카드, 표면
-    onPrimary = white,
+    tertiary = dark,
+    background = white,   // 밝은 배경
+    surface = white,      // 카드, 표면
+    onPrimary = white, //primary 위 텍스트색
     onSecondary = black,
     onBackground = black,       // 배경 위 텍스트
     onSurface = black

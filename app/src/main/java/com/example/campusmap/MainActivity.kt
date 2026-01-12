@@ -37,17 +37,28 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Coffee
+import androidx.compose.material.icons.filled.DirectionsBus
+import androidx.compose.material.icons.filled.HomeWork
+import androidx.compose.material.icons.filled.LocalCafe
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -55,9 +66,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.layout.WindowMetricsCalculator
 import com.example.campusmap.ui.map.CampusMapScreen
+import com.example.campusmap.ui.theme.black
+import com.example.campusmap.ui.theme.dark
+import com.example.campusmap.ui.theme.white
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -70,6 +85,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -97,18 +113,42 @@ fun CampusmapApp() {
     }
     var markerPosition by rememberSaveable { mutableStateOf(initialLatLng) }
 
+    val myItemColors = NavigationSuiteDefaults.itemColors(
+        navigationBarItemColors = NavigationBarItemDefaults.colors(
+            selectedIconColor = Color(0xFF004187),
+            selectedTextColor = Color(0xFF004187),
+            indicatorColor = Color(0xFFD0ECF9),
+            unselectedIconColor = black,
+            unselectedTextColor = black
+        ),
+        navigationRailItemColors = NavigationRailItemDefaults.colors(
+            selectedIconColor = Color(0xFF004187),
+            selectedTextColor = Color(0xFF004187),
+            indicatorColor = Color(0xFFD0ECF9),
+            unselectedIconColor = black,
+            unselectedTextColor = black
+        )
+    )
+
     NavigationSuiteScaffold(
+        containerColor = Color.White,
+        navigationSuiteColors = NavigationSuiteDefaults.colors(
+            navigationBarContainerColor = Color(0xFFFDFDFD),
+            navigationBarContentColor = dark
+        ),
         navigationSuiteItems = {
-            AppDestinations.entries.forEach {
+            AppDestinations.entries.forEach { destination ->
+                // 2. 미리 만들어둔 myItemColors 변수를 그대로 사용합니다.
                 item(
-                    icon = { Icon(it.icon, contentDescription = it.label) },
-                    label = { Text(it.label) },
-                    selected = it == currentDestination,
+                    icon = { Icon(destination.icon, contentDescription = destination.label) },
+                    label = { Text(destination.label) },
+                    selected = destination == currentDestination,
+                    colors = myItemColors,
                     onClick = {
-                        if (it == AppDestinations.SHUTTLE) {
+                        if (destination == AppDestinations.SHUTTLE) {
                             showShuttleSheet = true
                         } else {
-                            currentDestination = it
+                            currentDestination = destination
                         }
                     }
 
@@ -204,33 +244,49 @@ enum class AppDestinations(
     val icon: ImageVector,
 ) {
     MAP("지도", Icons.Default.Map),
-    FACILITIES("시설", Icons.Default.Place),
-    SHUTTLE("셔틀", Icons.Default.ShoppingCart),
+    FACILITIES("시설 안내", Icons.Default.Place),
+    SHUTTLE("셔틀버스", Icons.Default.DirectionsBus),
 }
 
-data class MapCategory(val text: String, val color: Color)
+data class MapCategory(val icon: ImageVector, val text: String, val color: Color)
 val mapCategories = listOf(
-    MapCategory("강의동", Color.LightGray),
-    MapCategory("식당", Color(251, 198, 18)),
-    MapCategory("카페", Color(140,98, 57)),
-    MapCategory("매점", Color(57, 181, 74)),
-    MapCategory("셔틀 정류장", Color.DarkGray),
-    MapCategory("기숙사", Color(41,171, 226)),
-    MapCategory("가볼 만한 곳", Color(255,153, 218)),
+    MapCategory(Icons.Default.School,"강의동", Color(95,190,235)),
+    MapCategory(Icons.Default.Restaurant,"식당", Color(250, 189, 0, 255)),
+    MapCategory(Icons.Default.LocalCafe,"카페", Color(243, 118, 0, 255)),
+    MapCategory(Icons.Default.ShoppingCart,"매점", Color(0, 203, 27, 255)),
+    MapCategory(Icons.Default.DirectionsBus,"셔틀 정류장", Color.Black),
+    MapCategory(Icons.Default.HomeWork,"기숙사", Color(69, 0, 255, 255)),
+    MapCategory(Icons.Default.Place,"가볼 만한 곳", Color(255, 0, 161, 255)),
 )
 @Composable
 fun MapCategoryButton(data: MapCategory) {
     Row(
         modifier = Modifier
             .shadow(3.dp, shape = RoundedCornerShape(20.dp))
-            .border(width = 1.dp, color = data.color, shape = RoundedCornerShape(20.dp))
+            .border(
+                width = 2.dp,
+                color = white,
+                shape = RoundedCornerShape(20.dp)
+            )
             .clip(RoundedCornerShape(20.dp))
-            .background(Color.White)
+            .background(white)
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
+
+        // 🔹 아이콘
+        Icon(
+            imageVector = data.icon,
+            contentDescription = data.text,
+            modifier = Modifier.size(16.dp),
+            tint = data.color
+        )
+
+        Spacer(modifier = Modifier.width(6.dp))
+
+        // 🔹 텍스트
         Text(
-            text = data.text,
-            modifier = Modifier
-                .padding(8.dp, 4.dp)
+            text = data.text
         )
     }
 }
