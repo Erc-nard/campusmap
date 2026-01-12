@@ -9,7 +9,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,6 +56,7 @@ import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.School
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -80,8 +83,10 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.layout.WindowMetricsCalculator
@@ -99,6 +104,7 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
+import java.time.format.TextStyle
 
 
 class MainActivity : ComponentActivity() {
@@ -286,6 +292,7 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
             maxZoomPreference = 20f
         )
     }
+    val interactionSource = remember { MutableInteractionSource() }
     var searchFieldText by remember { mutableStateOf("")}
     var searchQuery by remember { mutableStateOf("")}
     var selectedPlace by remember { mutableStateOf<PlaceData?>(null) }
@@ -297,7 +304,7 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
     fun MapCategoryButton(data: MapCategory) {
         Row(
             modifier = Modifier
-                .shadow(3.dp, shape = RoundedCornerShape(20.dp))
+                .shadow(8.dp, shape = RoundedCornerShape(20.dp))
                 .border(
                     width = 2.dp,
                     color = white,
@@ -368,15 +375,22 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .shadow(elevation = 5.dp, shape = RoundedCornerShape(50.dp))
+                        .shadow(elevation = 8.dp, shape = RoundedCornerShape(50.dp))
                         .clip(RoundedCornerShape(50.dp))
                         .background(Color.White),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (selectedPlace != null ) {
-                        BackHandler(enabled = true) { selectedPlace = null }
+                    if (selectedPlace != null) {
+                        BackHandler(enabled = true) {
+                            selectedPlace = null
+                            searchFieldText = searchQuery
+                        }
                         IconButton(
-                            onClick = { selectedPlace = null }
+                            onClick = {
+                                selectedPlace = null
+                                searchFieldText = searchQuery
+                            },
+                            modifier = Modifier.padding(start = 2.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Default.ArrowBack,
@@ -390,7 +404,8 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                         }
                         BackHandler(enabled = true) { clearSearchField() }
                         IconButton(
-                            onClick = { clearSearchField() }
+                            onClick = { clearSearchField() },
+                            modifier = Modifier.padding(start = 2.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Default.ArrowBack,
@@ -398,9 +413,14 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                             )
                         }
                     }
-                    TextField(
+                    BasicTextField(
                         value = searchFieldText,
                         onValueChange = { newValue -> searchFieldText = newValue },
+                        interactionSource = interactionSource,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = if (selectedPlace == null && searchQuery.isBlank()) 20.dp else 0.dp),
+                        singleLine = true,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                         keyboardActions = KeyboardActions(
                             onSearch = {
@@ -413,17 +433,39 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                                 }
                             }
                         ),
-                        modifier = Modifier
-                            .weight(1f),
-                        placeholder = { Text("건물, 식당, 편의시설 검색") },
-                        singleLine = true,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
+                    ) { innerTextField ->
+                        TextFieldDefaults.DecorationBox(
+                            value = searchFieldText,
+                            innerTextField = innerTextField,
+                            enabled = true,
+                            singleLine = true,
+                            visualTransformation = VisualTransformation.None,
+                            interactionSource = interactionSource,
+                            contentPadding = PaddingValues(0.dp),
+                            container = {
+                                Box {
+                                    if (searchFieldText.isEmpty()) {
+                                        Text(
+                                            text = "검색",
+                                            fontSize = 16.sp,
+                                            color = Color.Gray
+                                        )
+                                    }
+                                    TextFieldDefaults.Container(
+                                        enabled = true,
+                                        isError = false,
+                                        interactionSource = interactionSource,
+                                        colors = TextFieldDefaults.colors(
+                                            focusedContainerColor = Color.Transparent,
+                                            unfocusedContainerColor = Color.Transparent,
+                                            focusedIndicatorColor = Color.Transparent,
+                                            unfocusedIndicatorColor = Color.Transparent
+                                        )
+                                    )
+                                }
+                            }
                         )
-                    )
+                    }
                     IconButton(
                         onClick = {
                             keyboardController?.hide()
@@ -433,7 +475,8 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                                     sheetScaffoldState.bottomSheetState.partialExpand()
                                 }
                             }
-                        }
+                        },
+                        modifier = Modifier.padding(end = 2.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Search,
