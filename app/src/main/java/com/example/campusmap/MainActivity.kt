@@ -95,7 +95,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 
 
@@ -128,6 +130,7 @@ fun CampusmapApp() {
         position = CameraPosition.fromLatLngZoom(initialLatLng, 16f)
     }
     var markerPosition by rememberSaveable { mutableStateOf(initialLatLng) }
+    var markerState = rememberMarkerState(position = initialLatLng)
 
     val myItemColors = NavigationSuiteDefaults.itemColors(
         navigationBarItemColors = NavigationBarItemDefaults.colors(
@@ -175,10 +178,11 @@ fun CampusmapApp() {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             when (currentDestination) {
                 AppDestinations.MAP ->
-                    Map(Modifier.fillMaxHeight(), cameraPositionState, markerPosition)
+                    Map(Modifier.fillMaxHeight(), cameraPositionState, markerState)
                 AppDestinations.FACILITIES ->
                     FacilitiesNavigation(padding = innerPadding, onMoveToMap = { coordinate ->
                         currentDestination = AppDestinations.MAP
+                        markerState.position = coordinate
                         markerPosition = coordinate
                         scope.launch {
                             cameraPositionState.animate(
@@ -271,7 +275,7 @@ val mapCategories = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState, markerPosition: LatLng) {
+fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState, markerState: MarkerState) {
     val mapProperties = remember {
         MapProperties(
             latLngBoundsForCameraTarget = LatLngBounds(
@@ -284,6 +288,7 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
     }
     var searchFieldText by remember { mutableStateOf("")}
     var searchQuery by remember { mutableStateOf("")}
+    var selectedPlace by remember { mutableStateOf<PlaceData?>(null) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val sheetScaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
@@ -323,7 +328,16 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
     fun SearchResultRow(data: PlaceData) {
         Column(
             modifier = Modifier
-                .clickable {}
+                .clickable {
+                    searchFieldText = data.title
+                    selectedPlace = data
+                    scope.launch {
+                        cameraPositionState.animate(
+                            update = CameraUpdateFactory.newLatLngZoom(data.coordinates, 18f)
+                        )
+                        markerState.position = data.coordinates
+                    }
+                }
                 .fillMaxWidth()
                 .padding(16.dp, 8.dp)
         ) {
@@ -359,7 +373,17 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                         .background(Color.White),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (searchQuery.isNotBlank()) {
+                    if (selectedPlace != null ) {
+                        BackHandler(enabled = true) { selectedPlace = null }
+                        IconButton(
+                            onClick = { selectedPlace = null }
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                                contentDescription = "뒤로"
+                            )
+                        }
+                    } else if (searchQuery.isNotBlank()) {
                         fun clearSearchField() {
                             searchFieldText = ""
                             searchQuery = ""
@@ -450,7 +474,11 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                             LocalConfiguration.current.screenHeightDp.dp - innerPadding.calculateTopPadding() - 160.dp
                         })
                 ) {
-                    if (searchResult.isNotEmpty()) {
+                    if (selectedPlace != null) {
+                        item {
+                            SearchResultRow(selectedPlace!!)
+                        }
+                    } else if (searchResult.isNotEmpty()) {
                         items(searchResult) { resultItem ->
                             SearchResultRow(resultItem)
                         }
@@ -471,7 +499,7 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                 modifier = modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState,
                 mapProperties = mapProperties,
-                markerPosition = markerPosition
+                markerState = markerState
             )
         }
     }
