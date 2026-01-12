@@ -1,7 +1,7 @@
 # 카이랑 맵이랑
 
 
-<img width="2960" height="2406" alt="Image" src="https://github.com/user-attachments/assets/97814248-0b04-4010-8d45-4c7015b3cc63" />
+<img width="2960" height="2406" alt="Image" src="이미지링크" />
 
 우리 동네 SNS
 
