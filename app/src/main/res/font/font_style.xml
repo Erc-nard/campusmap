@@ -1,9 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<font-family xmlns:android="http://schemas.android.com/apk/res/android">
+<font-family xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="schemas.android.com">
     <font
-        android:fontStyle="normal"
-        android:font="@font/pretendard" />
+        app:font="@font/pretendard_thin"
+        app:fontStyle="normal"
+        app:fontWeight="100" /> <!-- Thin (100) -->
     <font
-        android:fontStyle="italic"
-        android:font="@font/pretendard" />
+        app:font="@font/pretendard_extralight"
+        app:fontStyle="normal"
+        app:fontWeight="200" /> <!-- ExtraLight (200) -->
+    <font
+        app:font="@font/pretendard_light"
+        app:fontStyle="normal"
+        app:fontWeight="300" /> <!-- Light (300) -->
+    <font
+        app:font="@font/pretendard_regular"
+        app:fontStyle="normal"
+        app:fontWeight="400" /> <!-- Regular (400) -->
+    <font
+        app:font="@font/pretendard_medium"
+        app:fontStyle="normal"
+        app:fontWeight="500" /> <!-- Medium (500) -->
+    <font
+        app:font="@font/pretendard_semibold"
+        app:fontStyle="normal"
+        app:fontWeight="600" /> <!-- SemiBold (600) -->
+    <font
+        app:font="@font/pretendard_bold"
+        app:fontStyle="normal"
+        app:fontWeight="700" /> <!-- Bold (700) -->
+    <font
+        app:font="@font/pretendard_extrabold"
+        app:fontStyle="normal"
+        app:fontWeight="800" /> <!-- ExtraBold (800) -->
+    <font
+        app:font="@font/pretendard_black"
+        app:fontStyle="normal"
+        app:fontWeight="900" /> <!-- Black (900) -->
 </font-family>
