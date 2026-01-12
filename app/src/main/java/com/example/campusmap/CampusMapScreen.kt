@@ -24,7 +24,7 @@ fun CampusMapScreen(
     modifier: Modifier = Modifier,
     cameraPositionState: CameraPositionState,
     mapProperties: MapProperties,
-    markerPosition: LatLng
+    markerState: MarkerState
 ) {
     val buildings = remember {
         listOf(
@@ -728,7 +728,7 @@ fun CampusMapScreen(
         }
     ) {
         Marker(
-            state = MarkerState(position = markerPosition),
+            state = markerState,
             title = "Marker"
         )
         buildings.forEach { building ->
