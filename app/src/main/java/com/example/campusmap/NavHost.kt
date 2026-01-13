@@ -8,6 +8,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -24,9 +26,12 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -44,6 +49,7 @@ import com.google.android.gms.maps.model.LatLng
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.haze
 import dev.chrisbanes.haze.hazeChild
+import kotlinx.coroutines.launch
 
 interface FacilityData {
     val id: Int
@@ -62,10 +68,16 @@ fun DetailView(title: String, modifier: Modifier = Modifier, content: @Composabl
     Surface(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = padding),
+            .padding(horizontal = padding)
+            .shadow( //그림자옵션
+                elevation = 10.dp,
+                shape = RoundedCornerShape(10.dp),
+                ambientColor = Color(0xFF5FBEEB),
+                spotColor = Color(0x5525739B),
+                clip = false
+            ),
         shape = RoundedCornerShape(padding),
         color = Color.White,
-//        shadowElevation = 2.dp
     ) {
         Column(
             modifier = modifier
@@ -100,7 +112,8 @@ fun FacilitiesNavigation(padding: PaddingValues, onMoveToMap: (LatLng) -> Unit) 
         }
         else -> "시설"
     }
-    var selectedTabIndex by remember { mutableStateOf(0) }
+    val pagerState = rememberPagerState(pageCount = { topLevelFacilitiesList.size })
+    val scope = rememberCoroutineScope()
     val listState = rememberLazyListState() // Detail view에서 스크롤 위치를 확인하기 위함
     val showTitle by remember {
         derivedStateOf { listState.firstVisibleItemIndex > 0 }
@@ -157,33 +170,42 @@ fun FacilitiesNavigation(padding: PaddingValues, onMoveToMap: (LatLng) -> Unit) 
                                     Text(
                                         text = item.title,
                                         style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = if (pagerState.currentPage == index) null else FontWeight.Light,
                                         fontSize = 17.sp,
-                                        fontWeight = if (selectedTabIndex == index) null else FontWeight.Light,
                                         modifier = Modifier
                                             .clip(shape = RoundedCornerShape(48.dp))
-                                            .background(if (selectedTabIndex == index) selectedBackground.copy(0.5f) else Color.Transparent)
-                                            .clickable { selectedTabIndex = index }
-                                            .padding(12.dp)
+                                            .background(if (pagerState.currentPage == index) selectedBackground.copy(0.5f) else Color.Transparent)
+                                            .clickable {
+                                                scope.launch {
+                                                    pagerState.animateScrollToPage(index)
+                                                }
+                                            }
+                                            .padding(8.dp)
                                     )
                                 }
                             }
                         }
                     }
                 ) { innerPadding ->
-                    ColumnView(
-                        data = topLevelFacilitiesList[selectedTabIndex].items,
-                        onItemClick = { itemId ->
-                            navController.navigate(
-                                FacilityItemRoute(
-                                    categoryIndex = selectedTabIndex,
-                                    index = itemId
+                    HorizontalPager(
+                        state = pagerState,
+                        verticalAlignment = Alignment.Top
+                    ) { page ->
+                        ColumnView(
+                            data = topLevelFacilitiesList[page].items,
+                            onItemClick = { itemId ->
+                                navController.navigate(
+                                    FacilityItemRoute(
+                                        categoryIndex = page,
+                                        index = itemId
+                                    )
                                 )
-                            )
-                        },
-                        innerPadding = innerPadding,
-                        modifier = Modifier
-                            .haze(state = hazeState),
-                    )
+                            },
+                            innerPadding = innerPadding,
+                            modifier = Modifier
+                                .haze(state = hazeState),
+                        )
+                    }
                 }
             }
 
@@ -205,7 +227,6 @@ fun FacilitiesNavigation(padding: PaddingValues, onMoveToMap: (LatLng) -> Unit) 
                             },
                             modifier = Modifier
                                 .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()),
-//                                .shadow(elevation = 2.dp, shape = CircleShape),
                             colors = IconButtonDefaults.iconButtonColors(
                                 containerColor = Color.White,
                                 contentColor = Color.Black
