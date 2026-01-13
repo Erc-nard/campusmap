@@ -402,6 +402,13 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                             .heightIn(max = if (searchQuery.isBlank()) 0.dp else maxSheetHeight)
                             .padding(horizontal = 20.dp)
                             .padding(bottom = 20.dp)
+                            .shadow( //그림자옵션
+                                elevation = 10.dp,
+                                shape = RoundedCornerShape(10.dp),
+                                ambientColor = Color(0xFF5FBEEB),
+                                spotColor = Color(0x5525739B),
+                                clip = false
+                            )
                             .clip(RoundedCornerShape(20.dp))
                             .background(white)
                     ) {
@@ -413,13 +420,20 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                     Text(
                         text = "검색 결과 ${searchResult.size}개",
                         modifier = Modifier
-                            .padding(horizontal = 40.dp)
+                            .padding(horizontal = 20.dp)
                             .padding(bottom = 10.dp)
                     )
                     LazyColumn(
                         modifier = Modifier
                             .heightIn(max = if (searchQuery.isBlank()) 0.dp else maxSheetHeight)
                             .padding(horizontal = 20.dp)
+                            .shadow( //그림자옵션
+                                elevation = 10.dp,
+                                shape = RoundedCornerShape(10.dp),
+                                ambientColor = Color(0xFF5FBEEB),
+                                spotColor = Color(0x5525739B),
+                                clip = false
+                            )
                             .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
                             .background(white)
                     ) {
