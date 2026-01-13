@@ -36,7 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import kotlinx.serialization.Serializable
 import androidx.navigation.compose.composable
@@ -99,19 +98,6 @@ fun DetailView(title: String, modifier: Modifier = Modifier, content: @Composabl
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FacilitiesNavigation(padding: PaddingValues, navController: NavHostController, onMoveToMap: (LatLng) -> Unit) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val title = when (navBackStackEntry?.destination?.route?.substringAfterLast(".")) {
-        "Facilities" -> "시설"
-        "FacilityItemRoute/{categoryIndex}/{index}" -> {
-            val item: FacilityItemRoute? = navBackStackEntry?.toRoute()
-            val categoryIndex = item?.categoryIndex
-            val index = item?.index
-            if (categoryIndex != null && index != null) {
-                topLevelFacilitiesList[categoryIndex].items[index].title
-            } else { "시설" }
-        }
-        else -> "시설"
-    }
     val pagerState = rememberPagerState(pageCount = { topLevelFacilitiesList.size })
     val scope = rememberCoroutineScope()
 

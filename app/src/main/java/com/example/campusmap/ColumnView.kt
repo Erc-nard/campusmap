@@ -3,6 +3,7 @@ package com.example.campusmap
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -25,6 +26,7 @@ fun <ItemType : FacilityData> ColumnView(data: List<ItemType>, innerPadding: Pad
             bottom = innerPadding.calculateBottomPadding() + 30.dp
         ),
         modifier = modifier
+            .fillMaxSize()
             .padding(start = 10.dp, end = 10.dp)
     ) {
         items(data) { item ->

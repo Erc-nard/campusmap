@@ -74,6 +74,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -92,6 +93,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.layout.WindowMetricsCalculator
@@ -134,17 +136,17 @@ fun CampusmapApp() {
 
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.MAP) }
 
-    // 지도 탭 관련
+    // map tab
     val initialLatLng = LatLng(36.368038, 127.365761)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(initialLatLng, 16f)
     }
     var markerState = rememberMarkerState(position = initialLatLng)
 
-    // 시설 탭 관련
-    val facilitiesTabNavController = rememberNavController()
+    // facilities tab
+    val navController = rememberNavController()
 
-    // 셔틀 탭 관련
+    // shuttle tab
     var showShuttleSheet by rememberSaveable { mutableStateOf(false) }
     var showShuttleScreen by rememberSaveable { mutableStateOf(false) }
     var selectedShuttle by rememberSaveable { mutableStateOf<ShuttleType?>(null) }
@@ -186,15 +188,20 @@ fun CampusmapApp() {
                     colors = myItemColors,
                     onClick = {
                         when (destination) {
-                            AppDestinations.MAP ->
+                            AppDestinations.MAP -> {
                                 currentDestination = destination
-                            AppDestinations.FACILITIES -> if (currentDestination != destination) {
+                            }
+                            AppDestinations.FACILITIES -> if (currentDestination != AppDestinations.FACILITIES) {
                                 currentDestination = destination
                             } else {
-                                facilitiesTabNavController.popBackStack()
+                                val routeName = navController.currentBackStackEntry?.destination?.route?.substringAfterLast(".")
+                                if (routeName == "FacilityItemRoute/{categoryIndex}/{index}") {
+                                    navController.popBackStack()
+                                }
                             }
-                            AppDestinations.SHUTTLE ->
+                            AppDestinations.SHUTTLE -> {
                                 showShuttleSheet = true
+                            }
                         }
                     }
 
@@ -210,7 +217,7 @@ fun CampusmapApp() {
                     BackHandler(enabled = true) {
                         currentDestination = AppDestinations.MAP
                     }
-                    FacilitiesNavigation(padding = innerPadding, navController = facilitiesTabNavController, onMoveToMap = { coordinate ->
+                    FacilitiesNavigation(padding = innerPadding, navController = navController, onMoveToMap = { coordinate ->
                         currentDestination = AppDestinations.MAP
                         markerState.position = coordinate
                         scope.launch {
