@@ -1,14 +1,11 @@
 package com.example.campusmap
 
 import android.os.Bundle
-import android.renderscript.RenderScript
-import android.util.EventLogTags
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -51,7 +48,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.filled.Coffee
 import androidx.compose.material.icons.filled.DirectionsBus
 import androidx.compose.material.icons.filled.HomeWork
 import androidx.compose.material.icons.filled.LocalCafe
@@ -68,29 +64,22 @@ import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.SmallFloatingActionButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -101,10 +90,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.window.core.layout.WindowSizeClass
-import androidx.window.layout.WindowMetricsCalculator
 import com.example.campusmap.ui.map.CampusMapScreen
 import com.example.campusmap.ui.theme.appBackground
 import com.example.campusmap.ui.theme.black
@@ -127,7 +113,6 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.time.format.TextStyle
 
 
 class MainActivity : ComponentActivity() {
@@ -342,12 +327,12 @@ enum class AppDestinations(
 
 data class MapCategory(val icon: ImageVector, val text: String, val color: Color)
 val mapCategories = listOf(
-    MapCategory(Icons.Default.School,"강의동", Color(95,190,235)),
-    MapCategory(Icons.Default.Restaurant,"식당", Color(250, 189, 0, 255)),
-    MapCategory(Icons.Default.LocalCafe,"카페", Color(243, 118, 0, 255)),
-    MapCategory(Icons.Default.ShoppingCart,"매점", Color(0, 203, 27, 255)),
-    MapCategory(Icons.Default.DirectionsBus,"셔틀", Color.Black),
-    MapCategory(Icons.Default.HomeWork,"기숙사", Color(69, 0, 255, 255)),
+    MapCategory(Icons.Default.School, "강의동", Color(95,190,235)),
+    MapCategory(Icons.Default.Restaurant, "식당", Color(250, 189, 0, 255)),
+    MapCategory(Icons.Default.LocalCafe, "카페", Color(243, 118, 0, 255)),
+    MapCategory(Icons.Default.ShoppingCart, "매점", Color(0, 203, 27, 255)),
+    MapCategory(Icons.Default.DirectionsBus, "셔틀", Color.Black),
+    MapCategory(Icons.Default.HomeWork, "기숙사", Color(69, 0, 255, 255)),
 //    MapCategory(Icons.Default.Place,"가볼 만한 곳", Color(255, 0, 161, 255)),
 )
 
@@ -417,33 +402,39 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
             mutableStateOf<String?>(null)
         }
         getCurrentLocation { location ->
-            location?.let { currentLocation ->
-                val startLocation = android.location.Location("start").apply {
-                    latitude = currentLocation.latitude
-                    longitude = currentLocation.longitude
+            if (data.getPlaceCoordinates() == null)
+                distanceString = null
+            else {
+                location?.let { currentLocation ->
+                    val startLocation = android.location.Location("start").apply {
+                        latitude = currentLocation.latitude
+                        longitude = currentLocation.longitude
+                    }
+                    val endLocation = android.location.Location("end").apply {
+                        latitude = data.getPlaceCoordinates()!!.latitude
+                        longitude = data.getPlaceCoordinates()!!.longitude
+                    }
+                    val calculatedDistance = startLocation.distanceTo(endLocation)
+                    distanceString = if (calculatedDistance >= 1000f)
+                        "%.2f km".format(calculatedDistance)
+                    else
+                        "%.0f m".format(calculatedDistance)
                 }
-                val endLocation = android.location.Location("end").apply {
-                    latitude = data.coordinates.latitude
-                    longitude = data.coordinates.longitude
-                }
-                val calculatedDistance = startLocation.distanceTo(endLocation)
-                distanceString = if (calculatedDistance >= 1000f)
-                    "%.2f km".format(calculatedDistance)
-                else
-                    "%.0f m".format(calculatedDistance)
             }
         }
 
         Column(
             modifier = Modifier
                 .clickable(enabled = clickable) {
-                    searchFieldText = data.title
+                    searchFieldText = data.getTitle()
                     selectedPlace = data
-                    scope.launch {
-                        cameraPositionState.animate(
-                            update = CameraUpdateFactory.newLatLngZoom(data.coordinates, 18f)
-                        )
-                        markerState.position = data.coordinates
+                    data.getPlaceCoordinates()?.let { coordinates ->
+                        scope.launch {
+                            cameraPositionState.animate(
+                                update = CameraUpdateFactory.newLatLngZoom(coordinates, 18f)
+                            )
+                            markerState.position = coordinates
+                        }
                     }
                 }
                 .fillMaxWidth()
@@ -451,14 +442,14 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
         ) {
             Row {
                 Text(
-                    text = data.title,
+                    text = data.getTitle(),
                     fontWeight = FontWeight.Bold
                 )
                 Text(" · ")
                 Text(data.category)
             }
             Text(
-                text = (if (data.isBuildingItself) data.location.buildingCode else data.location.description)
+                text = (if (data.isBuildingItself) data.buildingCode else buildings[data.buildingCode]?.description ?: "건물 정보 없음")
                         + (if (distanceString != null) " · $distanceString" else ""),
                 color = Color.Gray
             )
@@ -470,10 +461,10 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
     }
 
     val searchResult = places.filter { item ->
-        item.title.contains(searchQuery) || item.category == searchQuery
-                || item.location.buildingCode == searchQuery
-                || (searchQuery.contains("-") && item.location.buildingCode == searchQuery.substringBefore('-'))
-                || item.location.buildingName.contains(searchQuery)
+        item.getTitle().contains(searchQuery) || item.category == searchQuery
+                || item.buildingCode == searchQuery
+                || (searchQuery.contains("-") && item.buildingCode == searchQuery.substringBefore('-'))
+                || (buildings[item.buildingCode]?.name?.contains(searchQuery) ?: false)
                 || item.keywords.contains(searchQuery)
                 || item.description.contains(searchQuery)
     }
