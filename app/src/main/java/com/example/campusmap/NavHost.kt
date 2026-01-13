@@ -36,8 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import kotlinx.serialization.Serializable
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -98,7 +96,9 @@ fun DetailView(title: String, modifier: Modifier = Modifier, content: @Composabl
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacilitiesNavigation(padding: PaddingValues, navController: NavHostController, onMoveToMap: (LatLng) -> Unit) {
+fun FacilitiesNavigation(padding: PaddingValues, onMoveToMap: (LatLng) -> Unit) {
+    val navController = rememberNavController()
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val title = when (navBackStackEntry?.destination?.route?.substringAfterLast(".")) {
         "Facilities" -> "시설"
@@ -114,6 +114,10 @@ fun FacilitiesNavigation(padding: PaddingValues, navController: NavHostControlle
     }
     val pagerState = rememberPagerState(pageCount = { topLevelFacilitiesList.size })
     val scope = rememberCoroutineScope()
+    val listState = rememberLazyListState() // Detail view에서 스크롤 위치를 확인하기 위함
+    val showTitle by remember {
+        derivedStateOf { listState.firstVisibleItemIndex > 0 }
+    }
 
     val hazeState = remember { HazeState() }
 
