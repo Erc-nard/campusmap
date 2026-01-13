@@ -413,7 +413,7 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                     Text(
                         text = "검색 결과 ${searchResult.size}개",
                         modifier = Modifier
-                            .padding(horizontal = 40.dp)
+                            .padding(horizontal = 20.dp)
                             .padding(bottom = 10.dp)
                     )
                     LazyColumn(
