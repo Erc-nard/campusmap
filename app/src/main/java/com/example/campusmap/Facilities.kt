@@ -149,7 +149,7 @@ val kaimaru = listOf(
         coordinate = LatLng(36.373712, 127.359256),
         location = Location("N11", "카이마루", annotation = "정문으로 들어가서 좌측에 있습니다.")
     )),
-    FacilityItem(id = 1, title = "더큰식탁", imageURL = "", details = ItemDetail(
+    FacilityItem(id = 1, title = "더큰식탁", imageURL = "https://mblogthumb-phinf.pstatic.net/MjAyNDA1MTBfMTU1/MDAxNzE1MzE5MDE5NTg4.bfQx2y0ONYrSLxSrhdH_Q5hNMOc2wOuvJkUZ4h3yc8Qg.btTB9ydlT4LS4Ka5jOTKuZ2sRHw-H_fhDD795b0ylPIg.JPEG/20240509%EF%BC%BF183138.jpg?type=w800", details = ItemDetail(
         businessHours = listOf(
             BusinessHours(setOf(DayClass.WEEKDAYS), false, LocalTime.of(10, 30), LocalTime.of(19, 0)),
             BusinessHours(setOf(DayClass.SATURDAY), false, LocalTime.of(11, 0), LocalTime.of(14, 0))
@@ -192,7 +192,7 @@ val kaimaru = listOf(
         coordinate = LatLng(36.373712, 127.359256),
         location = Location("N11", "카이마루", annotation = "정문으로 들어가서 좌측에 있습니다.")
     )),
-    FacilityItem(id = 6, title = "롤링파스타", imageURL = "", details = ItemDetail(
+    FacilityItem(id = 6, title = "롤링파스타", imageURL = "https://postfiles.pstatic.net/MjAyNTAyMThfOSAg/MDAxNzM5ODY0MjA0Mjgz.3kyL2V8bQ7Fsc_WniSHLQ3ZTKlApmyyOEVPse_7zHLEg.85ATlVi-sVunOy6dlYh4Of_f1OiUdWN9OzL3QuRM_S0g.JPEG/IMG_8653.jpg?type=w773", details = ItemDetail(
         businessHours = listOf(
             BusinessHours(setOf(DayClass.WEEKDAYS), false, LocalTime.of(10, 30), LocalTime.of(19, 30), orderEnd = LocalTime.of(19, 0)),
             BusinessHours(setOf(DayClass.SATURDAY), false, LocalTime.of(11, 0), LocalTime.of(14, 0))
