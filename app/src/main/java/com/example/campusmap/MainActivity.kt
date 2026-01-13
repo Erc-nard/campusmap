@@ -74,6 +74,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -92,6 +93,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.layout.WindowMetricsCalculator
 import com.example.campusmap.ui.map.CampusMapScreen
@@ -132,15 +135,21 @@ fun CampusmapApp() {
     val scope = rememberCoroutineScope()
 
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.MAP) }
-    var showShuttleSheet by rememberSaveable { mutableStateOf(false) }
-    var showShuttleScreen by rememberSaveable { mutableStateOf(false) }
-    var selectedShuttle by rememberSaveable { mutableStateOf<ShuttleType?>(null) }
 
+    // map tab
     val initialLatLng = LatLng(36.368038, 127.365761)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(initialLatLng, 16f)
     }
     var markerState = rememberMarkerState(position = initialLatLng)
+
+    // facilities tab
+    val navController = rememberNavController()
+
+    // shuttle tab
+    var showShuttleSheet by rememberSaveable { mutableStateOf(false) }
+    var showShuttleScreen by rememberSaveable { mutableStateOf(false) }
+    var selectedShuttle by rememberSaveable { mutableStateOf<ShuttleType?>(null) }
 
     val myItemColors = NavigationSuiteDefaults.itemColors(
         navigationBarItemColors = NavigationBarItemDefaults.colors(
@@ -178,10 +187,21 @@ fun CampusmapApp() {
                     selected = destination == currentDestination,
                     colors = myItemColors,
                     onClick = {
-                        if (destination == AppDestinations.SHUTTLE) {
-                            showShuttleSheet = true
-                        } else {
-                            currentDestination = destination
+                        when (destination) {
+                            AppDestinations.MAP -> {
+                                currentDestination = destination
+                            }
+                            AppDestinations.FACILITIES -> if (currentDestination != AppDestinations.FACILITIES) {
+                                currentDestination = destination
+                            } else {
+                                val routeName = navController.currentBackStackEntry?.destination?.route?.substringAfterLast(".")
+                                if (routeName == "FacilityItemRoute/{categoryIndex}/{index}") {
+                                    navController.popBackStack()
+                                }
+                            }
+                            AppDestinations.SHUTTLE -> {
+                                showShuttleSheet = true
+                            }
                         }
                     }
 
@@ -197,7 +217,7 @@ fun CampusmapApp() {
                     BackHandler(enabled = true) {
                         currentDestination = AppDestinations.MAP
                     }
-                    FacilitiesNavigation(padding = innerPadding, onMoveToMap = { coordinate ->
+                    FacilitiesNavigation(padding = innerPadding, navController = navController, onMoveToMap = { coordinate ->
                         currentDestination = AppDestinations.MAP
                         markerState.position = coordinate
                         scope.launch {
