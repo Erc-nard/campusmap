@@ -158,6 +158,10 @@ fun CampusmapApp() {
             unselectedTextColor = black
         )
     )
+    BackHandler(enabled = showShuttleScreen) {
+        showShuttleScreen = false
+        currentDestination = AppDestinations.MAP
+    }
 
     NavigationSuiteScaffold(
         containerColor = Color.White,
@@ -234,6 +238,7 @@ fun CampusmapApp() {
                             selectedShuttle = ShuttleType.CAMPUS
                             showShuttleSheet = false
                             showShuttleScreen = true
+                            currentDestination = AppDestinations.SHUTTLE
                         },
                         modifier = Modifier.weight(1f)
                     ) { Text("교내", style = MaterialTheme.typography.titleLarge) }
@@ -244,6 +249,7 @@ fun CampusmapApp() {
                             selectedShuttle = ShuttleType.OUTSIDE
                             showShuttleSheet = false
                             showShuttleScreen = true
+                            currentDestination = AppDestinations.SHUTTLE
                         },
                         modifier = Modifier.weight(1f)
                     ) { Text("출근", style = MaterialTheme.typography.titleLarge) }
@@ -258,7 +264,8 @@ fun CampusmapApp() {
         selectedShuttle?.let { shuttle ->
             ShuttleScreenFixed(
                 startShuttle = shuttle,
-                onClose = { showShuttleScreen = false }
+                onClose = { showShuttleScreen = false
+                    currentDestination = AppDestinations.MAP}
             )
         }
     }
