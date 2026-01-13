@@ -18,7 +18,7 @@ val places = listOf(
         category = "강의동",
         isBuildingItself = true,
         location = Location("E2", "산업경영학동"),
-        coordinates = LatLng(0.0, 0.0),
+        coordinates = LatLng(36.367463, 127.364463),
         keywords = listOf("산경동", "수리과", "수학과", "산시공", "산공", "산공과"),
         description = "수리과학과, 산업및시스템공학과"
     ),
@@ -27,7 +27,7 @@ val places = listOf(
         category = "강의동",
         isBuildingItself = true,
         location = Location("E3", "정보전자공학동"),
-        coordinates = LatLng(0.0, 0.0),
+        coordinates = LatLng(36.369002, 127.365229),
         keywords = listOf("전산", "전산과", "전전", "전자과"),
         description = "전산학부, 전기및전자공학부"
     ),
@@ -36,7 +36,7 @@ val places = listOf(
         category = "강의동",
         isBuildingItself = true,
         location = Location("E6", "자연과학동"),
-        coordinates = LatLng(0.0, 0.0),
+        coordinates = LatLng(36.370075, 127.364689),
         keywords = listOf("자과동", "수학과", "수리과", "자연과학부", "물리과", "궁리실험관", "실험"),
         description = "수리과학과, 물리학과, 화학과, 생명과학과"
     ),
@@ -45,7 +45,7 @@ val places = listOf(
         category = "강의동",
         isBuildingItself = true,
         location = Location("E11", "창의학습관"),
-        coordinates = LatLng(0.0, 0.0),
+        coordinates = LatLng(36.370437, 127.362566),
         keywords = listOf("창의관", "터만홀"),
         description = "새내기과정학부"
     ),
@@ -54,7 +54,7 @@ val places = listOf(
         category = "강의동",
         isBuildingItself = true,
         location = Location("E16", "정문술빌딩"),
-        coordinates = LatLng(0.0, 0.0),
+        coordinates = LatLng(36.371605, 127.361976),
         keywords = listOf("바뇌과"),
         description = "바이오및뇌공학과"
     ),
@@ -63,7 +63,7 @@ val places = listOf(
         category = "강의동",
         isBuildingItself = true,
         location = Location("E16-1", "양분순빌딩"),
-        coordinates = LatLng(0.0, 0.0),
+        coordinates = LatLng(36.371639, 127.361879), //정문술빌딩 옆 맞죠??
         keywords = listOf("바뇌과"),
         description = "바이오및뇌공학과"
     ),
@@ -72,7 +72,7 @@ val places = listOf(
         category = "강의동",
         isBuildingItself = true,
         location = Location("W1", "응용공학동"),
-        coordinates = LatLng(0.0, 0.0),
+        coordinates = LatLng(36.365831, 127.361325),
         keywords = listOf("응공동", "소재과", "건환공", "생화공", "화생공", "화학생명공학과"),
         description = "신소재공학과, 건설및환경공학과, 생명화학공학과"
     ),
@@ -81,7 +81,7 @@ val places = listOf(
         category = "강의동",
         isBuildingItself = true,
         location = Location("N4", "디지털인문사회과학부동"),
-        coordinates = LatLng(0.0, 0.0),
+        coordinates = LatLng(36.373422, 127.362578),
         keywords = listOf("교양과목", "인사동"),
         description = "디지털인문사회과학부"
     ),
@@ -90,7 +90,7 @@ val places = listOf(
         category = "강의동",
         isBuildingItself = true,
         location = Location("N7", "기계공학동"),
-        coordinates = LatLng(0.0, 0.0),
+        coordinates = LatLng(36.372550, 127.358729),
         keywords = listOf("기계동", "원양공", "원양과", "항공과", "기계과"),
         description = "원자력및양자공학과, 항공우주공학과, 기계공학과"
     ),
@@ -121,14 +121,14 @@ val places = listOf(
         category = "식당",
         location = Location("N11", "카이마루"),
         keywords = listOf("카마", "북측식당", "북측"),
-        coordinates = LatLng(36.373750, 127.359234),
+        coordinates = LatLng(36.373656, 127.359367),
         description = "학식, 푸드코트"
     ),
     PlaceData(
         title = "리틀하노이",
         category = "식당",
         location = Location("N11", "카이마루"),
-        coordinates = LatLng(36.373750, 127.359234),
+        coordinates = LatLng(36.373656, 127.359367),
         keywords = listOf("카마", "북측식당", "북측"),
         description = "베트남음식, 쌀국수"
     ),
@@ -136,7 +136,7 @@ val places = listOf(
         title = "별리달리",
         category = "식당",
         location = Location("N11", "카이마루"),
-        coordinates = LatLng(36.373750, 127.359234),
+        coordinates = LatLng(36.373656, 127.359367),
         keywords = listOf("카마", "북측식당", "북측"),
         description = "돈까스, 볶음밥"
     ),
@@ -144,7 +144,7 @@ val places = listOf(
         title = "웰차이",
         category = "식당",
         location = Location("N11", "카이마루"),
-        coordinates = LatLng(36.373750, 127.359234),
+        coordinates = LatLng(36.373656, 127.359367),
         keywords = listOf("카마", "북측식당", "북측"),
         description = "중식, 짜장면, 짬뽕, 탕수육"
     ),
@@ -152,7 +152,7 @@ val places = listOf(
         title = "롤링파스타",
         category = "식당",
         location = Location("N11", "카이마루"),
-        coordinates = LatLng(36.373750, 127.359234),
+        coordinates = LatLng(36.373656, 127.359367),
         keywords = listOf("카마", "북측식당", "북측"),
         description = "양식, 파스타"
     ),
@@ -179,7 +179,7 @@ val places = listOf(
         title = "캘리포니아 베이커리",
         category = "카페",
         location = Location("E6-5", "자연과학동"),
-        coordinates = LatLng(0.0, 0.0),
+        coordinates = LatLng(36.370151, 127.363667),
         keywords = listOf("캘포", "빵집"),
         description = "빵, 커피, 차, 음료"
     ),
@@ -187,14 +187,14 @@ val places = listOf(
         title = "카페드롭탑",
         category = "카페",
         location = Location("W8", "교육지원동"),
-        coordinates = LatLng(0.0, 0.0),
+        coordinates = LatLng(36.370207, 127.359939),
         description = "커피, 차, 음료"
     ),
     PlaceData(
         title = "파스쿠찌",
         category = "카페",
         location = Location("E3", "정보전자공학동"),
-        coordinates = LatLng(0.0, 0.0),
+        coordinates = LatLng(36.368667, 127.364606),
         keywords = listOf("파스쿠치"),
         description = "커피, 차, 음료"
     ),
@@ -202,7 +202,7 @@ val places = listOf(
         title = "그라찌에",
         category = "카페",
         location = Location("E4", "KI빌딩"),
-        coordinates = LatLng(0.0, 0.0),
+        coordinates = LatLng(36.368242, 127.363863),
         keywords = listOf("그라찌에"),
         description = "커피, 차, 음료"
     ),
@@ -210,7 +210,7 @@ val places = listOf(
         title = "탐앤탐스",
         category = "카페",
         location = Location("N1", "김병호IT융합빌딩", 2),
-        coordinates = LatLng(0.0, 0.0),
+        coordinates = LatLng(36.374148, 127.365409),
         keywords = listOf("탐탐"),
         description = "커피, 차, 음료"
     ),
@@ -218,7 +218,7 @@ val places = listOf(
         title = "카페 오가다",
         category = "카페",
         location = Location("E9", "학술문화관", 2),
-        coordinates = LatLng(0.0, 0.0),
+        coordinates = LatLng(36.369237, 127.362653),
         description = "커피, 차, 음료"
     ),
 

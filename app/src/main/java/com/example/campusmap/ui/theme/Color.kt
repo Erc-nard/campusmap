@@ -16,5 +16,5 @@ val dark = Color(0xFF004187)
 val main = Color(0xFF5FBEEB)
 val black = Color(0xFF000000)
 
-val appBackground = Color(240, 243, 246)
-val selectedBackground = Color(210, 213, 216)
+val appBackground = Color(0xFFFFFFFF)
+val selectedBackground = Color(0xFF5FBEEB)
