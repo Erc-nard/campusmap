@@ -2,6 +2,7 @@ package com.example.campusmap
 
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContentProviderCompat.requireContext
 
 @Composable
 fun ContactView(itemData: FacilityItem) {
@@ -58,6 +60,7 @@ fun ContactView(itemData: FacilityItem) {
                             itemData.details.contact
                         )
                     )
+                    Toast.makeText(context, "연락처가 복사되었습니다.", Toast.LENGTH_SHORT).show()
                 },
             ) {
                 Icon(

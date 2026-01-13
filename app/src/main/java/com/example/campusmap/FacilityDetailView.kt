@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -73,7 +74,7 @@ fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng) -> Unit, ge
             )
         }
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
             contentPadding = PaddingValues(bottom = 40.dp),
             modifier = if (windowSizeClass.windowHeightSizeClass == WindowHeightSizeClass.COMPACT) {
                 Modifier
@@ -187,6 +188,20 @@ fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng) -> Unit, ge
                                 TitledText(item.title, bodyText)
                             }
                         Carousel(convertedData)
+                    }
+                }
+            } else if (itemData.details.topMenus.isNotEmpty()) {
+                item {
+                    DetailView("대표 메뉴") { innerPadding ->
+                        Column(
+                            modifier = Modifier
+                                .padding(horizontal = innerPadding)
+                        ) {
+//                            itemData.details.topMenus.forEach { menu ->
+//                                Text(menu)
+//                            }
+                            Text(itemData.details.topMenus.joinToString(", "))
+                        }
                     }
                 }
             }
