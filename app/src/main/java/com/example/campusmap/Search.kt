@@ -4,9 +4,9 @@ import android.location.Location
 import com.google.android.gms.maps.model.LatLng
 
 sealed interface SearchQuery {
-    data class Text(val text: String)
-    data class Category(val category: String)
-    data class BuildingCode(val buildingCode: String)
+    data class Text(val text: String): SearchQuery
+    data class Category(val category: String): SearchQuery
+    data class BuildingCode(val buildingCode: String): SearchQuery
 }
 
 class SearchResult(
@@ -16,11 +16,15 @@ class SearchResult(
     val isInvalid: Boolean
         get() = (placeReference == null && buildingReference == null)
     val name: String
-        get() = placeReference?.getTitle() ?: buildingReference!!.name
+        get() = placeReference?.title ?: buildingReference!!.name
     val category: String
-        get() = placeReference?.category ?: buildingReference!!.categories.joinToString(", ")
+        get() = placeReference?.category ?: buildingReference!!.categories.map { it.displayText }.joinToString(", ")
     val locationDescription: String
-        get() = if (placeReference == null) buildingReference!!.code else buildings[placeReference.buildingCode]?.description ?: ""
+        get() = if (placeReference == null)
+            buildingReference!!.code
+        else if (buildings[placeReference.buildingCode] != null) {
+            buildings[placeReference.buildingCode]!!.buildingDescription + (if (placeReference.floor != null) " ${placeReference.floor}층" else "")
+        } else "건물 정보 없음"
     val coordinates: LatLng?
         get() = if (placeReference == null) buildingReference!!.coordinates else placeReference.getPlaceCoordinates()
     fun getDistance(currentLocation: LatLng): Float? {
@@ -38,9 +42,11 @@ class SearchResult(
             return startPosition.distanceTo(endPosition)
         }
     }
+    val description: String
+        get() = placeReference?.description ?: buildingReference!!.description
 }
 
-fun getSearchResult(query: SearchQuery): List<SearchResult> {
+fun getSearchResult(query: SearchQuery, currentLocation: LatLng? = null): List<SearchResult> {
     val results = mutableListOf<SearchResult>()
 
     when (query) {
@@ -73,6 +79,14 @@ fun getSearchResult(query: SearchQuery): List<SearchResult> {
                     results.add(SearchResult(placeReference = place))
             }
         }
+    }
+
+    if (currentLocation != null) {
+        results.sortWith(Comparator { lhs, rhs ->
+            val lhsDistance = lhs.getDistance(currentLocation) ?: Float.MAX_VALUE
+            val rhsDistance = rhs.getDistance(currentLocation) ?: Float.MIN_VALUE
+            (lhsDistance - rhsDistance).toInt()
+        })
     }
 
     return results.toList()

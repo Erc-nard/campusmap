@@ -3,6 +3,7 @@ package com.example.campusmap.ui.map
 import android.os.Build
 import com.google.android.gms.maps.model.CameraPosition
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -11,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import com.example.campusmap.buildings
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import kotlin.collections.forEach
 
@@ -20,9 +22,12 @@ fun CampusMapScreen(
     cameraPositionState: CameraPositionState,
     mapProperties: MapProperties,
     mapUiSettings: MapUiSettings,
-    markerState: MarkerState
+    markerPositionsState: MutableState<List<LatLng>>,
+    selectedBuildingState: MutableState<String?>,
+    onFloorTap: () -> Unit,
+    onBuildingTap: (String) -> Unit,
 ) {
-    var selectedBuildingId by remember { mutableStateOf<String?>(null) }
+//    var selectedBuildingId by remember { mutableStateOf<String?>(null) }
 
     GoogleMap(
         modifier = modifier,
@@ -30,15 +35,17 @@ fun CampusMapScreen(
         cameraPositionState = cameraPositionState,
         properties = mapProperties,
         onMapClick = {
-            selectedBuildingId = null
+            selectedBuildingState.value = null
+            onFloorTap()
         }
     ) {
-        Marker(
-            state = markerState,
-            title = "Marker"
-        )
+        markerPositionsState.value.forEach { position ->
+            Marker(
+                state = MarkerState(position = position)
+            )
+        }
         buildings.forEach { (code, building) ->
-            val isSelected = selectedBuildingId == code
+            val isSelected = selectedBuildingState.value == code
             val buildingColor = when (building.code[0]) {
                 'E' -> Color(239, 153, 37)
                 'W' -> Color(111, 182, 70)
@@ -55,7 +62,7 @@ fun CampusMapScreen(
                     strokeWidth = 3f,
                     clickable = true,
                     onClick = {
-                        selectedBuildingId = code
+                        onBuildingTap(code)
                     }
                 )
             }

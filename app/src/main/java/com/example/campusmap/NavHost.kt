@@ -79,7 +79,7 @@ fun DetailView(title: String, modifier: Modifier = Modifier, content: @Composabl
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacilitiesNavigation(padding: PaddingValues, navController: NavHostController, onMoveToMap: (LatLng) -> Unit, getCurrentLocation: ((LatLng?) -> Unit) -> Unit) {
+fun FacilitiesNavigation(padding: PaddingValues, navController: NavHostController, onMoveToMap: (LatLng, String?) -> Unit, getCurrentLocation: ((LatLng?) -> Unit) -> Unit) {
     val pagerState = rememberPagerState(pageCount = { topLevelFacilitiesList.size })
     val scope = rememberCoroutineScope()
 
