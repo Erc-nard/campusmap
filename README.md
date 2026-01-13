@@ -1,7 +1,7 @@
 # 카이랑 맵이랑
 
 
-<img width="2960" height="2406" alt="Image" src="이미지링크" />
+<img width="2960" height="2406" alt="Image" src="https://github.com/user-attachments/assets/a65acb85-0920-465d-a940-e01bda7c7e68" />
 
 ## 더 간편히, 더 자세히 카이스트 지도
 
