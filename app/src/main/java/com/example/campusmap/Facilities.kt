@@ -375,8 +375,8 @@ val cafe = listOf(
 //)
 val topLevelFacilitiesList = listOf(
     FacilityCategory(id = 0, title = "학식", items = cafeteria),
-    FacilityCategory(id = 1, title = "카이마루 푸드코트", items = kaimaru),
-    FacilityCategory(id = 2, title = "태울관 푸드코트", items = taeulgwan),
+    FacilityCategory(id = 1, title = "카이마루", items = kaimaru),
+    FacilityCategory(id = 2, title = "태울관", items = taeulgwan),
     FacilityCategory(id = 3, title = "프랜차이즈", items = franchise),
     FacilityCategory(id = 4, title = "카페", items = cafe),
 //    FacilityCategory(id = 5, title = "매점", items = kiosk)
