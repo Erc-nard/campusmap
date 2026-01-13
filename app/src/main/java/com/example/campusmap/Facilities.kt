@@ -344,7 +344,7 @@ val cafe = listOf(
         coordinate = LatLng(36.368667, 127.364606),
         location = Location("E3", "정보전자공학동")
     )),
-    FacilityItem(id = 7, title = "탐앤탐즈", imageURL = "https://kaist.ac.kr/kr/img/campus/tom%20and%20toms.jpg", details = ItemDetail(
+    FacilityItem(id = 7, title = "탐앤탐스", imageURL = "https://kaist.ac.kr/kr/img/campus/tom%20and%20toms.jpg", details = ItemDetail(
         businessHours = listOf(
             BusinessHours(setOf(DayClass.WEEKDAYS), includeHolidays = false, begin = LocalTime.of(7, 0), end = LocalTime.of(22, 0)),
             BusinessHours(setOf(DayClass.SATURDAY, DayClass.SUNDAY), includeHolidays = false, begin = LocalTime.of(10, 0), end = LocalTime.of(21, 0)),
