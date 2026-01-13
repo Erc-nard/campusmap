@@ -19,6 +19,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,15 +35,40 @@ import com.google.android.gms.maps.model.LatLng
 import java.text.DecimalFormat
 
 @Composable
-fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng) -> Unit) {
+fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng) -> Unit, getCurrentLocation: ((LatLng?) -> Unit) -> Unit = {}) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+
+    var distanceString by remember {
+        mutableStateOf<String?>(null)
+    }
+
+    getCurrentLocation { location ->
+        distanceString = null
+        location?.let { currentLocation ->
+            val startLocation = android.location.Location("start").apply {
+                latitude = currentLocation.latitude
+                longitude = currentLocation.longitude
+            }
+            val endLocation = android.location.Location("end").apply {
+                latitude = itemData.details.coordinate.latitude
+                longitude = itemData.details.coordinate.longitude
+            }
+            val calculatedDistance = startLocation.distanceTo(endLocation)
+            distanceString = if (calculatedDistance >= 1000f)
+                "%.2f km".format(calculatedDistance)
+            else
+                "%.0f m".format(calculatedDistance)
+        }
+    }
 
     Row {
         if (windowSizeClass.windowHeightSizeClass == WindowHeightSizeClass.COMPACT) {
             AsyncImage(
                 model = itemData.imageURL,
                 contentDescription = itemData.title,
-                modifier = Modifier.fillMaxHeight().weight(1f),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f),
                 contentScale = ContentScale.Crop
             )
         }
@@ -47,7 +76,9 @@ fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng) -> Unit) {
             verticalArrangement = Arrangement.spacedBy(20.dp),
             contentPadding = PaddingValues(bottom = 40.dp),
             modifier = if (windowSizeClass.windowHeightSizeClass == WindowHeightSizeClass.COMPACT) {
-                Modifier.fillMaxHeight().weight(2f)
+                Modifier
+                    .fillMaxHeight()
+                    .weight(2f)
             } else {
                 Modifier.fillMaxSize()
             }
@@ -73,7 +104,9 @@ fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng) -> Unit) {
                     Text(
                         text = itemData.title,
                         style = MaterialTheme.typography.headlineLarge,
-                        modifier = Modifier.padding(horizontal = 20.dp).padding(top = 40.dp)
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp)
+                            .padding(top = 40.dp)
                     )
                 }
             }
@@ -88,7 +121,12 @@ fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng) -> Unit) {
                             Text(itemData.details.location.description)
                             if (!itemData.details.location.annotation.isNullOrBlank()) {
                                 Text(
-                                    text = itemData.details.location.annotation,
+                                    text = (if (distanceString != null) "${distanceString!!} · " else "") + itemData.details.location.annotation,
+                                    fontWeight = FontWeight.Light
+                                )
+                            } else if (distanceString != null) {
+                                Text(
+                                    text = distanceString!!,
                                     fontWeight = FontWeight.Light
                                 )
                             }

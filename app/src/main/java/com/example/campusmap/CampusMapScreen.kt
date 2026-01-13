@@ -24,6 +24,7 @@ fun CampusMapScreen(
     modifier: Modifier = Modifier,
     cameraPositionState: CameraPositionState,
     mapProperties: MapProperties,
+    mapUiSettings: MapUiSettings,
     markerState: MarkerState
 ) {
     val buildings = remember {
@@ -721,6 +722,7 @@ fun CampusMapScreen(
 
     GoogleMap(
         modifier = modifier,
+        uiSettings = mapUiSettings,
         cameraPositionState = cameraPositionState,
         properties = mapProperties,
         onMapClick = {

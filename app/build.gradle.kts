@@ -66,8 +66,10 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.7.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.google.maps.android:maps-compose:4.3.3")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.maps.android:maps-compose:2.11.4")
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.compose.foundation)
@@ -80,6 +82,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("dev.chrisbanes.haze:haze:0.6.0") // Blur
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
 
     // Used to implement navigation
     val nav_version = "2.9.6"
