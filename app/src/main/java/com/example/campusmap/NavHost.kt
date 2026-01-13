@@ -72,7 +72,7 @@ fun DetailView(title: String, modifier: Modifier = Modifier, content: @Composabl
                 .padding(vertical = padding)
         ) {
             Text(
-                text = title,
+                text = title, //시설이름
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
                 modifier = Modifier.padding(horizontal = padding).padding(bottom = 12.dp)
@@ -157,12 +157,13 @@ fun FacilitiesNavigation(padding: PaddingValues, onMoveToMap: (LatLng) -> Unit) 
                                     Text(
                                         text = item.title,
                                         style = MaterialTheme.typography.labelMedium,
+                                        fontSize = 17.sp,
                                         fontWeight = if (selectedTabIndex == index) null else FontWeight.Light,
                                         modifier = Modifier
                                             .clip(shape = RoundedCornerShape(48.dp))
                                             .background(if (selectedTabIndex == index) selectedBackground.copy(0.5f) else Color.Transparent)
                                             .clickable { selectedTabIndex = index }
-                                            .padding(8.dp)
+                                            .padding(12.dp)
                                     )
                                 }
                             }
