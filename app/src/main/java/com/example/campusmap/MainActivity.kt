@@ -1,6 +1,7 @@
 package com.example.campusmap
 
 import android.os.Bundle
+import android.renderscript.RenderScript
 import android.util.EventLogTags
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -58,22 +59,28 @@ import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.School
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationRailItemDefaults
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -84,6 +91,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
@@ -102,16 +110,23 @@ import com.example.campusmap.ui.theme.appBackground
 import com.example.campusmap.ui.theme.black
 import com.example.campusmap.ui.theme.dark
 import com.example.campusmap.ui.theme.white
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.time.format.TextStyle
 
 
@@ -142,6 +157,30 @@ fun CampusmapApp() {
         position = CameraPosition.fromLatLngZoom(initialLatLng, 16f)
     }
     var markerState = rememberMarkerState(position = initialLatLng)
+
+    val context = LocalContext.current
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+    val currentLocation = remember {
+        mutableStateOf<LatLng?>(null)
+    }
+    fun getCurrentLocation(postAction: (LatLng?) -> Unit = {}) {
+        scope.launch {
+            try {
+                val result = fusedLocationClient.getCurrentLocation(
+                    Priority.PRIORITY_HIGH_ACCURACY,
+                    null
+                ).await()
+
+                result?.let { location ->
+                    currentLocation.value = LatLng(location.latitude, location.longitude)
+                }
+            } catch(e: SecurityException) {
+                currentLocation.value = null
+            }
+
+            postAction(currentLocation.value)
+        }
+    }
 
     // facilities tab
     val navController = rememberNavController()
@@ -212,7 +251,7 @@ fun CampusmapApp() {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             when (currentDestination) {
                 AppDestinations.MAP ->
-                    Map(Modifier.fillMaxHeight(), cameraPositionState, markerState)
+                    Map(Modifier.fillMaxHeight(), cameraPositionState, markerState, getCurrentLocation = ::getCurrentLocation)
                 AppDestinations.FACILITIES -> {
                     BackHandler(enabled = true) {
                         currentDestination = AppDestinations.MAP
@@ -225,7 +264,7 @@ fun CampusmapApp() {
                                 update = CameraUpdateFactory.newLatLngZoom(coordinate, 18f)
                             )
                         }
-                    })
+                    }, getCurrentLocation = ::getCurrentLocation)
                 }
                 AppDestinations.SHUTTLE ->
                     Shuttle(
@@ -312,19 +351,32 @@ val mapCategories = listOf(
 //    MapCategory(Icons.Default.Place,"가볼 만한 곳", Color(255, 0, 161, 255)),
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState, markerState: MarkerState) {
-    val mapProperties = remember {
-        MapProperties(
-            latLngBoundsForCameraTarget = LatLngBounds(
-                LatLng(36.36244323875914, 127.35429730754099),
-                LatLng(36.37798415287542, 127.3705715881045)
-            ),
-            minZoomPreference = 15f,
-            maxZoomPreference = 20f
+fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState, markerState: MarkerState, getCurrentLocation: ((LatLng?) -> Unit) -> Unit) {
+    val locationPermissionState = rememberPermissionState(
+        android.Manifest.permission.ACCESS_FINE_LOCATION
+    )
+    val isGranted = locationPermissionState.status.isGranted
+
+    LaunchedEffect(Unit) {
+        locationPermissionState.launchPermissionRequest()
+    }
+
+    val mapProperties by remember(isGranted) {
+        mutableStateOf(
+            MapProperties(
+                latLngBoundsForCameraTarget = LatLngBounds(
+                    LatLng(36.36244323875914, 127.35429730754099),
+                    LatLng(36.37798415287542, 127.3705715881045)
+                ),
+                minZoomPreference = 15f,
+                maxZoomPreference = 20f,
+                isMyLocationEnabled = isGranted
+            )
         )
     }
+    val uiSettings = MapUiSettings(myLocationButtonEnabled = false)
     val interactionSource = remember { MutableInteractionSource() }
     var searchFieldText by remember { mutableStateOf("")}
     var searchQuery by remember { mutableStateOf("")}
@@ -360,7 +412,28 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
         }
     }
     @Composable
-    fun SearchResultRow(data: PlaceData, clickable: Boolean = true) {
+    fun SearchResultRow(data: PlaceData, clickable: Boolean = true, getCurrentLocation: ((LatLng?) -> Unit) -> Unit = {}) {
+        var distanceString by remember {
+            mutableStateOf<String?>(null)
+        }
+        getCurrentLocation { location ->
+            location?.let { currentLocation ->
+                val startLocation = android.location.Location("start").apply {
+                    latitude = currentLocation.latitude
+                    longitude = currentLocation.longitude
+                }
+                val endLocation = android.location.Location("end").apply {
+                    latitude = data.coordinates.latitude
+                    longitude = data.coordinates.longitude
+                }
+                val calculatedDistance = startLocation.distanceTo(endLocation)
+                distanceString = if (calculatedDistance >= 1000f)
+                    "%.2f km".format(calculatedDistance)
+                else
+                    "%.0f m".format(calculatedDistance)
+            }
+        }
+
         Column(
             modifier = Modifier
                 .clickable(enabled = clickable) {
@@ -385,7 +458,8 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                 Text(data.category)
             }
             Text(
-                text = if (data.isBuildingItself) data.location.buildingCode else data.location.description,
+                text = (if (data.isBuildingItself) data.location.buildingCode else data.location.description)
+                        + (if (distanceString != null) " · $distanceString" else ""),
                 color = Color.Gray
             )
             Text(
@@ -433,7 +507,7 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                             .background(white)
                     ) {
                         item {
-                            SearchResultRow(selectedPlace!!, clickable = false)
+                            SearchResultRow(selectedPlace!!, clickable = false, getCurrentLocation = getCurrentLocation)
                         }
                     }
                 } else if (searchResult.isNotEmpty()) {
@@ -458,7 +532,7 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                             .background(white)
                     ) {
                         items(searchResult) { resultItem ->
-                            SearchResultRow(resultItem)
+                            SearchResultRow(resultItem, getCurrentLocation = getCurrentLocation)
                         }
                     }
                 } else {
@@ -473,12 +547,15 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
         ) { innerPadding ->
             Box {
                 CampusMapScreen(
-                    modifier = modifier.fillMaxSize(),
+                    modifier = modifier
+                        .fillMaxSize(),
                     cameraPositionState = cameraPositionState,
                     mapProperties = mapProperties,
+                    mapUiSettings = uiSettings,
                     markerState = markerState
                 )
 
+                // 상단 검색창, 카테고리
                 Column() {
                     Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
                     Row(
@@ -596,6 +673,32 @@ fun Map(modifier: Modifier = Modifier, cameraPositionState: CameraPositionState,
                             }
                         }
                     }
+                }
+
+                // 현위치 버튼
+                SmallFloatingActionButton(
+                    onClick = {
+                        getCurrentLocation { location ->
+                            location?.let { location ->
+                                scope.launch {
+                                    cameraPositionState.animate(
+                                        update = CameraUpdateFactory.newLatLng(location), // 위치와 줌 레벨(15f) 설정
+                                        durationMs = 1000 // 1초 동안 이동
+                                    )
+                                }
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(start = 8.dp, bottom = 24.dp),
+                    shape = CircleShape,
+                    containerColor = white
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Adjust,
+                        contentDescription = "현재 위치 보기"
+                    )
                 }
             }
         }

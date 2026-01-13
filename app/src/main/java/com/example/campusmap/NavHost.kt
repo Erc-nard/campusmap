@@ -66,38 +66,20 @@ data class FacilityItemRoute(val categoryIndex: Int, val index: Int)
 @Composable
 fun DetailView(title: String, modifier: Modifier = Modifier, content: @Composable (Dp) -> Unit) {
     val padding = 20.dp
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = padding)
-            .shadow( //그림자옵션
-                elevation = 10.dp,
-                shape = RoundedCornerShape(10.dp),
-                ambientColor = Color(0xFF5FBEEB),
-                spotColor = Color(0x5525739B),
-                clip = false
-            ),
-        shape = RoundedCornerShape(padding),
-        color = Color.White,
-    ) {
-        Column(
-            modifier = modifier
-                .padding(vertical = padding)
-        ) {
-            Text(
-                text = title, //시설이름
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 20.sp,
-                modifier = Modifier.padding(horizontal = padding).padding(bottom = 12.dp)
-            )
-            content(padding)
-        }
+    Column {
+        Text(
+            text = title, //시설이름
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 20.sp,
+            modifier = Modifier.padding(horizontal = padding).padding(bottom = 12.dp)
+        )
+        content(padding)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacilitiesNavigation(padding: PaddingValues, navController: NavHostController, onMoveToMap: (LatLng) -> Unit) {
+fun FacilitiesNavigation(padding: PaddingValues, navController: NavHostController, onMoveToMap: (LatLng) -> Unit, getCurrentLocation: ((LatLng?) -> Unit) -> Unit) {
     val pagerState = rememberPagerState(pageCount = { topLevelFacilitiesList.size })
     val scope = rememberCoroutineScope()
 
@@ -127,8 +109,10 @@ fun FacilitiesNavigation(padding: PaddingValues, navController: NavHostControlle
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .hazeChild(state = hazeState, blurRadius = 20.dp)
-                                .background(appBackground.copy(alpha = 0.5f))
+                                .hazeChild(
+                                    state = hazeState, blurRadius = 20.dp
+                                )
+                                .background(appBackground.copy(alpha = 0.9f))
                         ) {
                             // 상태 막대만큼 비우기
                             Spacer(modifier = Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
@@ -200,7 +184,7 @@ fun FacilitiesNavigation(padding: PaddingValues, navController: NavHostControlle
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Box {
-                        FacilityDetailView(itemData, onMoveToMap)
+                        FacilityDetailView(itemData, onMoveToMap, getCurrentLocation)
 
                         // 뒤로 가기 버튼
                         IconButton(
