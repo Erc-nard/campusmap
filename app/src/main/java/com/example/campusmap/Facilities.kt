@@ -103,17 +103,144 @@ val cafeteria = listOf(
             MealHours("중식", LocalTime.of(11, 20), LocalTime.of(13, 30)),
             MealHours("석식", LocalTime.of(17, 20), LocalTime.of(19, 0))
         ),
-        upcomingMenus = sampleCafeteriaMenuData
+        upcomingMenus = listOf(
+            MealMenu(LocalDate.of(2026, 1, 13), MealType.BREAKFAST, 1000, listOf(
+                "쌀밥",
+                "얼큰버섯국",
+                "함박스테이크조림(1,2,5,6,10,12,15)",
+                "돌나물무침",
+                "맛김치(5,6,9,13)",
+                "도시락김/숭늉"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 13), MealType.LUNCH, 5500, listOf(
+                "쌀밥/흑미밥",
+                "유채된장국(5,6)",
+                "제육두루치기(5,6,10)",
+                "사모사튀김*소스(1,2,5,6,12)",
+                "세발나물김가루무침",
+                "맛김치(5,6,9,13)",
+                "야채샐러드&드레싱(1,2,5,6)"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 13), MealType.DINNER, 5500, listOf(
+                "후랑크김치볶음밥(1,5,6,9,10,13,15)",
+                "어묵국(5,6)",
+                "치킨까스*소스(1,2,5,6,12,15)",
+                "건파래볶음",
+                "파인애플탑씨",
+                "백김치(5,6,9,13)",
+                "야채샐러드&드레싱(1,2,5,6)"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 14), MealType.BREAKFAST, 1000, listOf(
+                "쌀밥",
+                "얼갈이된장국(5,6)",
+                "해물완자간장볶음(1,5,6,17)",
+                "숙주나물(5)",
+                "맛김치(5,6,9,13)",
+                "도시락김/숭늉"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 14), MealType.LUNCH, 5500, listOf(
+                "쌀밥/흑미밥",
+                "부대찌개(1,5,6,9,10,13,15,16)",
+                "어니언치킨너겟(1,2,5,6,15)",
+                "새송이어묵볶음(5,6)",
+                "봄동겉절이",
+                "깍두기(5,6,9,13)",
+                "야채샐러드&드레싱(1,2,5,6)"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 14), MealType.DINNER, 1000, listOf(
+                "쌀밥",
+                "사골떡국(1,6,16)",
+                "고기산적야채볶음(1,5,6,10,15)",
+                "야채비빔만두(1,5,6,10,15)",
+                "간장마늘쫑지",
+                "맛김치(5,6,9,13)",
+                "야채샐러드&드레싱(1,2,5,6)"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 15), MealType.BREAKFAST, 1000, listOf(
+                "쌀밥",
+                "순두부계란국(1,5,6)",
+                "미트볼굴소스볶음(1,5,6,15,18)",
+                "마늘쫑지",
+                "맛김치(5,6,9,13)",
+                "도시락김/숭늉"
+            )),
+        )
     )),
     FacilityItem(id = 1, title = "서맛골", imageURL = "https://kaist.ac.kr/kr/img/content/sub05/sub0503_img02.jpg", details = ItemDetail(
         coordinate = LatLng(36.367063, 127.360462),
-        location = Location("학생회관", "W2"),
+        location = Location("학생회관—1", "W2"),
         mealHours = listOf(
             MealHours("조식", LocalTime.of(8, 0), LocalTime.of(9, 30)),
             MealHours("중식", LocalTime.of(11, 30), LocalTime.of(13, 30)),
             MealHours("석식", LocalTime.of(17, 0), LocalTime.of(19, 0))
         ),
-        upcomingMenus = sampleCafeteriaMenuData
+        upcomingMenus = listOf(
+            MealMenu(LocalDate.of(2026, 1, 13), MealType.BREAKFAST, 3700, listOf(
+                "백미밥",
+                "북어콩나물국 (5)",
+                "순두부&양념장 (5)",
+                "무말랭이무침 (5,6)",
+                "도시락김 (5,6)",
+                "배추김치 (5,9)",
+                "누룽지"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 13), MealType.LUNCH, 5500, listOf(
+                "백미밥",
+                "돈육김치찌개 (5,9,10)",
+                "멘치카츠&타르타르소스 (1,2,6,10,16)",
+                "갈릭버터알감자조림 (2)",
+                "치커리흑임자무침 (1,5,6)",
+                "배추김치 (5,9)",
+                "양배추샐러드&드레싱 (1,6)",
+                "페퍼민트"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 13), MealType.DINNER, 5500, listOf(
+                "백미밥",
+                "바지락순두부찌개 (5,18)",
+                "간장불고기 (5,6,10)",
+                "미역초무침",
+                "들깨무짠지채",
+                "배추김치 (5,9)",
+                "양배추채샐러드&드레싱 (1,6)"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 14), MealType.BREAKFAST, 3700, listOf(
+                "백미밥",
+                "애호박새우젓국(9)",
+                "계란장조림(1,5,6)",
+                "무나물",
+                "도시락김(5,6)",
+                "배추김치(5,9)",
+                "누룽지"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 14), MealType.LUNCH, 5500, listOf(
+                "백미밥",
+                "들깨미역국(5,6)",
+                "마라돈육떡찜(5,6,10)",
+                "탕평채(1,5,6,16)",
+                "돈나물&초장(5,6)",
+                "배추김치(5,9)",
+                "양배추샐러드&드레싱(1,6)",
+                "유자차"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 14), MealType.DINNER, 5500, listOf(
+                "백미밥",
+                "오징어뭇국(5,6,17)",
+                "제육볶음(5,6,10)",
+                "미역줄기볶음",
+                "연근조림(5,6)",
+                "배추김치(5,9)",
+                "양배추샐러드&드레싱(1,6)"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 15), MealType.BREAKFAST, 3700, listOf(
+                "백미밥",
+                "건새우아욱국(5,6,9)",
+                "어묵깻잎전(5,6,19)",
+                "콩자반(5)",
+                "도시락김(5,6)",
+                "배추김치(5,9)",
+                "누룽지"
+            )),
+        )
     )),
     FacilityItem(id = 2, title = "동맛골 (학생식당)", imageURL = "https://kaist.ac.kr/kr/img/content/sub05/sub0503_img03.jpg", details = ItemDetail(
         coordinate = LatLng(36.369180, 127.363866),
@@ -124,7 +251,59 @@ val cafeteria = listOf(
             MealHours("라면", LocalTime.of(14, 0), LocalTime.of(15, 30)),
             MealHours("석식", LocalTime.of(17, 20), LocalTime.of(19, 0))
         ),
-        upcomingMenus = sampleCafeteriaMenuData
+        upcomingMenus = listOf(
+            MealMenu(LocalDate.of(2026, 1, 13), MealType.BREAKFAST, 3500, listOf(
+                "(뚝)얼큰돈육순두부지개 (5,10)",
+                "쌀밥",
+                "콩자반 (5)",
+                "그린샐러드",
+                "깍두기 (9)",
+                "누룽지"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 13), MealType.LUNCH, 6000, listOf(
+                "콘치즈참치김치돌솥밥 (2,9,13)",
+                "팽이버섯유부장국 (5)",
+                "미니돈까스강정 (6,10,12,15)",
+                "그린샐러드/단무지/깍두기 (9)"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 13), MealType.DINNER, 5000, listOf(
+                "쌀밥",
+                "배추된장국",
+                "생선까스 (1,6)",
+                "두반장볼어묵조림 (5,6)",
+                "매콤콩나물무침",
+                "그린샐러드/석박지 (9)"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 14), MealType.BREAKFAST, 1000, listOf(
+                "(뚝)맑은소불고기 (16)",
+                "쌀밥",
+                "양념깻잎지",
+                "그린샐러드",
+                "배추김치 (9)",
+                "누룽지"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 14), MealType.LUNCH, 5500, listOf(
+                "스팸마요덮밥 (1,10,15)",
+                "다시마무채국",
+                "그린샐러드/단무지/배추김치 (9)"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 14), MealType.DINNER, 5000, listOf(
+                "쌀밥",
+                "애호박두부새우젓국 (5,9)",
+                "매콤돈육버섯찜 (10)",
+                "가지양파볶음",
+                "고추지무침",
+                "그린샐러드/배추김치 (9)"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 15), MealType.BREAKFAST, 3500, listOf(
+                "(뚝)돈육비지찌개 (5,9,10,13)",
+                "쌀밥",
+                "땅콩조림 (4)",
+                "그린샐러드",
+                "깍두기 (9)",
+                "누룽지"
+            )),
+        )
     )),
     FacilityItem(id = 3, title = "동맛골 (교직원식당)", imageURL = "https://kaist.ac.kr/kr/img/content/sub05/sub0503_img10.jpg", details = ItemDetail(
         coordinate = LatLng(36.369180, 127.363866),
@@ -134,11 +313,44 @@ val cafeteria = listOf(
             MealHours("석식", LocalTime.of(17, 30), LocalTime.of(19, 0))
         ),
         upcomingMenus = listOf(
-            MealMenu(LocalDate.of(2026, 1, 8), MealType.LUNCH, 5000, listOf("밥", "국", "김치", "주찬", "부찬1", "부찬2", "부찬3")),
-            MealMenu(LocalDate.of(2026, 1, 8), MealType.DINNER, 5000, listOf("밥", "국", "김치", "주찬", "부찬1", "부찬2", "부찬3")),
-            MealMenu(LocalDate.of(2026, 1, 9), MealType.LUNCH, 6500, listOf("잡곡밥", "맑은순두부국", "삼치무조림", "옛날소시지전", "궁채들깨무침", "석박지", "그린샐러드", "누룽지", "자스민차")),
-            MealMenu(LocalDate.of(2026, 1, 9), MealType.LUNCHONEDISH, 7000, listOf("모듬까스(생선까스*치킨까스)&콘타르*치플레소스", "후리가케밥", "미니온모밀", "단무지유자무침", "석박지", "그린샐러드")),
-            MealMenu(LocalDate.of(2026, 1, 9), MealType.DINNER, 6500, listOf("잡곡밥", "매콤어묵국", "표고버섯불고기", "브로콜리맛살볶음", "매콤콩나물무침", "배추김치", "그린샐러드", "누룽지", "자스민차"))
+            MealMenu(LocalDate.of(2026, 1, 13), MealType.LUNCH, 7000, listOf(
+                "(할랄)오야꼬동(닭살계란덮밥) & 매콤물만두강정 (1,6,10,12,15)",
+                "팽이유부장국 (5)",
+                "석박지 (9)",
+                "그린샐러드"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 13), MealType.DINNER, 6500, listOf(
+                "잡곡밥",
+                "배추된장국",
+                "매콤돈육시래기찜 (10)",
+                "두부계란전 (1,5)",
+                "땅콩조림 (4)",
+                "석박지 (9)",
+                "그린샐러드",
+                "누룽지/쟈스민차"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 14), MealType.LUNCH, 7000, listOf(
+                "베이컨크림스파게티&갈릭모닝빵 (1,2,6,10)",
+                "양송이스프 (2,6)",
+                "배추김치 (9)",
+                "그린샐러드"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 14), MealType.DINNER, 6500, listOf(
+                "잡곡밥",
+                "애호박두부새우젓국 (5,9)",
+                "떡갈비알마늘볶음 (6,10)",
+                "계란말이 (1)",
+                "두부짬뽕조림 (9,17)",
+                "배추김치 (9)",
+                "그린샐러드",
+                "누룽지/수정과"
+            )),
+            MealMenu(LocalDate.of(2026, 1, 15), MealType.LUNCH, 6500, listOf(
+                "사천식가지덮밥&감자만두찜 (5,6,10)",
+                "맑은감자호박국",
+                "배추김치 (9)",
+                "그린샐러드"
+            )),
         )
     )),
     FacilityItem(id = 4, title = "더큰도시락", imageURL = "https://kaist.ac.kr/kr/img/content/sub05/sub0503_img11.jpg", details = ItemDetail(
