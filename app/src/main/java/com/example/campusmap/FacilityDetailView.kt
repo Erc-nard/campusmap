@@ -1,5 +1,8 @@
 package com.example.campusmap
 
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.FilledIconButton
@@ -26,17 +30,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.window.core.layout.WindowHeightSizeClass
 import coil3.compose.AsyncImage
 import com.google.android.gms.maps.model.LatLng
 import java.text.DecimalFormat
 
 @Composable
-fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng, String?) -> Unit, getCurrentLocation: ((LatLng?) -> Unit) -> Unit = {}) {
+fun FacilityDetailView(
+    itemData: FacilityItem,
+    onMoveToMap: (LatLng, String?) -> Unit,
+    onMoveToBuildingMap: (String) -> Unit,
+    getCurrentLocation: ((LatLng?) -> Unit) -> Unit = {}
+) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
     var distanceString by remember {
@@ -205,9 +217,60 @@ fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng, String?) ->
                     }
                 }
             }
+            if (itemData.details.departmentBuildings.isNotEmpty()) {
+                val buildings = itemData.details.departmentBuildings.mapNotNull { code ->
+                    buildingMaps[code]
+                }
+                if (buildings.isNotEmpty()) {
+                    item {
+                        DetailView("건물 안내도") { innerPadding ->
+                            Column(Modifier.padding(horizontal = innerPadding)) {
+                                buildings.forEach { building ->
+                                    Text(
+                                        text = building.description,
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(20.dp))
+                                            .clickable {
+                                                onMoveToBuildingMap(building.code)
+                                            }
+                                            .padding(8.dp, 4.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    item {
+                        DetailView("학과 건물") { innerPadding ->
+                            Text(
+                                text = itemData.details.departmentBuildings.joinToString(", "),
+                                modifier = Modifier.padding(horizontal = innerPadding)
+                            )
+                        }
+                    }
+                }
+            }
             if (itemData.details.contact.isNotEmpty()) {
                 item {
                     ContactView(itemData)
+                }
+            }
+            if (itemData.details.url.isNotBlank()) {
+                item {
+                    val context = LocalContext.current
+                    Row(Modifier.padding(horizontal = 20.dp)) {
+                        Text(
+                            text = "홈페이지 방문 →",
+                            color = Color(0, 128, 255),
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .clickable {
+                                    val openURL = Intent(Intent.ACTION_VIEW)
+                                    openURL.data = Uri.parse(itemData.details.url)
+                                    context.startActivity(openURL)
+                                }
+                        )
+                    }
                 }
             }
         }

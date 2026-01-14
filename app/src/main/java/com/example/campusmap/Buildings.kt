@@ -17,6 +17,8 @@ data class BuildingData(
     val polygon: List<LatLng> = listOf(),
     val keywords: List<String> = listOf(),
     val description: String = "",
+    val facilityCategoryReference: Int? = null,
+    val facilityItemReference: Int? = null
 ) {
     val buildingDescription: String
         get() = "$name ($code)"
@@ -75,6 +77,7 @@ val buildings = mapOf(
             LatLng(36.36736282518112, 127.36504732439876),
         ),
         keywords = listOf("수리과", "수학과", "응용수학과"),
+        facilityCategoryReference = 5, facilityItemReference = 0
     ),
     "E2-2" to BuildingData(
         code = "E2-2",
@@ -115,7 +118,8 @@ val buildings = mapOf(
             LatLng(36.36863466868382, 127.36465769068059)
         ),
         keywords = listOf("전산동"),
-        description = "전산학부, 전기및전자공학부"
+        description = "전산학부, 전기및전자공학부",
+        facilityCategoryReference = 5, facilityItemReference = 3
     ),
     "E3-1" to BuildingData(
         code = "E3-1",
@@ -148,6 +152,7 @@ val buildings = mapOf(
             LatLng(36.3681058053952, 127.3652067956013)
         ),
         keywords = listOf("전산과"),
+        facilityCategoryReference = 5, facilityItemReference = 3
     ),
     "E3-2" to BuildingData(
         code = "E3-2",
@@ -249,7 +254,8 @@ val buildings = mapOf(
         name = "크래프톤 SoC 빌딩",
         category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36771616442249, 127.36516876041993),
-        keywords = listOf("전산과", "Krafton", "krafton"),
+        keywords = listOf("전산과", "Krafton", "krafton", "몰입캠프", "몰캠"),
+        facilityCategoryReference = 5, facilityItemReference = 3
     ),
     "E4" to BuildingData(
         code = "E4",
@@ -358,6 +364,7 @@ val buildings = mapOf(
             LatLng(36.36950160976572, 127.36480102499858)
         ),
         keywords = listOf("수리과", "수학과"),
+        facilityCategoryReference = 5, facilityItemReference = 0
     ),
     "E6-2" to BuildingData(
         code = "E6-2",
@@ -382,6 +389,7 @@ val buildings = mapOf(
             LatLng(36.369905865006366, 127.3644797611599)
         ),
         keywords = listOf("물리과"),
+        facilityCategoryReference = 5, facilityItemReference = 1
     ),
     "E6-3" to BuildingData(
         code = "E6-3",
@@ -423,7 +431,8 @@ val buildings = mapOf(
             LatLng(36.370299884365465, 127.36455960149088),
             LatLng(36.37031104684884, 127.364593083174),
             LatLng(36.3704821651514, 127.36462731130091)
-        )
+        ),
+        facilityCategoryReference = 5, facilityItemReference = 2
     ),
     "E6-5" to BuildingData(
         code = "E6-5",

@@ -13,6 +13,7 @@ data class ItemDetail(
     val businessHours: List<BusinessHours> = listOf(),
     val coordinate: LatLng = LatLng(0.0, 0.0),
     val contact: String = "",
+    val departmentBuildings: List<String> = listOf(),
     val location: Location = Location(),
     val mealHours: List<MealHours> = listOf(),
     val topMenus: List<String> = listOf(),
@@ -138,6 +139,25 @@ val cafeteria = listOf(
             MealMenu(LocalDate.of(2026, 1, 9), MealType.LUNCHONEDISH, 7000, listOf("모듬까스(생선까스*치킨까스)&콘타르*치플레소스", "후리가케밥", "미니온모밀", "단무지유자무침", "석박지", "그린샐러드")),
             MealMenu(LocalDate.of(2026, 1, 9), MealType.DINNER, 6500, listOf("잡곡밥", "매콤어묵국", "표고버섯불고기", "브로콜리맛살볶음", "매콤콩나물무침", "배추김치", "그린샐러드", "누룽지", "자스민차"))
         )
+    )),
+    FacilityItem(id = 4, title = "더큰도시락", imageURL = "https://kaist.ac.kr/kr/img/content/sub05/sub0503_img11.jpg", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS), includeHolidays = false, LocalTime.of(10, 0), LocalTime.of(19, 0)),
+        ),
+        contact = "042-350-0875",
+        coordinate = LatLng(36.36691719709483, 127.36044608597967),
+        location = Location("학생회관–1", "W2", 2),
+        topMenus = listOf("도시락", "제육볶음", "돈까스", "불고기", "볶음밥")
+    )),
+    FacilityItem(id = 5, title = "풀빛마루", imageURL = "https://kaist.ac.kr/kr/img/content/sub05/sub0508_img06.jpg", details = ItemDetail(
+        businessHours = listOf(
+            BusinessHours(setOf(DayClass.WEEKDAYS), includeHolidays = false, LocalTime.of(8, 20), LocalTime.of(18, 45), orderEnd = LocalTime.of(18, 30)),
+            BusinessHours(setOf(DayClass.SATURDAY), includeHolidays = false, begin = LocalTime.of(11, 20), LocalTime.of(18, 30))
+        ),
+        contact = "042-350-0365",
+        coordinate = LatLng(36.37413290617624, 127.35984139413212),
+        location = Location("학생회관–2", "N13"),
+        topMenus = listOf("덮밥", "샐러드", "부리또")
     )),
 )
 val kaimaru = listOf(
@@ -400,11 +420,69 @@ val cafe = listOf(
 //    FacilityItem(id = 6, title = "세종관", imageURL = "https://kaist.ac.kr/kr/img/content/sub05/sub0505_img01.jpg"),
 //    FacilityItem(id = 7, title = "김병호 IT융합센터", imageURL = "https://kaist.ac.kr/kr/img/content/sub05/sub0505_img01.jpg"),
 //)
+val departments = listOf(
+    FacilityItem(
+        id = 0,
+        title = "수리과학과",
+        imageURL = "https://mathsci.kaist.ac.kr/cms/wp-content/uploads/2022/04/MA_hori_en-ko.png",
+        details = ItemDetail(
+            coordinate = LatLng(36.36946653264515, 127.36448328344173),
+            departmentBuildings = listOf("E2", "E2-1", "E6", "E6-1"),
+            location = Location("E6-1", "수리과학과", 2),
+            url = "https://mathsci.kaist.ac.kr"
+        )
+    ),
+    FacilityItem(
+        id = 1,
+        title = "물리학과",
+        imageURL = "https://physics.kaist.ac.kr/layouts/jit_layouts_2018/resource/images/common/logo.png",
+        details = ItemDetail(
+            coordinate = LatLng(36.36985742247803, 127.3641118116951),
+            departmentBuildings = listOf("E6", "E6-2"),
+            location = Location("E6-2", "물리학과", 1),
+            url = "https://physics.kaist.ac.kr"
+        )
+    ),
+    FacilityItem(
+        id = 2,
+        title = "화학과",
+        imageURL = "https://chem.kaist.ac.kr/public/images/sub/sub01/campusmap/building/img01.jpg",
+        details = ItemDetail(
+            coordinate = LatLng(36.370444936630456, 127.36427612613731),
+            departmentBuildings = listOf("E6", "E6-4", "E6-6", "E22"),
+            location = Location("E6-4", "화학과", 1),
+            url = "https://chem.kaist.ac.kr"
+        )
+    ),
+    FacilityItem(
+        id = 3,
+        title = "전산학부",
+        imageURL = "https://cs.kaist.ac.kr/upload_files/mcontent/4/202506/68621c383fbdf.png",
+        details = ItemDetail(
+            coordinate = LatLng(36.36802315868566, 127.3657106244192),
+            departmentBuildings = listOf("E3", "E3-1", "E3-5", "N1", "N5"),
+            location = Location("E3-1", "전산학부", 1),
+            url = "https://cs.kaist.ac.kr"
+        )
+    ),
+    FacilityItem(
+        id = 4,
+        title = "전기및전자공학부",
+        imageURL = "https://ee.kaist.ac.kr/wp-content/uploads/2025/06/visual-logo06.png",
+        details = ItemDetail(
+            coordinate = LatLng(36.36802315868566, 127.3657106244192),
+            departmentBuildings = listOf("E3", "E3-2", "E3-4", "N1"),
+            location = Location("E3-2", "전기및전자공학부", 1),
+            url = "https://ee.kaist.ac.kr"
+        )
+    )
+)
 val topLevelFacilitiesList = listOf(
-    FacilityCategory(id = 0, title = "학식", items = cafeteria),
+    FacilityCategory(id = 0, title = "식당", items = cafeteria),
     FacilityCategory(id = 1, title = "카이마루", items = kaimaru),
     FacilityCategory(id = 2, title = "태울관", items = taeulgwan),
     FacilityCategory(id = 3, title = "프랜차이즈", items = franchise),
     FacilityCategory(id = 4, title = "카페", items = cafe),
-//    FacilityCategory(id = 5, title = "매점", items = kiosk)
+    FacilityCategory(id = 5, title = "학과", items = departments),
+//    FacilityCategory(id = 6, title = "매점", items = kiosk)
 )

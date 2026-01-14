@@ -62,6 +62,8 @@ interface FacilityData {
 @Serializable object Facilities
 @Serializable
 data class FacilityItemRoute(val categoryIndex: Int, val index: Int)
+@Serializable
+data class BuildingMapViewer(val buildingCode: String)
 
 @Composable
 fun DetailView(title: String, modifier: Modifier = Modifier, content: @Composable (Dp) -> Unit) {
@@ -84,6 +86,10 @@ fun FacilitiesNavigation(padding: PaddingValues, navController: NavHostControlle
     val scope = rememberCoroutineScope()
 
     val hazeState = remember { HazeState() }
+
+    fun onMoveToBuildingMap(buildingCode: String) {
+        navController.navigate(BuildingMapViewer(buildingCode))
+    }
 
     NavHost(
         navController = navController,
@@ -184,7 +190,7 @@ fun FacilitiesNavigation(padding: PaddingValues, navController: NavHostControlle
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Box {
-                        FacilityDetailView(itemData, onMoveToMap, getCurrentLocation)
+                        FacilityDetailView(itemData, onMoveToMap, ::onMoveToBuildingMap, getCurrentLocation)
 
                         // 뒤로 가기 버튼
                         IconButton(
@@ -204,6 +210,17 @@ fun FacilitiesNavigation(padding: PaddingValues, navController: NavHostControlle
                             )
                         }
                     }
+                }
+            }
+
+            composable<BuildingMapViewer> { backstackEntry ->
+                val route: BuildingMapViewer = backstackEntry.toRoute()
+
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    BuildingMapView(buildingMaps[route.buildingCode]!!)
                 }
             }
         }

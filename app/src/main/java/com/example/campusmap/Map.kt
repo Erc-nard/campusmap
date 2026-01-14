@@ -115,6 +115,7 @@ fun Map(
     searchQuery: MutableState<SearchQuery?>,
     selectedPlace: MutableState<SearchResult?>,
 
+    onDetailButtonTab: (Int, Int) -> Unit,
     getCurrentLocation: ((LatLng?) -> Unit) -> Unit
 ) {
     // 권한 관련
@@ -232,6 +233,17 @@ fun Map(
                     text = data.description,
                     maxLines = 1,
                     color = Color.Gray
+                )
+            }
+            if (!clickable && (data.facilityCategoryReference != null) && (data.facilityItemReference != null)) {
+                Text(
+                    text = "상세 정보 보기",
+                    color = Color(0, 128, 255),
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .clickable {
+                            onDetailButtonTab(data.facilityCategoryReference!!, data.facilityItemReference!!)
+                        }
                 )
             }
         }
