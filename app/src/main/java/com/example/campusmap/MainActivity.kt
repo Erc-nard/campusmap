@@ -147,6 +147,10 @@ fun CampusmapApp() {
     val markerPositionsState = remember { mutableStateOf<List<LatLng>>(listOf()) }
     val selectedBuildingState = remember { mutableStateOf<String?>(null) }
 
+    val searchFieldText = remember { mutableStateOf("") }
+    val searchQuery = remember { mutableStateOf<SearchQuery?>(null) }
+    val selectedPlace = remember { mutableStateOf<SearchResult?>(null) }
+
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     val currentLocation = remember {
@@ -241,9 +245,15 @@ fun CampusmapApp() {
                 AppDestinations.MAP ->
                     Map(
                         Modifier.fillMaxHeight(),
+
                         cameraPositionState = cameraPositionState,
                         markerPositionsState = markerPositionsState,
                         selectedBuildingState = selectedBuildingState,
+
+                        searchFieldText = searchFieldText,
+                        searchQuery = searchQuery,
+                        selectedPlace = selectedPlace,
+
                         getCurrentLocation = ::getCurrentLocation
                     )
                 AppDestinations.FACILITIES -> {

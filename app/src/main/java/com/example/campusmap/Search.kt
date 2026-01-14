@@ -18,7 +18,7 @@ class SearchResult(
     val name: String
         get() = placeReference?.title ?: buildingReference!!.name
     val category: String
-        get() = placeReference?.category ?: buildingReference!!.categories.map { it.displayText }.joinToString(", ")
+        get() = placeReference?.category ?: buildingReference!!.category?.displayText ?: ""
     val locationDescription: String
         get() = if (placeReference == null)
             buildingReference!!.code
@@ -62,7 +62,7 @@ fun getSearchResult(query: SearchQuery, currentLocation: LatLng? = null): List<S
         }
         is SearchQuery.Category -> {
             buildings.forEach { (_, building) ->
-                if (building.categories.any { it.displayText == query.category })
+                if (building.category?.displayText == query.category)
                     results.add(SearchResult(buildingReference = building))
             }
             places.forEach { place ->

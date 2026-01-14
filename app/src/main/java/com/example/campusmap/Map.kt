@@ -32,7 +32,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Adjust
-import androidx.compose.material.icons.filled.Cake
+import androidx.compose.material.icons.filled.BakeryDining
+import androidx.compose.material.icons.filled.Balcony
 import androidx.compose.material.icons.filled.DirectionsBus
 import androidx.compose.material.icons.filled.HomeWork
 import androidx.compose.material.icons.filled.LocalCafe
@@ -88,11 +89,14 @@ data class MapCategory(val icon: ImageVector, val text: String, val color: Color
 val mapCategories = listOf(
     MapCategory(Icons.Default.School, "강의·연구동", Color(95,190,235)),
     MapCategory(Icons.Default.Restaurant, "식당", Color(250, 189, 0, 255)),
-    MapCategory(Icons.Default.Cake, "베이커리", Color(250, 219, 135, 255)),
+    MapCategory(Icons.Default.BakeryDining, "베이커리", Color(250, 219, 135, 255)),
     MapCategory(Icons.Default.LocalCafe, "카페", Color(243, 118, 0, 255)),
     MapCategory(Icons.Default.ShoppingCart, "매점", Color(0, 203, 27, 255)),
     MapCategory(Icons.Default.DirectionsBus, "셔틀", Color.Black),
     MapCategory(Icons.Default.HomeWork, "기숙사", Color(69, 0, 255, 255)),
+    MapCategory(Icons.Default.Balcony, "학습공간", Color(101, 250, 170, 255)),
+    MapCategory(Icons.Default.Balcony, "복지시설", Color(101, 250, 170, 255)),
+    MapCategory(Icons.Default.Balcony, "행정시설", Color(101, 250, 170, 255)),
 //    MapCategory(Icons.Default.Place,"가볼 만한 곳", Color(255, 0, 161, 255)),
 )
 
@@ -100,9 +104,15 @@ val mapCategories = listOf(
 @Composable
 fun Map(
     modifier: Modifier = Modifier,
+
     cameraPositionState: CameraPositionState,
     markerPositionsState: MutableState<List<LatLng>>,
     selectedBuildingState: MutableState<String?>,
+
+    searchFieldText: MutableState<String>,
+    searchQuery: MutableState<SearchQuery?>,
+    selectedPlace: MutableState<SearchResult?>,
+
     getCurrentLocation: ((LatLng?) -> Unit) -> Unit
 ) {
     // 권한 관련
@@ -129,9 +139,6 @@ fun Map(
     }
     val uiSettings = MapUiSettings(myLocationButtonEnabled = false)
     val interactionSource = remember { MutableInteractionSource() }
-    var searchFieldText by remember { mutableStateOf("")}
-    var searchQuery by remember { mutableStateOf<SearchQuery?>(null)}
-    var selectedPlace by remember { mutableStateOf<SearchResult?>(null) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val sheetScaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
@@ -144,8 +151,8 @@ fun Map(
                 .clip(RoundedCornerShape(20.dp))
                 .background(white)
                 .clickable {
-                    searchFieldText = data.text
-                    searchQuery = SearchQuery.Category(data.text)
+                    searchFieldText.value = data.text
+                    searchQuery.value = SearchQuery.Category(data.text)
                 }
                 .padding(horizontal = 10.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -184,8 +191,8 @@ fun Map(
         Column(
             modifier = Modifier
                 .clickable(enabled = clickable) {
-                    searchFieldText = data.name
-                    selectedPlace = data
+                    searchFieldText.value = data.name
+                    selectedPlace.value = data
                     data.coordinates?.let { coordinates ->
                         scope.launch {
                             cameraPositionState.animate(
@@ -228,7 +235,7 @@ fun Map(
         }
     }
 
-    val searchResult = (if (searchQuery != null) getSearchResult(searchQuery!!) else listOf()).toMutableList()
+    val searchResult = (if (searchQuery.value != null) getSearchResult(searchQuery.value!!) else listOf()).toMutableList()
     if (searchResult.isNotEmpty()) {
         getCurrentLocation { currentLocation ->
             currentLocation?.let {
@@ -252,13 +259,13 @@ fun Map(
 
         BottomSheetScaffold(
             scaffoldState = sheetScaffoldState,
-            sheetPeekHeight = if (searchQuery == null) 0.dp else 160.dp,
+            sheetPeekHeight = if (searchQuery.value == null) 0.dp else 160.dp,
             sheetContainerColor = appBackground,
             sheetContent = {
-                if (selectedPlace != null) {
+                if (selectedPlace.value != null) {
                     LazyColumn(
                         modifier = Modifier
-                            .heightIn(max = if (searchQuery == null) 0.dp else maxSheetHeight)
+                            .heightIn(max = if (searchQuery.value == null) 0.dp else maxSheetHeight)
                             .padding(horizontal = 20.dp)
                             .padding(bottom = 20.dp)
                             .shadow( //그림자옵션
@@ -272,7 +279,7 @@ fun Map(
                             .background(white)
                     ) {
                         item {
-                            SearchResultRow(selectedPlace!!, clickable = false, getCurrentLocation = getCurrentLocation)
+                            SearchResultRow(selectedPlace.value!!, clickable = false, getCurrentLocation = getCurrentLocation)
                         }
                     }
                 } else if (searchResult.isNotEmpty()) {
@@ -284,7 +291,7 @@ fun Map(
                     )
                     LazyColumn(
                         modifier = Modifier
-                            .heightIn(max = if (searchQuery == null) 0.dp else maxSheetHeight)
+                            .heightIn(max = if (searchQuery.value == null) 0.dp else maxSheetHeight)
                             .padding(horizontal = 20.dp)
                             .padding(bottom = 20.dp)
                             .shadow( //그림자옵션
@@ -321,20 +328,20 @@ fun Map(
                     markerPositionsState = markerPositionsState,
                     selectedBuildingState = selectedBuildingState,
                     onFloorTap = {
-                        when (searchQuery) {
+                        when (searchQuery.value) {
                             is SearchQuery.BuildingCode -> {
-                                searchFieldText = ""
-                                searchQuery = null
-                                selectedPlace = null
+                                searchFieldText.value = ""
+                                searchQuery.value = null
+                                selectedPlace.value = null
                             }
                             else -> {}
                         }
                     },
                     onBuildingTap = { buildingCode ->
-                        searchFieldText = buildingCode
-                        searchQuery = SearchQuery.BuildingCode(buildingCode)
+                        searchFieldText.value = buildingCode
+                        searchQuery.value = SearchQuery.BuildingCode(buildingCode)
                         selectedBuildingState.value = buildingCode
-                        selectedPlace = null
+                        selectedPlace.value = null
                     }
                 )
 
@@ -350,13 +357,13 @@ fun Map(
                             .background(Color.White),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (selectedPlace != null) {
+                        if (selectedPlace.value != null) {
                             fun removeSelection() {
-                                selectedPlace = null
-                                searchFieldText = when (searchQuery) {
-                                    is SearchQuery.Text -> (searchQuery as SearchQuery.Text).text
-                                    is SearchQuery.Category -> (searchQuery as SearchQuery.Category).category
-                                    is SearchQuery.BuildingCode -> (searchQuery as SearchQuery.BuildingCode).buildingCode
+                                selectedPlace.value = null
+                                searchFieldText.value = when (searchQuery.value) {
+                                    is SearchQuery.Text -> (searchQuery.value as SearchQuery.Text).text
+                                    is SearchQuery.Category -> (searchQuery.value as SearchQuery.Category).category
+                                    is SearchQuery.BuildingCode -> (searchQuery.value as SearchQuery.BuildingCode).buildingCode
                                     else -> ""
                                 }
                                 markerPositionsState.value = searchResult.mapNotNull { it.coordinates }
@@ -370,10 +377,10 @@ fun Map(
                                     contentDescription = "뒤로"
                                 )
                             }
-                        } else if (searchQuery != null) {
+                        } else if (searchQuery.value != null) {
                             fun clearSearchField() {
-                                searchFieldText = ""
-                                searchQuery = null
+                                searchFieldText.value = ""
+                                searchQuery.value = null
                             }
                             BackHandler(enabled = true, onBack = ::clearSearchField)
                             IconButton(onClick = ::clearSearchField) {
@@ -384,20 +391,20 @@ fun Map(
                             }
                         }
                         BasicTextField(
-                            value = searchFieldText,
-                            onValueChange = { newValue -> searchFieldText = newValue },
+                            value = searchFieldText.value,
+                            onValueChange = { newValue -> searchFieldText.value = newValue },
                             interactionSource = interactionSource,
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(horizontal = if (selectedPlace == null && searchQuery == null) 20.dp else 0.dp),
+                                .padding(horizontal = if (selectedPlace.value == null && searchQuery.value == null) 20.dp else 0.dp),
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                             keyboardActions = KeyboardActions(
                                 onSearch = {
                                     keyboardController?.hide()
-                                    selectedPlace = null
-                                    searchQuery = SearchQuery.Text(searchFieldText.trimEnd())
-                                    if (searchQuery == null) {
+                                    selectedPlace.value = null
+                                    searchQuery.value = SearchQuery.Text(searchFieldText.value.trimEnd())
+                                    if (searchQuery.value == null) {
                                         scope.launch {
                                             sheetScaffoldState.bottomSheetState.partialExpand()
                                         }
@@ -406,7 +413,7 @@ fun Map(
                             ),
                         ) { innerTextField ->
                             TextFieldDefaults.DecorationBox(
-                                value = searchFieldText,
+                                value = searchFieldText.value,
                                 innerTextField = innerTextField,
                                 enabled = true,
                                 singleLine = true,
@@ -415,7 +422,7 @@ fun Map(
                                 contentPadding = PaddingValues(0.dp),
                                 container = {
                                     Box {
-                                        if (searchFieldText.isEmpty()) {
+                                        if (searchFieldText.value.isEmpty()) {
                                             Text(
                                                 text = "검색",
                                                 fontSize = 16.sp,
@@ -440,8 +447,8 @@ fun Map(
                         IconButton(
                             onClick = {
                                 keyboardController?.hide()
-                                searchQuery = SearchQuery.Text(searchFieldText.trimEnd())
-                                if (searchQuery == null) {
+                                searchQuery.value = SearchQuery.Text(searchFieldText.value.trimEnd())
+                                if (searchQuery.value == null) {
                                     scope.launch {
                                         sheetScaffoldState.bottomSheetState.partialExpand()
                                     }
@@ -454,7 +461,7 @@ fun Map(
                             )
                         }
                     }
-                    if (searchQuery == null) {
+                    if (searchQuery.value == null) {
                         LazyRow(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             contentPadding = PaddingValues(16.dp, 12.dp)

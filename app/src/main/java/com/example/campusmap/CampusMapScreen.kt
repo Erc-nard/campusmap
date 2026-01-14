@@ -27,8 +27,6 @@ fun CampusMapScreen(
     onFloorTap: () -> Unit,
     onBuildingTap: (String) -> Unit,
 ) {
-//    var selectedBuildingId by remember { mutableStateOf<String?>(null) }
-
     GoogleMap(
         modifier = modifier,
         uiSettings = mapUiSettings,
@@ -62,6 +60,7 @@ fun CampusMapScreen(
                     strokeWidth = 3f,
                     clickable = true,
                     onClick = {
+                        selectedBuildingState.value = code
                         onBuildingTap(code)
                     }
                 )

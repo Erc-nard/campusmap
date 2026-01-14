@@ -153,7 +153,7 @@ val places = listOf(
     PlaceData(
         title = "퀴즈노스",
         category = "베이커리",
-        buildingCode = "E13-1",
+        buildingCode = "N13-1",
         floor = 2,
         coordinates = LatLng(36.37338355831737, 127.36029761797428),
         keywords = listOf("샌드위치", "큊"),
@@ -247,7 +247,7 @@ val places = listOf(
     PlaceData(
         title = "북카페 엔젤리너스",
         category = "카페",
-        buildingCode = "E13-1",
+        buildingCode = "N13-1",
         floor = 2,
         coordinates = LatLng(36.37302455732518, 127.36055783677611),
         keywords = listOf("책", "엔제리너스"),
