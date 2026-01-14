@@ -34,9 +34,11 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.material.icons.filled.BakeryDining
 import androidx.compose.material.icons.filled.Balcony
+import androidx.compose.material.icons.filled.BusinessCenter
 import androidx.compose.material.icons.filled.DirectionsBus
 import androidx.compose.material.icons.filled.HomeWork
 import androidx.compose.material.icons.filled.LocalCafe
+import androidx.compose.material.icons.filled.Nature
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Search
@@ -89,14 +91,14 @@ data class MapCategory(val icon: ImageVector, val text: String, val color: Color
 val mapCategories = listOf(
     MapCategory(Icons.Default.School, "강의·연구동", Color(95,190,235)),
     MapCategory(Icons.Default.Restaurant, "식당", Color(250, 189, 0, 255)),
-    MapCategory(Icons.Default.BakeryDining, "베이커리", Color(250, 219, 135, 255)),
+    MapCategory(Icons.Default.BakeryDining, "베이커리", Color(189, 56, 14, 255)),
     MapCategory(Icons.Default.LocalCafe, "카페", Color(243, 118, 0, 255)),
     MapCategory(Icons.Default.ShoppingCart, "매점", Color(0, 203, 27, 255)),
     MapCategory(Icons.Default.DirectionsBus, "셔틀", Color.Black),
     MapCategory(Icons.Default.HomeWork, "기숙사", Color(69, 0, 255, 255)),
-    MapCategory(Icons.Default.Balcony, "학습공간", Color(101, 250, 170, 255)),
-    MapCategory(Icons.Default.Balcony, "복지시설", Color(101, 250, 170, 255)),
-    MapCategory(Icons.Default.Balcony, "행정시설", Color(101, 250, 170, 255)),
+    MapCategory(Icons.Default.School, "학습공간", Color(101, 250, 170, 255)),
+    MapCategory(Icons.Default.Nature, "복지시설", Color(205, 220, 57, 255)),
+    MapCategory(Icons.Default.BusinessCenter, "행정시설", Color(156, 39, 176, 255)),
 //    MapCategory(Icons.Default.Place,"가볼 만한 곳", Color(255, 0, 161, 255)),
 )
 
