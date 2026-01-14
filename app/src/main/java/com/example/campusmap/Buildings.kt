@@ -52,6 +52,7 @@ val buildings = mapOf(
             LatLng(36.36727915387967, 127.36441179572866),
             LatLng(36.367362179771874, 127.36452082500756),
         ),
+        keywords = listOf("산경동"),
         description = "수리과학과, 산업및시스템공학과"
     ),
     "E2-1" to BuildingData(
@@ -65,6 +66,7 @@ val buildings = mapOf(
             LatLng(36.36699337535, 127.3642990358111),
             LatLng(36.36736282518112, 127.36504732439876),
         ),
+        keywords = listOf("수리과", "수학과", "응용수학과"),
     ),
     "E2-2" to BuildingData(
         code = "E2-2",
@@ -77,6 +79,7 @@ val buildings = mapOf(
             LatLng(36.36714831245916, 127.36372869213808),
             LatLng(36.36750441840819, 127.36442120329208),
         ),
+        keywords = listOf("산시공", "산공과"),
     ),
     "E3" to BuildingData(
         code = "E3",
@@ -103,6 +106,7 @@ val buildings = mapOf(
             LatLng(36.36861900891381, 127.36462140298373),
             LatLng(36.36863466868382, 127.36465769068059)
         ),
+        keywords = listOf("전산동"),
         description = "전산학부, 전기및전자공학부"
     ),
     "E3-1" to BuildingData(
@@ -135,6 +139,7 @@ val buildings = mapOf(
             LatLng(36.368094276892826, 127.36529309907871),
             LatLng(36.3681058053952, 127.3652067956013)
         ),
+        keywords = listOf("전산과"),
     ),
     "E3-2" to BuildingData(
         code = "E3-2",
@@ -171,6 +176,7 @@ val buildings = mapOf(
             LatLng(36.368679101999305, 127.36559947883873),
             LatLng(36.3686316547113, 127.36564382869422),
         ),
+        keywords = listOf("전전", "전자과"),
     ),
     "E3-3" to BuildingData(
         code = "E3-3",
@@ -235,6 +241,7 @@ val buildings = mapOf(
         name = "크래프톤 SoC 빌딩",
         category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36771616442249, 127.36516876041993),
+        keywords = listOf("전산과", "Krafton", "krafton"),
     ),
     "E4" to BuildingData(
         code = "E4",
@@ -308,6 +315,7 @@ val buildings = mapOf(
             LatLng(36.37029922112135, 127.36477689078342),
             LatLng(36.370416269794944, 127.36481086686341)
         ),
+        keywords = listOf("자과동"),
         description = "수리과학과, 물리학과, 화학과, 생명과학과"
     ),
     "E6-1" to BuildingData(
@@ -340,7 +348,8 @@ val buildings = mapOf(
             LatLng(36.36948129114095, 127.36481485899287),
             LatLng(36.369488126393684, 127.36478981896684),
             LatLng(36.36950160976572, 127.36480102499858)
-        )
+        ),
+        keywords = listOf("수리과", "수학과"),
     ),
     "E6-2" to BuildingData(
         code = "E6-2",
@@ -363,7 +372,8 @@ val buildings = mapOf(
             LatLng(36.36971006671862, 127.36441198916418),
             LatLng(36.36971674894057, 127.36443709233941),
             LatLng(36.369905865006366, 127.3644797611599)
-        )
+        ),
+        keywords = listOf("물리과"),
     ),
     "E6-3" to BuildingData(
         code = "E6-3",
@@ -381,7 +391,8 @@ val buildings = mapOf(
             LatLng(36.369918716439344, 127.36543534578604),
             LatLng(36.3699164294561, 127.36544647823482),
             LatLng(36.36999521274775, 127.3654691330091)
-        )
+        ),
+        keywords = listOf("생명과", "생물"),
     ),
     "E6-4" to BuildingData(
         code = "E6-4",
@@ -427,6 +438,7 @@ val buildings = mapOf(
             LatLng(36.370475921824095, 127.363719109352),
             LatLng(36.37048940529457, 127.36373031534299)
         ),
+        keywords = listOf("일물실", "일화실")
     ),
     "E6-6" to BuildingData(
         code = "E6-6",
@@ -474,7 +486,6 @@ val buildings = mapOf(
     "E9" to BuildingData(
         code = "E9",
         name = "학술문화관",
-        // categories = ),
         coordinates = LatLng(36.36959433368902, 127.36246419283363),
         polygon = listOf(
             LatLng(36.36992784736996, 127.36243788204352),
@@ -492,12 +503,11 @@ val buildings = mapOf(
             LatLng(36.369895731952845, 127.36262716650313),
             LatLng(36.369830752932636, 127.36250986204789)
         ),
-        description = "새내기과정학부"
+        keywords = listOf("학술관", "도서관", "중도", "중앙도서관"),
     ),
     "E9-1" to BuildingData(
         code = "E9-1",
         name = "KAIST 미술관",
-        // categories = ),
         coordinates = LatLng(36.36984781209899, 127.36282752055794),
         polygon = listOf(
             LatLng(36.370109444520445, 127.36273123266075),
@@ -523,6 +533,8 @@ val buildings = mapOf(
         name = "창의학습관",
         category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.37039142059578, 127.36261275211453),
+        keywords = listOf("창의관", "터만홀", "새학", "즐대생", "신대생", "즐거울 대학생활", "신나는 대학생활"),
+        description = "새내기과정학부"
     ),
     "E12" to BuildingData(
         code = "E12",
@@ -552,18 +564,19 @@ val buildings = mapOf(
             LatLng(36.37048510733375, 127.36143479065362),
             LatLng(36.37050318109732, 127.36141815941238),
             LatLng(36.370653265443096, 127.36170300652273),
-        )
+        ),
     ),
     "E15" to BuildingData(
         code = "E15",
         name = "대강당",
-        coordinates = LatLng(36.37198035120703, 127.36315222543857)
+        coordinates = LatLng(36.37198035120703, 127.36315222543857),
     ),
     "E16" to BuildingData(
         code = "E16",
         name = "정문술빌딩",
         category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.371434203131074, 127.36197684818413),
+        keywords = listOf("바뇌과"),
         description = "바이오및뇌공학과"
     ),
     "E16-1" to BuildingData(
@@ -581,6 +594,7 @@ val buildings = mapOf(
             LatLng(36.371138994164376, 127.3627443696382),
             LatLng(36.37123463047781, 127.36241051362875)
         ),
+        keywords = listOf("바뇌과"),
         description = "바이오및뇌공학과"
     ),
     "E17" to BuildingData(
@@ -616,6 +630,8 @@ val buildings = mapOf(
         name = "카이스트클리닉 파팔라도센터",
         category = BuildingCategory.WELFAREFACILITY,
         coordinates = LatLng(36.36942520152913, 127.3698679810428),
+        keywords = listOf("병원", "진료", "보건실"),
+        description = "내과, 정신과, 이비인후과, 치과, 건강검진"
     ),
     "E22" to BuildingData(
         code = "E22",
@@ -653,6 +669,7 @@ val buildings = mapOf(
             LatLng(36.36611728067218, 127.36123352142609),
             LatLng(36.366162102853444, 127.36131172688432),
         ),
+        keywords = listOf("응공동"),
         description = "신소재공학과, 건설및환경공학과, 생명화학공학과"
     ),
     "W1-1" to BuildingData(
@@ -680,6 +697,7 @@ val buildings = mapOf(
             LatLng(36.365695347817905, 127.3614432794637)
         ),
         coordinates = LatLng(36.36537373892009, 127.36125794082754),
+        keywords = listOf("소재과"),
     ),
     "W1-2" to BuildingData(
         code = "W1-2",
@@ -692,6 +710,7 @@ val buildings = mapOf(
             LatLng(36.36566001106412, 127.36195288718655),
             LatLng(36.36582886051932, 127.36199266818159),
         ),
+        keywords = listOf("건환공", "건축과"),
     ),
     "W1-3" to BuildingData(
         code = "W1-3",
@@ -704,6 +723,7 @@ val buildings = mapOf(
             LatLng(36.366132756165, 127.36133109076553),
             LatLng(36.3663969376271, 127.36188108745861),
         ),
+        keywords = listOf("생화공", "화생공"),
     ),
 //    "W1-4" to BuildingData(
 //        code = "W1-4",
@@ -853,6 +873,7 @@ val buildings = mapOf(
             LatLng(36.367506580624465, 127.3569889640791),
             LatLng(36.367584899353396, 127.35716760690102),
         ),
+        keywords = listOf("사감실"),
     ),
     "W4-1" to BuildingData(
         code = "W4-1",
@@ -1042,7 +1063,8 @@ val buildings = mapOf(
             LatLng(36.37032522202956, 127.35540279119348),
             LatLng(36.37062936369856, 127.35540417457277),
         ),
-        description = "서측 남학생·여학생 기숙사, 학부생, 헬스장, 매점"
+        keywords = listOf("미르관", "나래관"),
+        description = "서측 남학생·여학생 기숙사, 학부생, 헬스장, 매점, 세탁소"
     ),
     "W7" to BuildingData(
         code = "W7",
@@ -1160,7 +1182,8 @@ val buildings = mapOf(
             LatLng(36.37134081043046, 127.35707612745593),
             LatLng(36.371383673822756, 127.3570568224684),
             LatLng(36.371394896695094, 127.35707080295246),
-        )
+        ),
+        keywords = listOf("항공우주공학과", "항공과"),
     ),
     "W11" to BuildingData(
         code = "W11",
@@ -1258,6 +1281,8 @@ val buildings = mapOf(
             LatLng(36.37438353433223, 127.36559552626969),
             LatLng(36.374471397324214, 127.36559593743267),
         ),
+        keywords = listOf("전자과"),
+        description = "전기및전자공학부"
     ),
     "N2" to BuildingData(
         code = "N2",
@@ -1270,6 +1295,8 @@ val buildings = mapOf(
             LatLng(36.37283396016637, 127.36397524476165),
             LatLng(36.37304574108462, 127.36397344546678),
         ),
+        keywords = listOf("융인재"),
+        description = "융합인재학부"
     ),
     "N3" to BuildingData(
         code = "N3",
@@ -1286,6 +1313,7 @@ val buildings = mapOf(
             LatLng(36.372798910791865, 127.36142042113632),
             LatLng(36.37282413084274, 127.36127567151236),
         ),
+        keywords = listOf("류스컴", "스컴", "수영장"),
     ),
     "N4" to BuildingData(
         code = "N4",
@@ -1304,6 +1332,7 @@ val buildings = mapOf(
             LatLng(36.373113432144976, 127.36319928053501),
             LatLng(36.373552747302675, 127.36320132279849),
         ),
+        keywords = listOf("인사동"),
         description = "디지털인문사회과학부"
     ),
     "N5" to BuildingData(
@@ -1363,6 +1392,7 @@ val buildings = mapOf(
             LatLng(36.37290182762836, 127.35866843487646),
             LatLng(36.37292662625055, 127.35866297693056),
         ),
+        keywords = listOf("기계동"),
         description = "원자력및양자공학과, 항공우주공학과, 기계공학과"
     ),
     "N7-1" to BuildingData(
@@ -1381,7 +1411,8 @@ val buildings = mapOf(
             LatLng(36.37199856646959, 127.35936353949732),
             LatLng(36.371999077514964, 127.35919360433063),
             LatLng(36.37205313873273, 127.3591966387259)
-        )
+        ),
+        keywords = listOf("원양공", "원양과"),
     ),
     "N7-2" to BuildingData(
         code = "N7-2",
@@ -1395,7 +1426,8 @@ val buildings = mapOf(
             LatLng(36.37211347999645, 127.3586090986063),
             LatLng(36.37210886548262, 127.35864529367059),
             LatLng(36.37222376337329, 127.35864582108034)
-        )
+        ),
+        keywords = listOf("항공과"),
     ),
     "N7-3" to BuildingData(
         code = "N7-3",
@@ -1416,6 +1448,7 @@ val buildings = mapOf(
             LatLng(36.37288419060269, 127.3592896079442),
             LatLng(36.372931501489624, 127.35928982550887),
         ),
+        keywords = listOf("기계과"),
     ),
     "N7-4" to BuildingData(
         code = "N7-4",
@@ -1432,6 +1465,7 @@ val buildings = mapOf(
             LatLng(36.37284435568604, 127.35830043341056),
             LatLng(36.372909689775426, 127.35830073302952),
         ),
+        keywords = listOf("기계과"),
     ),
     "N7-5" to BuildingData(
         code = "N7-5",
@@ -1468,7 +1502,9 @@ val buildings = mapOf(
             LatLng(36.373913695084646, 127.36006604473748),
             LatLng(36.37391185468596, 127.36067615471642),
             LatLng(36.37440749236931, 127.36067844287219),
-        )
+        ),
+        keywords = listOf("교분"),
+        description = "학습공간, 인쇄소, SPARCS"
     ),
     "N11" to BuildingData(
         code = "N11",
@@ -1486,7 +1522,8 @@ val buildings = mapOf(
             LatLng(36.37401004514717, 127.35949258667365),
             LatLng(36.37401282605755, 127.35931708570749),
             LatLng(36.37406464273324, 127.35931732402068),
-        )
+        ),
+        keywords = listOf("카이마루"),
     ),
     "N12" to BuildingData(
         code = "N12",
@@ -1528,6 +1565,7 @@ val buildings = mapOf(
             LatLng(36.374104624983815, 127.35962673477194),
             LatLng(36.37417881973158, 127.35962673477194),
         ),
+        keywords = listOf("사감실"),
     ),
     "N13" to BuildingData(
         code = "N13",
@@ -1580,7 +1618,9 @@ val buildings = mapOf(
             LatLng(36.3732916428858, 127.36089337817643),
             LatLng(36.37329478748429, 127.36059808655935),
             LatLng(36.37346640294391, 127.36046794072391)
-        )
+        ),
+        keywords = listOf("신학관", "신옥", "동연", "총학"),
+        description = "학부총학생회, 동아리연합회"
     ),
     "N14" to BuildingData(
         code = "N14",
@@ -1738,6 +1778,8 @@ val buildings = mapOf(
             LatLng(36.373889258835625, 127.36292986624113),
             LatLng(36.37411005130887, 127.36292810597506),
         ),
+        keywords = listOf("산디", "산디과"),
+        description = "산업디자인학과"
     ),
 //    "N29" to BuildingData(
 //        code = "N29",
