@@ -56,16 +56,16 @@ val kaiMaruWeekdayTimes = listOf(
 // 좌표는 화면상의 대략적인 위치를 잡았습니다 (교내 노선은 보통 가운데나 특정 라인을 따르므로)
 val campusStationOffsets = listOf( //0.12f 출발
     Triple("카이마루", 0, 0.12f), //시간,위치 (x축은 고정)
-    Triple("스컴", 2, 0.20f),
-    Triple("창의관", 4, 0.28f),
-    Triple("의과학센터", 6, 0.36f),
-    Triple("클리닉", 8, 0.44f),
-    Triple("나노종합", 10, 0.52f),
-    Triple("정문", 12, 0.60f),
-    Triple("신소재공학동", 14, 0.68f),
-    Triple("kisti", 16, 0.74f),
-    Triple("희망다솜", 18, 0.82f),
-    Triple("외국인아파트", 20, 0.90f)
+    Triple("스컴", 1, 0.20f),
+    Triple("창의관", 2, 0.28f),
+    Triple("의과학센터", 3, 0.36f),
+    Triple("클리닉", 4, 0.44f),
+    Triple("나노종합", 5, 0.52f),
+    Triple("정문", 6, 0.60f),
+    Triple("신소재공학동", 7, 0.68f),
+    Triple("kisti", 8, 0.74f),
+    Triple("희망다솜", 9, 0.82f),
+    Triple("외국인아파트", 10, 0.90f)
 )
 
 // 3. 통근 1호차 데이터
@@ -120,18 +120,19 @@ fun ShuttleScreenFixed(
     // =================================================================
     // [⏰ 시간 제어 및 테스트 코드]
     // =================================================================
-    val currentTimeState = produceState(initialValue = LocalTime.of(8, 40, 0)) {
+    val currentTimeState = produceState(initialValue = LocalTime.now()) {
         // 1. 시작 시간을 루프 '밖'에서 변수로 선언합니다.
-        var virtualTime = LocalTime.of(8, 40, 0) // 테스트 시작 시간 (아침 8시)
+       // var virtualTime = LocalTime.of(8, 40, 0) // 테스트 시작 시간 (아침 8시)
 
         while (true) {
             // 2. 현재 가상 시간을 UI에 반영
-            value = virtualTime
+           // value = virtualTime
+            value= LocalTime.now()
 
             // 3. 시간을 흐르게 함 (속도 조절은 여기서!)
             // 예: 0.1초(100ms)마다 실제 시간 10초씩 흐르게 설정 (100배속)
-            virtualTime = virtualTime.plusSeconds(2)
-            delay(100)
+           // virtualTime = virtualTime.plusSeconds(2)
+            delay(1000)
 
             // [참고] 만약 실제 속도(1초에 1초)로 보고 싶다면:
             // virtualTime = virtualTime.plusSeconds(1)
@@ -285,41 +286,38 @@ fun BusMovingLayer(
 
 fun calculateCampusBusPositions(now: LocalTime): List<Pair<Float, Float>> {
     val activeBuses = mutableListOf<Pair<Float, Float>>()
-
-    // 교내 버스 x좌표 (기본값 중앙 약간 왼쪽, 153/360 비율 참고)
     val defaultX = 171f / 360f
+    val travelDuration = 10L // 운행 시간 10분
 
-    kaiMaruWeekdayTimes.forEach { departureTime ->
-        // 각 역의 도착 예정 시간 계산
-        val routeTimes = campusStationOffsets.map { (_, offset, yRatio) ->
-            departureTime.plusMinutes(offset.toLong()) to yRatio
+    kaiMaruWeekdayTimes.forEachIndexed { index, departureTime ->
+        val arrivalTime = departureTime.plusMinutes(travelDuration)
+
+        // 1. [운행 로직] 현재 시간이 출발~도착 사이일 때 (이동 중)
+        if (!now.isBefore(departureTime) && now.isBefore(arrivalTime)) {
+            val totalMillis = Duration.ofMinutes(travelDuration).toMillis()
+            val passedMillis = Duration.between(departureTime, now).toMillis()
+            val progress = passedMillis.toFloat() / totalMillis
+
+            val startY = campusStationOffsets.first().third
+            val endY = campusStationOffsets.last().third
+            val currentY = lerp(startY, endY, progress)
+
+            activeBuses.add(defaultX to currentY)
         }
 
-        val startTime = routeTimes.first().first
-        val endTime = routeTimes.last().first
-
-        // 현재 이 버스가 운행 중인가?
-        if (!now.isBefore(startTime) && now.isBefore(endTime)) {
-            // 현재 어떤 역 사이를 지나가고 있나?
-            for (i in 0 until routeTimes.size - 1) {
-                val (sTime, sY) = routeTimes[i]
-                val (eTime, eY) = routeTimes[i + 1]
-
-                if (!now.isBefore(sTime) && now.isBefore(eTime)) {
-                    val totalMillis = Duration.between(sTime, eTime).toMillis()
-                    val passedMillis = Duration.between(sTime, now).toMillis()
-                    val progress = if (totalMillis > 0) passedMillis.toFloat() / totalMillis else 0f
-
-                    // Y축만 이동 (X축은 고정 혹은 필요시 변경)
-                    val currentY = lerp(sY, eY, progress)
-
-                    activeBuses.add(defaultX to currentY)
-                    break
-                }
+        // 2. [대기 로직] 다음 버스가 출발 5분 전부터 카이마루에서 대기하게 함
+        // (현재 시간이 다음 버스 출발 5분 전 ~ 출발 시간 사이일 때)
+        val nextBusTime = kaiMaruWeekdayTimes.getOrNull(index) // 현재 루프의 버스를 기준으로 체크
+        if (nextBusTime != null) {
+            val standByStartTime = nextBusTime.minusMinutes(5) // 5분 전부터 대기
+            if (!now.isBefore(standByStartTime) && now.isBefore(nextBusTime)) {
+                val startY = campusStationOffsets.first().third // 카이마루 위치
+                activeBuses.add(defaultX to startY)
             }
         }
     }
-    return activeBuses
+    // 중복 위치 방지 (대기 중인 버스와 이동 시작하는 버스가 겹칠 수 있음)
+    return activeBuses.distinct()
 }
 
 fun calculateCommuterBusPositions(now: LocalTime): List<Pair<Float, Float>> {
@@ -391,22 +389,27 @@ fun ShuttleTimetableBottomSheet(
             Text(
                 text = if (shuttleType == ShuttleType.CAMPUS) "교내 셔틀 시간표" else "통근 셔틀 시간표",
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier
+                    .padding(16.dp)
+                // 교내 셔틀일 때만 제목도 중앙 정렬하고 싶다면 아래 주석 해제
+                // .let { if (shuttleType == ShuttleType.CAMPUS) it.align(Alignment.CenterHorizontally) else it }
             )
 
             if (shuttleType == ShuttleType.CAMPUS) {
+                // [교내 셔틀] 시간만 중앙에 표시
                 kaiMaruWeekdayTimes.forEach { time ->
-                    TimeRow("카이마루 출발", time)
+                    TimeRow(name = "", time = time, isCentered = true)
                 }
             } else {
+                // [통근 셔틀] 기존 양식 유지 (이름 - 시간)
                 Text("1호차", Modifier.padding(16.dp), style = MaterialTheme.typography.titleSmall)
                 commuterBus1Stations.forEach { node ->
-                    node.time?.let { TimeRow(node.name, it) }
+                    node.time?.let { TimeRow(node.name, it, isCentered = false) }
                 }
-                Divider(Modifier.padding(vertical = 8.dp))
+                HorizontalDivider(Modifier.padding(vertical = 8.dp))
                 Text("2호차", Modifier.padding(16.dp), style = MaterialTheme.typography.titleSmall)
                 commuterBus2Stations.forEach { node ->
-                    node.time?.let { TimeRow(node.name, it) }
+                    node.time?.let { TimeRow(node.name, it, isCentered = false) }
                 }
             }
         }
@@ -414,14 +417,26 @@ fun ShuttleTimetableBottomSheet(
 }
 
 @Composable
-fun TimeRow(name: String, time: LocalTime) {
+fun TimeRow(name: String, time: LocalTime, isCentered: Boolean = false) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        // isCentered가 true면 중앙 정렬(Center), false면 양끝 정렬(SpaceBetween)
+        horizontalArrangement = if (isCentered) Arrangement.Center else Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(name)
-        Text(time.format(DateTimeFormatter.ofPattern("HH:mm")))
+        // 이름이 있을 때만 표시 (통근 셔틀용)
+        if (name.isNotBlank()) {
+            Text(text = name, style = MaterialTheme.typography.bodyLarge)
+        }
+
+        // 시간 표시
+        Text(
+            text = time.format(DateTimeFormatter.ofPattern("HH:mm")),
+            style = MaterialTheme.typography.bodyLarge,
+            // 중앙 정렬일 때(교내) 글자를 조금 더 강조
+            fontWeight = if (isCentered) androidx.compose.ui.text.font.FontWeight.Bold else null
+        )
     }
 }
