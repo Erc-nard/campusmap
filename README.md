@@ -78,4 +78,5 @@ src="https://github.com/user-attachments/assets/a792a2c0-0970-4753-a3af-6b385c6a
 
 
 ### 🟡 APK 파일
-release에 첨부
+
+[여기](https://github.com/Erc-nard/campusmap/releases/download/v0.1.0-alpha/campusmap-v0.1.0-alpha.apk)를 클릭하여 바로 내려받거나, Releases 탭에서 내역을 확인할 수 있습니다.
