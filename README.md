@@ -18,7 +18,7 @@
 
 ### ✨ 소개
 정보가 모자란 기존 지도앱들로 불편했던 카이스트 생활. 이젠 카이랑 맵이랑으로 해결! 
-<img width="1029" height="740" alt="Image" src="https://github.com/user-attachments/assets/e021faff-73c1-42b6-abf2-a25d86ac7568" />
+<img width="1029" height="742" alt="Image" src="https://github.com/user-attachments/assets/f1060c97-c18d-4f8e-91a9-e9773f95de10" />
 <img width="1706" height="937" alt="Image" src="https://github.com/user-attachments/assets/a0859beb-e30d-4879-a726-3e3a36058bba" />
 
 ### 📌 주요 기능
