@@ -44,6 +44,10 @@ class SearchResult(
     }
     val description: String
         get() = placeReference?.description ?: buildingReference!!.description
+    val facilityCategoryReference: Int?
+        get() = placeReference?.facilityCategoryReference ?: buildingReference?.facilityCategoryReference
+    val facilityItemReference: Int?
+        get() = placeReference?.facilityItemReference ?: buildingReference?.facilityItemReference
 }
 
 fun getSearchResult(query: SearchQuery, currentLocation: LatLng? = null): List<SearchResult> {

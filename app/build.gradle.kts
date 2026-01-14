@@ -84,6 +84,8 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("dev.chrisbanes.haze:haze:0.6.0") // Blur
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
+    implementation("io.coil-kt.coil3:coil-svg:3.0.0")
+    implementation("me.saket.telephoto:zoomable-image-coil3:0.14.0")
 
     // Used to implement navigation
     val nav_version = "2.9.6"

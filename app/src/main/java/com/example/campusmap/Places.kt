@@ -12,7 +12,8 @@ data class PlaceData(
     private val coordinates: LatLng? = null,
     val keywords: List<String> = listOf(),
     val description: String = "",
-    val imageURL: String = ""
+    val facilityCategoryReference: Int? = null,
+    val facilityItemReference: Int? = null
 ) {
     fun testTextQuery(query: String): Boolean {
         if (title.contains(query))
@@ -49,7 +50,8 @@ val places = listOf(
         buildingCode = "E5",
         coordinates = LatLng(36.369115119669836, 127.36372948971835),
         keywords = listOf("동측식당", "동측"),
-        description = "학식"
+        description = "학식",
+        facilityCategoryReference = 0, facilityItemReference = 2
     ),
     PlaceData(
         title = "동맛골 (교직원식당)",
@@ -58,7 +60,8 @@ val places = listOf(
         floor = 2,
         coordinates = LatLng(36.369115119669836, 127.36372948971835),
         keywords = listOf("동측식당", "동측"),
-        description = "학식"
+        description = "학식",
+        facilityCategoryReference = 0, facilityItemReference = 3
     ),
     PlaceData(
         title = "서맛골",
@@ -66,7 +69,8 @@ val places = listOf(
         buildingCode = "W2",
         coordinates = LatLng(36.366930630459535, 127.36047400474106),
         keywords = listOf("서측식당", "서측"),
-        description = "학식"
+        description = "학식",
+        facilityCategoryReference = 0, facilityItemReference = 1
     ),
     PlaceData(
         title = "더큰도시락",
@@ -75,7 +79,8 @@ val places = listOf(
         floor = 2,
         coordinates = LatLng(36.36691719709483, 127.36044608597967),
         keywords = listOf("서측식당", "서측"),
-        description = "도시락, 제육볶음, 돈까스, 불고기, 볶음밥, 덮밥"
+        description = "도시락, 제육볶음, 돈까스, 불고기, 볶음밥",
+        facilityCategoryReference = 0, facilityItemReference = 4
     ),
     PlaceData(
         title = "카이마루",
@@ -83,7 +88,8 @@ val places = listOf(
         buildingCode = "N11",
         keywords = listOf("카마", "북측식당", "북측"),
         coordinates = LatLng(36.373656, 127.359367),
-        description = "학식, 푸드코트"
+        description = "학식, 푸드코트",
+        facilityCategoryReference = 0, facilityItemReference = 0
     ),
     PlaceData(
         title = "리틀하노이",
@@ -91,7 +97,8 @@ val places = listOf(
         buildingCode = "N11",
         coordinates = LatLng(36.373656, 127.359367),
         keywords = listOf("카마", "북측식당", "북측"),
-        description = "베트남음식, 쌀국수"
+        description = "베트남음식, 쌀국수",
+        facilityCategoryReference = 1, facilityItemReference = 2
     ),
     PlaceData(
         title = "별리달리",
@@ -99,7 +106,8 @@ val places = listOf(
         buildingCode = "N11",
         coordinates = LatLng(36.373656, 127.359367),
         keywords = listOf("카마", "북측식당", "북측"),
-        description = "돈까스, 볶음밥"
+        description = "돈까스, 볶음밥",
+        facilityCategoryReference = 1, facilityItemReference = 0
     ),
     PlaceData(
         title = "웰차이",
@@ -107,7 +115,8 @@ val places = listOf(
         buildingCode = "N11",
         coordinates = LatLng(36.373656, 127.359367),
         keywords = listOf("카마", "북측식당", "북측"),
-        description = "중식, 짜장면, 짬뽕, 탕수육"
+        description = "중식, 짜장면, 짬뽕, 탕수육",
+        facilityCategoryReference = 1, facilityItemReference = 4
     ),
     PlaceData(
         title = "롤링파스타",
@@ -115,7 +124,8 @@ val places = listOf(
         buildingCode = "N11",
         coordinates = LatLng(36.373656, 127.359367),
         keywords = listOf("카마", "북측식당", "북측"),
-        description = "양식, 파스타"
+        description = "양식, 파스타",
+        facilityCategoryReference = 1, facilityItemReference = 6
     ),
     PlaceData(
         title = "인생설렁탕",
@@ -123,7 +133,8 @@ val places = listOf(
         buildingCode = "N13",
         floor = 2,
         coordinates = LatLng(36.37304832156488, 127.36014841940174),
-        description = "설렁탕, 해장국"
+        description = "설렁탕, 해장국",
+        facilityCategoryReference = 2, facilityItemReference = 1
     ),
     PlaceData(
         title = "제순식당",
@@ -131,7 +142,8 @@ val places = listOf(
         buildingCode = "N13",
         floor = 2,
         coordinates = LatLng(36.37304832156488, 127.36014841940174),
-        description = "제육볶음"
+        description = "제육볶음",
+        facilityCategoryReference = 2, facilityItemReference = 0
     ),
     PlaceData(
         title = "역전우동",
@@ -139,7 +151,8 @@ val places = listOf(
         buildingCode = "N13",
         floor = 2,
         coordinates = LatLng(36.37304832156488, 127.36014841940174),
-        description = "우동"
+        description = "우동",
+        facilityCategoryReference = 2, facilityItemReference = 2
     ),
     PlaceData(
         title = "풀빛마루",
@@ -147,7 +160,8 @@ val places = listOf(
         buildingCode = "N12",
         coordinates = LatLng(36.37413290617624, 127.35984139413212),
         keywords = listOf("풀마", "브리또"),
-        description = "덮밥, 샐러드, 부리또"
+        description = "덮밥, 샐러드, 부리또",
+        facilityCategoryReference = 0, facilityItemReference = 5
     ),
 
     PlaceData(
@@ -157,7 +171,8 @@ val places = listOf(
         floor = 2,
         coordinates = LatLng(36.37338355831737, 127.36029761797428),
         keywords = listOf("샌드위치", "큊"),
-        description = "샌드위치"
+        description = "샌드위치",
+        facilityCategoryReference = 3, facilityItemReference = 3
     ),
     PlaceData(
         title = "써브웨이",
@@ -165,7 +180,8 @@ val places = listOf(
         buildingCode = "E16-1",
         coordinates = LatLng(36.371233053424405, 127.36218763964615),
         keywords = listOf("샌드위치", "서브웨이", "섭웨", "썹웨", "썹픽", "섭픽", "Subway", "subway"),
-        description = "샌드위치"
+        description = "샌드위치",
+        facilityCategoryReference = 3, facilityItemReference = 0
     ),
     PlaceData(
         title = "캘리포니아 베이커리",
@@ -173,36 +189,41 @@ val places = listOf(
         buildingCode = "E6-5",
         coordinates = LatLng(36.370151, 127.363667),
         keywords = listOf("캘포", "빵집"),
-        description = "빵, 커피, 차, 음료"
+        description = "빵, 커피, 차, 음료",
+        facilityCategoryReference = 3, facilityItemReference = 2
     ),
     PlaceData(
         title = "던킨도너츠",
         category = "베이커리",
         buildingCode = "W1",
         coordinates = LatLng(36.36590090105745, 127.36126594897014),
-        description = "도넛, 커피"
+        description = "도넛, 커피",
+        facilityCategoryReference = 3, facilityItemReference = 4
     ),
 
     PlaceData(
-        title = "주스킹",
+        title = "쥬스킹",
         category = "카페",
         buildingCode = "N11",
         coordinates = LatLng(36.37363534403037, 127.35898103931018),
-        description = "생과일주스, 컵과일, 커피"
+        description = "생과일주스, 컵과일, 커피",
+        facilityCategoryReference = 4, facilityItemReference = 5
     ),
     PlaceData(
         title = "카페드롭탑",
         category = "카페",
         buildingCode = "W8",
         coordinates = LatLng(36.37001683351277, 127.35983079527352),
-        description = "커피, 차, 음료"
+        description = "커피, 차, 음료",
+        facilityCategoryReference = 4, facilityItemReference = 2
     ),
     PlaceData(
         title = "카페드림",
         category = "카페",
         buildingCode = "N7",
         coordinates = LatLng(36.37234765613437, 127.358651961529),
-        description = "커피, 차, 음료"
+        description = "커피, 차, 음료",
+        facilityCategoryReference = 4, facilityItemReference = 4
     ),
     PlaceData(
         title = "파스쿠찌",
@@ -210,7 +231,8 @@ val places = listOf(
         buildingCode = "E3",
         coordinates = LatLng(36.368667, 127.364606),
         keywords = listOf("파스쿠치"),
-        description = "커피, 차, 음료"
+        description = "커피, 차, 음료",
+        facilityCategoryReference = 4, facilityItemReference = 6
     ),
     PlaceData(
         title = "그라찌에",
@@ -218,7 +240,8 @@ val places = listOf(
         buildingCode = "E4",
         coordinates = LatLng(36.368242, 127.363863),
         keywords = listOf("그라찌에"),
-        description = "커피, 차, 음료"
+        description = "커피, 차, 음료",
+        facilityCategoryReference = 4, facilityItemReference = 0
     ),
     PlaceData(
         title = "탐앤탐스",
@@ -227,7 +250,8 @@ val places = listOf(
         floor = 2,
         coordinates = LatLng(36.374148, 127.365409),
         keywords = listOf("탐탐"),
-        description = "커피, 차, 음료"
+        description = "커피, 차, 음료",
+        facilityCategoryReference = 4, facilityItemReference = 7
     ),
     PlaceData(
         title = "카페 오가다",
@@ -235,14 +259,16 @@ val places = listOf(
         buildingCode = "E9",
         floor = 2,
         coordinates = LatLng(36.369237, 127.362653),
-        description = "커피, 차, 음료"
+        description = "커피, 차, 음료",
+        facilityCategoryReference = 4, facilityItemReference = 3
     ),
     PlaceData(
         title = "카페 잇",
         category = "카페",
         buildingCode = "W2-1",
         coordinates = LatLng(36.367409480330686, 127.36006671609844),
-        description = "커피, 차, 음료"
+        description = "커피, 차, 음료",
+        facilityCategoryReference = 4, facilityItemReference = 1
     ),
     PlaceData(
         title = "북카페 엔젤리너스",
@@ -251,7 +277,8 @@ val places = listOf(
         floor = 2,
         coordinates = LatLng(36.37302455732518, 127.36055783677611),
         keywords = listOf("책", "엔제리너스"),
-        description = "커피, 차, 음료"
+        description = "커피, 차, 음료",
+        facilityCategoryReference = 4, facilityItemReference = 8
     ),
 
     PlaceData(

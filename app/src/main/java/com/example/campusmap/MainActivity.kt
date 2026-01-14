@@ -138,6 +138,7 @@ fun CampusmapApp() {
     val scope = rememberCoroutineScope()
 
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.MAP) }
+    var pendingMove by remember { mutableStateOf<FacilityItemRoute?>(null) }
 
     // map tab
     val initialLatLng = LatLng(36.368038, 127.365761)
@@ -254,11 +255,23 @@ fun CampusmapApp() {
                         searchQuery = searchQuery,
                         selectedPlace = selectedPlace,
 
+                        onDetailButtonTab = { categoryId, itemId ->
+                            currentDestination = AppDestinations.FACILITIES
+                            pendingMove = FacilityItemRoute(categoryIndex = categoryId, index = itemId)
+                        },
                         getCurrentLocation = ::getCurrentLocation
                     )
                 AppDestinations.FACILITIES -> {
                     BackHandler(enabled = true) {
                         currentDestination = AppDestinations.MAP
+                    }
+                    LaunchedEffect(pendingMove) {
+                        pendingMove?.let { route ->
+                            navController.navigate(route) {
+                                launchSingleTop = true
+                            }
+                            pendingMove = null
+                        }
                     }
                     FacilitiesNavigation(padding = innerPadding, navController = navController, onMoveToMap = { coordinate, buildingCode ->
                         currentDestination = AppDestinations.MAP
