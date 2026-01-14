@@ -62,17 +62,20 @@ import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -112,6 +115,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.time.format.TextStyle
 
 
 class MainActivity : ComponentActivity() {
@@ -142,6 +146,30 @@ fun CampusmapApp() {
     }
     val markerPositionsState = remember { mutableStateOf<List<LatLng>>(listOf()) }
     val selectedBuildingState = remember { mutableStateOf<String?>(null) }
+
+    val context = LocalContext.current
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+    val currentLocation = remember {
+        mutableStateOf<LatLng?>(null)
+    }
+    fun getCurrentLocation(postAction: (LatLng?) -> Unit = {}) {
+        scope.launch {
+            try {
+                val result = fusedLocationClient.getCurrentLocation(
+                    Priority.PRIORITY_HIGH_ACCURACY,
+                    null
+                ).await()
+
+                result?.let { location ->
+                    currentLocation.value = LatLng(location.latitude, location.longitude)
+                }
+            } catch(e: SecurityException) {
+                currentLocation.value = null
+            }
+
+            postAction(currentLocation.value)
+        }
+    }
 
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
