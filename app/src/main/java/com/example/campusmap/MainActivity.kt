@@ -227,7 +227,7 @@ fun CampusmapApp() {
                                 currentDestination = destination
                             } else {
                                 val routeName = navController.currentBackStackEntry?.destination?.route?.substringAfterLast(".")
-                                if (routeName == "FacilityItemRoute/{categoryIndex}/{index}") {
+                                if (routeName != "Facilities") {
                                     navController.popBackStack()
                                 }
                             }

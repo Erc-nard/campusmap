@@ -126,7 +126,7 @@ fun FacilityDetailView(
             item {
                 DetailView("위치") { innerPadding ->
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                        verticalAlignment = Alignment.Top,
                         modifier = Modifier
                             .padding(horizontal = innerPadding)
                     ) {
@@ -141,6 +141,17 @@ fun FacilityDetailView(
                                 Text(
                                     text = distanceString!!,
                                     fontWeight = FontWeight.Light
+                                )
+                            }
+                            if (itemData.details.departmentBuildings.isEmpty() && buildingMaps.containsKey(itemData.details.location.buildingCode)) {
+                                Text(
+                                    text = "층별 안내도 보기 →",
+                                    color = Color(0, 128, 255),
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(4.dp))
+                                        .clickable {
+                                            onMoveToBuildingMap(itemData.details.location.buildingCode)
+                                        }
                                 )
                             }
                         }
@@ -218,34 +229,30 @@ fun FacilityDetailView(
                 }
             }
             if (itemData.details.departmentBuildings.isNotEmpty()) {
-                val buildings = itemData.details.departmentBuildings.mapNotNull { code ->
-                    buildingMaps[code]
-                }
-                if (buildings.isNotEmpty()) {
-                    item {
-                        DetailView("건물 안내도") { innerPadding ->
-                            Column(Modifier.padding(horizontal = innerPadding)) {
-                                buildings.forEach { building ->
-                                    Text(
-                                        text = building.description,
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(20.dp))
-                                            .clickable {
-                                                onMoveToBuildingMap(building.code)
-                                            }
-                                            .padding(8.dp, 4.dp)
-                                    )
+                item {
+                    DetailView("학과 건물") { innerPadding ->
+                        Column {
+                            itemData.details.departmentBuildings.forEach { buildingCode ->
+                                val building = buildings[buildingCode]!!
+                                Row(
+                                    modifier = Modifier.padding(horizontal = innerPadding)
+                                ) {
+                                    Text(building.buildingDescription)
+                                    if (buildingMaps[buildingCode] != null) {
+                                        Spacer(Modifier.width(4.dp))
+                                        Text(
+                                            text = "층별 안내도",
+                                            color = Color(0, 128, 255),
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(4.dp))
+                                                .clickable {
+                                                    onMoveToBuildingMap(buildingCode)
+                                                }
+                                                .padding(horizontal = 4.dp)
+                                        )
+                                    }
                                 }
                             }
-                        }
-                    }
-                } else {
-                    item {
-                        DetailView("학과 건물") { innerPadding ->
-                            Text(
-                                text = itemData.details.departmentBuildings.joinToString(", "),
-                                modifier = Modifier.padding(horizontal = innerPadding)
-                            )
                         }
                     }
                 }

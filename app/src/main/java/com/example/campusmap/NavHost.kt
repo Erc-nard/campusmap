@@ -220,7 +220,7 @@ fun FacilitiesNavigation(padding: PaddingValues, navController: NavHostControlle
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    BuildingMapView(buildingMaps[route.buildingCode]!!)
+                    BuildingMapView(buildingMaps[route.buildingCode]!!, navController)
                 }
             }
         }

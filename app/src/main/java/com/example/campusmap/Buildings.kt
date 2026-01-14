@@ -190,6 +190,7 @@ val buildings = mapOf(
             LatLng(36.3686316547113, 127.36564382869422),
         ),
         keywords = listOf("전전", "전자과"),
+        facilityCategoryReference = 5, facilityItemReference = 4
     ),
     "E3-3" to BuildingData(
         code = "E3-3",
@@ -589,6 +590,7 @@ val buildings = mapOf(
             LatLng(36.369830752932636, 127.36250986204789)
         ),
         keywords = listOf("학술관", "도서관", "중도", "중앙도서관"),
+        facilityCategoryReference = 6, facilityItemReference = 0
     ),
     "E9-1" to BuildingData(
         code = "E9-1",
@@ -1683,7 +1685,8 @@ val buildings = mapOf(
             LatLng(36.37440749236931, 127.36067844287219),
         ),
         keywords = listOf("교분"),
-        description = "학습공간, 인쇄소, SPARCS"
+        description = "열람실, 회의실, 인쇄소, SPARCS",
+        facilityCategoryReference = 6, facilityItemReference = 1
     ),
     "N11" to BuildingData(
         code = "N11",

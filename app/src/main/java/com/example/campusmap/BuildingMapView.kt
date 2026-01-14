@@ -41,12 +41,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHost
+import androidx.navigation.NavHostController
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
 import coil3.request.CachePolicy
+import coil3.request.ImageRequest
+import coil3.size.Precision
 import coil3.svg.SvgDecoder
 import com.example.campusmap.ui.theme.appBackground
 import com.example.campusmap.ui.theme.selectedBackground
@@ -60,15 +64,13 @@ import me.saket.telephoto.zoomable.rememberZoomableState
 import kotlin.math.absoluteValue
 
 @Composable
-fun BuildingMapView(data: BuildingMap) {
+fun BuildingMapView(data: BuildingMap, navController: NavHostController) {
     val scope = rememberCoroutineScope()
 
     val hazeState = remember { HazeState() }
 
     val building = buildings[data.code]!!
-    val initialFloorValue = data.data.keys.map { it.absoluteValue }.minOf { it }
-    val initialFloor = if (data.data.keys.contains(initialFloorValue)) initialFloorValue else -initialFloorValue
-    var currentFloor by remember { mutableStateOf(initialFloor) }
+    var currentFloor by remember { mutableStateOf(data.dominantFloorName ?: data.data.keys.first()) }
 
     Scaffold(
         topBar = {
@@ -86,7 +88,9 @@ fun BuildingMapView(data: BuildingMap) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
-                        onClick = {}
+                        onClick = {
+                            navController.popBackStack()
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
@@ -102,10 +106,9 @@ fun BuildingMapView(data: BuildingMap) {
                 LazyRow(
                     contentPadding = PaddingValues(start = 8.dp, end = 8.dp, bottom = 8.dp),
                 ) {
-                    items(items = data.data.keys.toList().sorted()) { item ->
-                        val floorLabel = if (item > 0) "${item}층" else "${-item+1}층"
+                    items(items = data.data.keys.toList()) { item ->
                         Text(
-                            text = floorLabel,
+                            text = item,
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = if (currentFloor == item) null else FontWeight.Light,
                             fontSize = 17.sp,
@@ -154,8 +157,13 @@ fun BuildingMapView(data: BuildingMap) {
                     }
                     .build()
 
+                val imageRequest = ImageRequest.Builder(LocalContext.current)
+                    .data(imageURL)
+                    .precision(Precision.EXACT) // 정확한 크기와 화질로 렌더링 강제
+                    .build()
+
                 ZoomableAsyncImage(
-                    model = imageURL,
+                    model = imageRequest,
                     contentDescription = building.buildingDescription + " " + currentFloor,
                     imageLoader = imageLoader,
                     state = zoomableState,
@@ -201,6 +209,12 @@ fun BuildingMapView(data: BuildingMap) {
 //                        SubcomposeAsyncImageContent()
 //                    }
 //                }
+                ZoomableAsyncImage(
+                    model = imageURL,
+                    contentDescription = building.buildingDescription + " " + currentFloor,
+                    state = zoomableState,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }

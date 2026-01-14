@@ -10,6 +10,7 @@ data class FacilityCategory(override val id: Int, override val title: String, va
 }
 data class FacilityItem(override val id: Int, override val title: String, override val imageURL: String, val details: ItemDetail) : FacilityData
 data class ItemDetail(
+    val building: String? = null,
     val businessHours: List<BusinessHours> = listOf(),
     val coordinate: LatLng = LatLng(0.0, 0.0),
     val contact: String = "",
@@ -52,15 +53,15 @@ data class BusinessHours(val days: Set<DayClass>, val includeHolidays: Boolean? 
     val timeDuration: String
         get() = "${this.begin}~${this.end}"
 }
-data class Location(val buildingCode: String = "", val buildingName: String = "", val floor: Int = 1, val annotation: String? = null) {
+data class Location(val buildingCode: String = "", val buildingName: String = "", val floor: Int? = 1, val annotation: String? = null) {
     val buildingCodeString: String
         get() = if (!this.buildingCode.isEmpty()) {
-            "(${this.buildingCode}) "
+            "(${this.buildingCode})"
         } else { "" }
     val floorString: String
-        get() = "${this.floor}층"
+        get() = if (this.floor == null) "" else "${this.floor}층"
     val description: String
-        get() = "${this.buildingName} ${this.buildingCodeString}${this.floorString}"
+        get() = "${this.buildingName} ${this.buildingCodeString} ${this.floorString}".trim()
 }
 data class MealHours(val name: String, val begin: LocalTime, val end: LocalTime) {
     val timeDuration: String
@@ -477,6 +478,30 @@ val departments = listOf(
         )
     )
 )
+val studyPlaces = listOf(
+    FacilityItem(
+        id = 0,
+        title = "학술문화관",
+        imageURL = "https://library.kaist.ac.kr/common/images/library_img_libraries.jpg",
+        details = ItemDetail(
+            building = "E9",
+            coordinate = LatLng(36.36959433368902, 127.36246419283363),
+            location = Location("E9", "학술문화관", null),
+            url = "https://library.kaist.ac.kr"
+        )
+    ),
+    FacilityItem(
+        id = 1,
+        title = "교양분관",
+        imageURL = "https://library.kaist.ac.kr/common/images/library_img_undergraduate.jpg",
+        details = ItemDetail(
+            building = "N10",
+            coordinate = LatLng(36.37416732341235, 127.36038202466077),
+            location = Location("N10", "교양분관", null),
+            url = "https://library.kaist.ac.kr"
+        )
+    )
+)
 val topLevelFacilitiesList = listOf(
     FacilityCategory(id = 0, title = "식당", items = cafeteria),
     FacilityCategory(id = 1, title = "카이마루", items = kaimaru),
@@ -484,5 +509,6 @@ val topLevelFacilitiesList = listOf(
     FacilityCategory(id = 3, title = "프랜차이즈", items = franchise),
     FacilityCategory(id = 4, title = "카페", items = cafe),
     FacilityCategory(id = 5, title = "학과", items = departments),
-//    FacilityCategory(id = 6, title = "매점", items = kiosk)
+    FacilityCategory(id = 6, title = "학습공간", items = studyPlaces),
+//    FacilityCategory(id = 7, title = "매점", items = kiosk)
 )
