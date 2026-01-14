@@ -171,30 +171,6 @@ fun CampusmapApp() {
         }
     }
 
-    val context = LocalContext.current
-    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
-    val currentLocation = remember {
-        mutableStateOf<LatLng?>(null)
-    }
-    fun getCurrentLocation(postAction: (LatLng?) -> Unit = {}) {
-        scope.launch {
-            try {
-                val result = fusedLocationClient.getCurrentLocation(
-                    Priority.PRIORITY_HIGH_ACCURACY,
-                    null
-                ).await()
-
-                result?.let { location ->
-                    currentLocation.value = LatLng(location.latitude, location.longitude)
-                }
-            } catch(e: SecurityException) {
-                currentLocation.value = null
-            }
-
-            postAction(currentLocation.value)
-        }
-    }
-
     // facilities tab
     val navController = rememberNavController()
 
