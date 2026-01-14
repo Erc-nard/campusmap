@@ -147,29 +147,9 @@ fun CampusmapApp() {
     val markerPositionsState = remember { mutableStateOf<List<LatLng>>(listOf()) }
     val selectedBuildingState = remember { mutableStateOf<String?>(null) }
 
-    val context = LocalContext.current
-    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
-    val currentLocation = remember {
-        mutableStateOf<LatLng?>(null)
-    }
-    fun getCurrentLocation(postAction: (LatLng?) -> Unit = {}) {
-        scope.launch {
-            try {
-                val result = fusedLocationClient.getCurrentLocation(
-                    Priority.PRIORITY_HIGH_ACCURACY,
-                    null
-                ).await()
-
-                result?.let { location ->
-                    currentLocation.value = LatLng(location.latitude, location.longitude)
-                }
-            } catch(e: SecurityException) {
-                currentLocation.value = null
-            }
-
-            postAction(currentLocation.value)
-        }
-    }
+    val searchFieldText = remember { mutableStateOf("") }
+    val searchQuery = remember { mutableStateOf<SearchQuery?>(null) }
+    val selectedPlace = remember { mutableStateOf<SearchResult?>(null) }
 
     val context = LocalContext.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
@@ -265,9 +245,15 @@ fun CampusmapApp() {
                 AppDestinations.MAP ->
                     Map(
                         Modifier.fillMaxHeight(),
+
                         cameraPositionState = cameraPositionState,
                         markerPositionsState = markerPositionsState,
                         selectedBuildingState = selectedBuildingState,
+
+                        searchFieldText = searchFieldText,
+                        searchQuery = searchQuery,
+                        selectedPlace = selectedPlace,
+
                         getCurrentLocation = ::getCurrentLocation
                     )
                 AppDestinations.FACILITIES -> {

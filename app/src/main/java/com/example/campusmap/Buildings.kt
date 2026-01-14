@@ -10,9 +10,10 @@ enum class BuildingCategory(val displayText: String) {
 data class BuildingData(
     val code: String,
     val name: String,
-    val categories: Set<BuildingCategory> = setOf(),
+    val category: BuildingCategory? = null,
     val coordinates: LatLng = LatLng(0.0, 0.0),
     val polygon: List<LatLng> = listOf(),
+    val keywords: List<String> = listOf(),
     val description: String = "",
 ) {
     val buildingDescription: String
@@ -24,7 +25,9 @@ data class BuildingData(
             return true
         if (name.contains(query))
             return true
-        if (categories.any { it.displayText == query })
+        if (category?.displayText == query)
+            return true
+        if (keywords.any { it.contains(query) })
             return true
         return false
     }
@@ -39,26 +42,46 @@ val buildings = mapOf(
     "E2" to BuildingData(
         code = "E2",
         name = "산업경영학동",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36731555708134, 127.36429496635816),
+        polygon = listOf( // 대충 그림
+            LatLng(36.367459326417475, 127.36443213580596),
+            LatLng(36.36740791749677, 127.36429818261492),
+            LatLng(36.36733174350295, 127.36415854280499),
+            LatLng(36.36719849969525, 127.36426377808769),
+            LatLng(36.36727915387967, 127.36441179572866),
+            LatLng(36.367362179771874, 127.36452082500756),
+        ),
         description = "수리과학과, 산업및시스템공학과"
     ),
     "E2-1" to BuildingData(
         code = "E2-1",
         name = "수리과학과",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36713030101744, 127.36446402964899),
+        polygon = listOf( // 대충 그림
+            LatLng(36.36750719801744, 127.36498671341323),
+            LatLng(36.3671062921386, 127.36421042024615),
+            LatLng(36.36699337535, 127.3642990358111),
+            LatLng(36.36736282518112, 127.36504732439876),
+        ),
     ),
     "E2-2" to BuildingData(
         code = "E2-2",
         name = "산업및시스템공학과",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36748935311833, 127.36418991996273),
+        polygon = listOf( // 대충 그림
+            LatLng(36.36763314805389, 127.36431873253048),
+            LatLng(36.367283825658056, 127.36361789518288),
+            LatLng(36.36714831245916, 127.36372869213808),
+            LatLng(36.36750441840819, 127.36442120329208),
+        ),
     ),
     "E3" to BuildingData(
         code = "E3",
         name = "정보전자공학동",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.368296163916234, 127.36484275483318),
         polygon = listOf(
             LatLng(36.36873178141499, 127.36458014303662), // 파스쿠찌 쪽 점
@@ -85,7 +108,7 @@ val buildings = mapOf(
     "E3-1" to BuildingData(
         code = "E3-1",
         name = "전산학부",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36802315868566, 127.3657106244192),
         polygon = listOf(
             LatLng(36.36800001277097, 127.36517565828161),
@@ -116,7 +139,7 @@ val buildings = mapOf(
     "E3-2" to BuildingData(
         code = "E3-2",
         name = "전기및전자공학부",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36866363002166, 127.36550190550042),
         polygon = listOf(
             LatLng(36.36865627460756, 127.36569687297816),
@@ -152,7 +175,7 @@ val buildings = mapOf(
     "E3-3" to BuildingData(
         code = "E3-3",
         name = "미래융합소자동",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36885182347663, 127.36658087027635),
         polygon = listOf(
             LatLng(36.36911742620727, 127.36666011750197), // 최북단
@@ -180,7 +203,7 @@ val buildings = mapOf(
     "E3-4" to BuildingData(
         code = "E3-4",
         name = "새늘동",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36931447949889, 127.3663183931),
         polygon = listOf(
             LatLng(36.369550931384694, 127.36635293086029), // 최북단
@@ -210,13 +233,13 @@ val buildings = mapOf(
     "E3-5" to BuildingData(
         code = "E3-5",
         name = "크래프톤 SoC 빌딩",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36771616442249, 127.36516876041993),
     ),
     "E4" to BuildingData(
         code = "E4",
         name = "KI빌딩",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36816376816719, 127.36393120503391),
         polygon = listOf(
             LatLng(36.36769790140649, 127.36377025010822),
@@ -228,7 +251,7 @@ val buildings = mapOf(
     "E5" to BuildingData(
         code = "E5",
         name = "교직원회관",
-        categories = setOf(BuildingCategory.WELFAREFACILITY),
+        category = BuildingCategory.WELFAREFACILITY,
         coordinates = LatLng(36.36930084928247, 127.36340441982821),
         polygon = listOf(
             LatLng(36.36958689127514, 127.36343082209508), // 최북단
@@ -258,7 +281,7 @@ val buildings = mapOf(
     "E6" to BuildingData(
         code = "E6",
         name = "자연과학동",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.370013766179156, 127.36455826658069),
         polygon = listOf(
             LatLng(36.37045064157008, 127.36462159258508),
@@ -290,7 +313,7 @@ val buildings = mapOf(
     "E6-1" to BuildingData(
         code = "E6-1",
         name = "수리과학과",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36946653264515, 127.36448328344173),
         polygon = listOf(
             LatLng(36.36961409236529, 127.36411624937911),
@@ -322,7 +345,7 @@ val buildings = mapOf(
     "E6-2" to BuildingData(
         code = "E6-2",
         name = "물리학과",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36985742247803, 127.3641118116951),
         polygon = listOf(
             LatLng(36.37001371273284, 127.3638367467998),
@@ -345,7 +368,7 @@ val buildings = mapOf(
     "E6-3" to BuildingData(
         code = "E6-3",
         name = "생명과학과",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36998295586009, 127.36505677898283),
         polygon = listOf(
             LatLng(36.370128230422964, 127.3647008761024),
@@ -363,7 +386,7 @@ val buildings = mapOf(
     "E6-4" to BuildingData(
         code = "E6-4",
         name = "화학과",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.370444936630456, 127.36427612613731),
         polygon = listOf(
             LatLng(36.37058775230088, 127.36398706769153),
@@ -386,7 +409,7 @@ val buildings = mapOf(
     "E6-5" to BuildingData(
         code = "E6-5",
         name = "궁리실험관",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.37040869947136, 127.36359900687478),
         polygon = listOf(
             LatLng(36.370537623305886, 127.36343245829775),
@@ -408,7 +431,7 @@ val buildings = mapOf(
     "E6-6" to BuildingData(
         code = "E6-6",
         name = "기초과학동",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.370787479085955, 127.36498253485357),
         polygon = listOf(
             LatLng(36.37097753079403, 127.36471876933194),
@@ -432,26 +455,26 @@ val buildings = mapOf(
     "E6-7" to BuildingData(
         code = "E6-7",
         name = "생명과학과및바이오관련교육연구동",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.369827807753964, 127.36569399844197),
     ),
     "E7" to BuildingData(
         code = "E7",
         name = "의과학연구센터",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36954417672625, 127.36708555741738),
     ),
     "E8" to BuildingData(
         code = "E8",
         name = "세종관",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.3709900294635, 127.36652404186783),
         description = "동측 남학생·여학생 기숙사, 학부생·대학원생, 헬스장, 매점"
     ),
     "E9" to BuildingData(
         code = "E9",
         name = "학술문화관",
-        // categories = setOf(),
+        // categories = ),
         coordinates = LatLng(36.36959433368902, 127.36246419283363),
         polygon = listOf(
             LatLng(36.36992784736996, 127.36243788204352),
@@ -474,7 +497,7 @@ val buildings = mapOf(
     "E9-1" to BuildingData(
         code = "E9-1",
         name = "KAIST 미술관",
-        // categories = setOf(),
+        // categories = ),
         coordinates = LatLng(36.36984781209899, 127.36282752055794),
         polygon = listOf(
             LatLng(36.370109444520445, 127.36273123266075),
@@ -498,7 +521,7 @@ val buildings = mapOf(
     "E11" to BuildingData(
         code = "E11",
         name = "창의학습관",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.37039142059578, 127.36261275211453),
     ),
     "E12" to BuildingData(
@@ -509,7 +532,7 @@ val buildings = mapOf(
     "E13" to BuildingData(
         code = "E13",
         name = "정몽헌 우리별연구소",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.37253860768711, 127.3662582901531),
     ),
     "E14" to BuildingData(
@@ -539,14 +562,14 @@ val buildings = mapOf(
     "E16" to BuildingData(
         code = "E16",
         name = "정문술빌딩",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.371434203131074, 127.36197684818413),
         description = "바이오및뇌공학과"
     ),
     "E16-1" to BuildingData(
         code = "E16-1",
         name = "양분순빌딩",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.371171659151884, 127.36237400574578),
         polygon = listOf(
             LatLng(36.37139950612709, 127.36227477224624),
@@ -568,19 +591,19 @@ val buildings = mapOf(
     "E18" to BuildingData(
         code = "E18",
         name = "대전질환모델동물센터",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.368133621480595, 127.36788957631991),
     ),
     "E18-1" to BuildingData(
         code = "E18-1",
         name = "바이오모델 시스템파크",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36850460328403, 127.36813368186097),
     ),
     "E19" to BuildingData(
         code = "E19",
         name = "나노종합기술원",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36825847304406, 127.36685108800089),
     ),
     "E20" to BuildingData(
@@ -591,20 +614,20 @@ val buildings = mapOf(
     "E21" to BuildingData(
         code = "E21",
         name = "카이스트클리닉 파팔라도센터",
-        categories = setOf(BuildingCategory.WELFAREFACILITY),
+        category = BuildingCategory.WELFAREFACILITY,
         coordinates = LatLng(36.36942520152913, 127.3698679810428),
     ),
     "E22" to BuildingData(
         code = "E22",
         name = "기초과학연구원",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36953065933403, 127.36708549391511)
     ),
 
     "W1" to BuildingData(
         code = "W1",
         name = "응용공학동",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36603180516268, 127.36118855596126),
         polygon = listOf(
             LatLng(36.366326952094916, 127.36118434875132),
@@ -635,7 +658,7 @@ val buildings = mapOf(
     "W1-1" to BuildingData(
         code = "W1-1",
         name = "신소재공학과",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         polygon = listOf(
             LatLng(36.36578724054127, 127.3608559345713),
             LatLng(36.36576023096076, 127.36084745294066),
@@ -661,25 +684,25 @@ val buildings = mapOf(
     "W1-2" to BuildingData(
         code = "W1-2",
         name = "건설및환경공학과",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.365777963343945, 127.36168879778428),
     ),
     "W1-3" to BuildingData(
         code = "W1-3",
         name = "생명화학공학과",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.366366400595865, 127.36154945252358),
     ),
-    "W1-4" to BuildingData(
-        code = "W1-4",
-        name = "LOTTE–KAIST R&D 센터",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
-        coordinates = LatLng(36.365756977994266, 127.36043237781786),
-    ),
+//    "W1-4" to BuildingData(
+//        code = "W1-4",
+//        name = "LOTTE–KAIST R&D 센터",
+//        category = BuildingCategory.RESEARCHBUILDING,
+//        coordinates = LatLng(36.365756977994266, 127.36043237781786),
+//    ),
     "W2" to BuildingData(
         code = "W2",
         name = "학생회관–1",
-        categories = setOf(BuildingCategory.WELFAREFACILITY),
+        category = BuildingCategory.WELFAREFACILITY,
         coordinates = LatLng(36.367056162397944, 127.36068351013648),
         polygon = listOf(
             LatLng(36.367440197899576, 127.36033985606882),
@@ -737,7 +760,7 @@ val buildings = mapOf(
     "W2-1" to BuildingData(
         code = "W2-1",
         name = "인터내셔널센터",
-        categories = setOf(BuildingCategory.WELFAREFACILITY),
+        category = BuildingCategory.WELFAREFACILITY,
         coordinates = LatLng(36.367407252614925, 127.3600583487425),
         polygon = listOf(
             LatLng(36.36775630117726, 127.36011009977946),
@@ -775,34 +798,34 @@ val buildings = mapOf(
     "W3" to BuildingData(
         code = "W3",
         name = "갈릴레이관",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.36751007986721, 127.35807818917537),
         description = "서측 남학생 기숙사, 대학원생, 헬스장"
     ),
     "W4" to BuildingData(
         code = "W4",
         name = "서측 생활관지원실",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.36757395957477, 127.3570589144688),
     ),
     "W4-1" to BuildingData(
         code = "W4-1",
         name = "여울관",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.36663909143154, 127.3577789171988),
         description = "서측 여학생 기숙사, 대학원생, 헬스장"
     ),
     "W4-2" to BuildingData(
         code = "W4-2",
         name = "나들관",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.367061884602734, 127.3572794295491),
         description = "서측 남학생 기숙사, 대학원생, 헬스장"
     ),
     "W4-3" to BuildingData(
         code = "W4-3",
         name = "다솜관",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.368159356001314, 127.35718137542567),
         polygon = listOf(
             LatLng(36.3683075143744, 127.35736033932389),
@@ -826,7 +849,7 @@ val buildings = mapOf(
     "W4-4" to BuildingData(
         code = "W4-4",
         name = "희망관",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.36842643026001, 127.35677030758848),
         polygon = listOf(
             LatLng(36.36869431756785, 127.35684117425157),
@@ -856,37 +879,37 @@ val buildings = mapOf(
     "W5-1" to BuildingData(
         code = "W5-1",
         name = "예지관",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.36910040547652, 127.35665359716809),
     ),
     "W5-2" to BuildingData(
         code = "W5-2",
         name = "스타트업 빌리지",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.369203813223606, 127.35597434333029),
     ),
     "W5-3" to BuildingData(
         code = "W5-3",
         name = "인터내셔널 빌리지 C",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.36951794042288, 127.35640478337196),
     ),
     "W5-4" to BuildingData(
         code = "W5-4",
         name = "인터내셔널 빌리지 A",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.3697297514319, 127.35563687410476),
     ),
     "W5-5" to BuildingData(
         code = "W5-5",
         name = "인터내셔널 빌리지 B",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.37001922242757, 127.35602541649448),
     ),
     "W6" to BuildingData(
         code = "W6",
         name = "미르·나래관",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.37036482080662, 127.35572333865174),
         polygon = listOf(
             LatLng(36.370631832044566, 127.35533175467393),
@@ -924,7 +947,7 @@ val buildings = mapOf(
     "W7" to BuildingData(
         code = "W7",
         name = "우정연구동",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.371083239081464, 127.35581297002796)
     ),
     "W8" to BuildingData(
@@ -964,13 +987,13 @@ val buildings = mapOf(
     "W8-1" to BuildingData(
         code = "W8-1",
         name = "중앙분석센터",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.37061294919397, 127.3593850248104),
     ),
     "W8-2" to BuildingData(
         code = "W8-2",
         name = "중앙분석센터",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.3704111011982, 127.35908044375414),
     ),
     "W8-3" to BuildingData(
@@ -986,7 +1009,7 @@ val buildings = mapOf(
     "W10" to BuildingData(
         code = "W10",
         name = "풍동실험실",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.37140903838021, 127.35686192957125),
         polygon = listOf(
             LatLng(36.37154607413569, 127.35699349017061),
@@ -1010,7 +1033,7 @@ val buildings = mapOf(
     "W11" to BuildingData(
         code = "W11",
         name = "외국인교수아파트",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.372075456552366, 127.35625765501564),
     ),
     "W12" to BuildingData(
@@ -1021,19 +1044,19 @@ val buildings = mapOf(
     "W13" to BuildingData(
         code = "W13",
         name = "메타융합관 I",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.366199084427365, 127.36025613498998),
     ),
     "W15" to BuildingData(
         code = "W15",
         name = "스마트도시센터",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36590054817419, 127.36212671111673),
     ),
     "W16" to BuildingData(
         code = "W16",
         name = "지오센트리퓨지 실험동",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.36557708230047, 127.36255419955485),
     ),
 
@@ -1041,11 +1064,17 @@ val buildings = mapOf(
         code = "N0",
         name = "동문",
         coordinates = LatLng(36.37359187852475, 36.37359187852475),
+        polygon = listOf(
+            LatLng(36.37364165597579, 127.36654762482993),
+            LatLng(36.37353576980234, 127.3665471280513),
+            LatLng(36.37353762089112, 127.36667807474669),
+            LatLng(36.37363674837121, 127.36667853998216),
+        ),
     ),
     "N1" to BuildingData(
         code = "N1",
         name = "김병호·김삼열 IT 융합 빌딩",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.37420744168713, 127.36571449761456),
         polygon = listOf(
             LatLng(36.374475013485615, 127.36515020256823),
@@ -1083,7 +1112,7 @@ val buildings = mapOf(
     "N2" to BuildingData(
         code = "N2",
         name = "행정분관",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.3729384927955, 127.36368042697042),
         polygon = listOf( // 대충 그림
             LatLng(36.37305214644643, 127.36334943413561),
@@ -1111,7 +1140,7 @@ val buildings = mapOf(
     "N4" to BuildingData(
         code = "N4",
         name = "디지털인문사회과학부동",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.37322548293082, 127.36265376417666),
         polygon = listOf( // 대충 그림
             LatLng(36.37355556751651, 127.36301467953118),
@@ -1130,7 +1159,7 @@ val buildings = mapOf(
     "N5" to BuildingData(
         code = "N5",
         name = "융합연구동",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.37399216192414, 127.3639109921991),
         polygon = listOf( // 대충 그림
             LatLng(36.37441166030797, 127.36302144331621),
@@ -1146,7 +1175,7 @@ val buildings = mapOf(
     "N6" to BuildingData(
         code = "N6",
         name = "교수회관",
-        categories = setOf(BuildingCategory.WELFAREFACILITY),
+        category = BuildingCategory.WELFAREFACILITY,
         coordinates = LatLng(36.37458429301477, 127.3647773956823),
         polygon = listOf( // 대충 그림
             LatLng(36.37467705303956, 127.36464967482033),
@@ -1158,7 +1187,7 @@ val buildings = mapOf(
     "N7" to BuildingData(
         code = "N7",
         name = "기계공학동",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.372457956220885, 127.35868311249841),
         polygon = listOf(
             LatLng(36.37293144982034, 127.35855713509231),
@@ -1189,7 +1218,7 @@ val buildings = mapOf(
     "N7-1" to BuildingData(
         code = "N7-1",
         name = "원자력및양자공학과",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.37192972330905, 127.35903170570182),
         polygon = listOf(
             LatLng(36.372054377653484, 127.35878433670705),
@@ -1207,7 +1236,7 @@ val buildings = mapOf(
     "N7-2" to BuildingData(
         code = "N7-2",
         name = "항공우주공학과",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.37214809267918, 127.35833624257093),
         polygon = listOf(
             LatLng(36.37222783788171, 127.35803852030215),
@@ -1221,25 +1250,55 @@ val buildings = mapOf(
     "N7-3" to BuildingData(
         code = "N7-3",
         name = "기계공학과",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.372821720855455, 127.35908595068013),
+        polygon = listOf(
+            LatLng(36.372932757494695, 127.35887194714746),
+            LatLng(36.372896719471484, 127.3588689957221),
+            LatLng(36.37289025362784, 127.35877145977649),
+            LatLng(36.37276183835424, 127.35877087009787),
+            LatLng(36.37275704807007, 127.35886556829337),
+            LatLng(36.3726962197822, 127.35886528889955),
+            LatLng(36.37269944447192, 127.35929154425823),
+            LatLng(36.372764786934, 127.35928905885469),
+            LatLng(36.372769058118074, 127.359367083371),
+            LatLng(36.372892967584384, 127.35936765330474),
+            LatLng(36.37288419060269, 127.3592896079442),
+            LatLng(36.372931501489624, 127.35928982550887),
+        ),
     ),
     "N7-4" to BuildingData(
         code = "N7-4",
         name = "기계공학과",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.37279813041212, 127.35793805578462),
+        polygon = listOf(
+            LatLng(36.372913904346575, 127.3576460673432),
+            LatLng(36.37284630901285, 127.35764854381193),
+            LatLng(36.37284207839617, 127.35755659003793),
+            LatLng(36.372664099306945, 127.3575557755339),
+            LatLng(36.37266379781348, 127.35840825489016),
+            LatLng(36.37284177688614, 127.35840907133608),
+            LatLng(36.37284435568604, 127.35830043341056),
+            LatLng(36.372909689775426, 127.35830073302952),
+        ),
     ),
     "N7-5" to BuildingData(
         code = "N7-5",
         name = "우주 모빌리티동",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.37319529160907, 127.35772257482589),
+        polygon = listOf(
+            LatLng(36.373299700496595, 127.35746396347976),
+            LatLng(36.373094719964364, 127.35745188203347),
+            LatLng(36.37309540465838, 127.35797563439857),
+            LatLng(36.37328690112394, 127.35797651180683),
+        ),
     ),
     "N9" to BuildingData(
         code = "N9",
         name = "실습동",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.374188308504635, 127.36163857988011),
         polygon = listOf( // 대충 그림
             LatLng(36.37440377498888, 127.36116318040776),
@@ -1264,7 +1323,7 @@ val buildings = mapOf(
     "N11" to BuildingData(
         code = "N11",
         name = "학생식당",
-        categories = setOf(BuildingCategory.WELFAREFACILITY),
+        category = BuildingCategory.WELFAREFACILITY,
         coordinates = LatLng(36.37376071920177, 127.35924349221885),
         polygon = listOf(
             LatLng(36.374065455200686, 127.35904709209814), // 최북단의 최서단
@@ -1282,7 +1341,7 @@ val buildings = mapOf(
     "N12" to BuildingData(
         code = "N12",
         name = "학생회관–2",
-        categories = setOf(BuildingCategory.WELFAREFACILITY),
+        category = BuildingCategory.WELFAREFACILITY,
         coordinates = LatLng(36.37419156545449, 127.35981380491972),
         polygon = listOf(
             LatLng(36.3743202323757, 127.35973081919266), // 최북단의 최서단
@@ -1310,13 +1369,20 @@ val buildings = mapOf(
     "N12-1" to BuildingData(
         code = "N12-1",
         name = "북측 생활관지원실",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.37413374498524, 127.35956280429369),
+        polygon = listOf(
+            LatLng(36.37417881973158, 127.35955743986503),
+            LatLng(36.37414966619386, 127.35951273069136),
+            LatLng(36.374104624983815, 127.35951273069136),
+            LatLng(36.374104624983815, 127.35962673477194),
+            LatLng(36.37417881973158, 127.35962673477194),
+        ),
     ),
     "N13" to BuildingData(
         code = "N13",
         name = "태울관",
-        categories = setOf(BuildingCategory.WELFAREFACILITY),
+        category = BuildingCategory.WELFAREFACILITY,
         coordinates = LatLng(36.37305769422756, 127.36002866896598),
         polygon = listOf(
             LatLng(36.3734630397363, 127.36008904103214),
@@ -1351,7 +1417,7 @@ val buildings = mapOf(
     "N13-1" to BuildingData(
         code = "N13-1",
         name = "장영신학생회관",
-        categories = setOf(BuildingCategory.WELFAREFACILITY),
+        category = BuildingCategory.WELFAREFACILITY,
         coordinates = LatLng(36.373123903463515, 127.36048586182231),
         polygon = listOf(
             LatLng(36.37346688196995, 127.36030914588302),
@@ -1369,7 +1435,7 @@ val buildings = mapOf(
     "N14" to BuildingData(
         code = "N14",
         name = "사랑관",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.37379274280365, 127.35833264201288),
         polygon = listOf(
             LatLng(36.37389890478544, 127.35824119327827),
@@ -1392,13 +1458,19 @@ val buildings = mapOf(
     "N15" to BuildingData(
         code = "N15",
         name = "교직원 숙소",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.37489889171141, 127.35984492224054),
+        polygon = listOf(
+            LatLng(36.374964813019446, 127.3596502082129),
+            LatLng(36.37481837461443, 127.35964953407462),
+            LatLng(36.37480823018361, 127.36002559211731),
+            LatLng(36.37496143567386, 127.36002351217913),
+        ),
     ),
     "N16" to BuildingData(
         code = "N16",
         name = "소망관",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.37384466876345, 127.35754446286795),
         polygon = listOf(
             LatLng(36.37394869393994, 127.3574140001945),
@@ -1423,7 +1495,7 @@ val buildings = mapOf(
     "N17" to BuildingData(
         code = "N17",
         name = "성실관",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.37433851638389, 127.35889512007444),
         polygon = listOf( // 대충 그림
             LatLng(36.37443790335457, 127.35880921225395),
@@ -1440,7 +1512,7 @@ val buildings = mapOf(
     "N18" to BuildingData(
         code = "N18",
         name = "진리관",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.37476119059525, 127.35918680156202),
         polygon = listOf( // 대충 그림
             LatLng(36.37484245408449, 127.3591342418963),
@@ -1457,7 +1529,7 @@ val buildings = mapOf(
     "N19" to BuildingData(
         code = "N19",
         name = "아름관",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.3737773522203, 127.35670001966157),
         polygon = listOf( // 대충 그림
             LatLng(36.3742019781559, 127.35633978619448),
@@ -1470,7 +1542,7 @@ val buildings = mapOf(
     "N20" to BuildingData(
         code = "N20",
         name = "신뢰관",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.37525967574469, 127.35899128904865),
         polygon = listOf( // 대충 그림
             LatLng(36.375541681462195, 127.35886164352554),
@@ -1487,7 +1559,7 @@ val buildings = mapOf(
     "N21" to BuildingData(
         code = "N21",
         name = "지혜관",
-        categories = setOf(BuildingCategory.DORMITORY),
+        category = BuildingCategory.DORMITORY,
         coordinates = LatLng(36.37589846761305, 127.35858746846219),
         polygon = listOf( // 대충 그림
             LatLng(36.37599638704609, 127.3582396674811),
@@ -1504,7 +1576,7 @@ val buildings = mapOf(
     "N25" to BuildingData(
         code = "N25",
         name = "산업디자인학과동",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
+        category = BuildingCategory.RESEARCHBUILDING,
         coordinates = LatLng(36.37370301575316, 127.36193999897594),
         polygon = listOf( // 대충 그림
             LatLng(36.374112359372596, 127.36216755617025),
@@ -1517,10 +1589,10 @@ val buildings = mapOf(
             LatLng(36.37411005130887, 127.36292810597506),
         ),
     ),
-    "N29" to BuildingData(
-        code = "N29",
-        name = "메타융합관 II",
-        categories = setOf(BuildingCategory.RESEARCHBUILDING),
-        coordinates = LatLng(36.37558017294899, 127.35954717354662),
-    ),
+//    "N29" to BuildingData(
+//        code = "N29",
+//        name = "메타융합관 II",
+//        category = BuildingCategory.RESEARCHBUILDING,
+//        coordinates = LatLng(36.37558017294899, 127.35954717354662),
+//    ),
 )
