@@ -36,7 +36,7 @@ import com.google.android.gms.maps.model.LatLng
 import java.text.DecimalFormat
 
 @Composable
-fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng) -> Unit, getCurrentLocation: ((LatLng?) -> Unit) -> Unit = {}) {
+fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng, String?) -> Unit, getCurrentLocation: ((LatLng?) -> Unit) -> Unit = {}) {
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
     var distanceString by remember {
@@ -56,7 +56,7 @@ fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng) -> Unit, ge
             }
             val calculatedDistance = startLocation.distanceTo(endLocation)
             distanceString = if (calculatedDistance >= 1000f)
-                "%.2f km".format(calculatedDistance)
+                "%.2f km".format(calculatedDistance / 1000)
             else
                 "%.0f m".format(calculatedDistance)
         }
@@ -135,7 +135,7 @@ fun FacilityDetailView(itemData: FacilityItem, onMoveToMap: (LatLng) -> Unit, ge
                         if (itemData.details.coordinate != LatLng(0.0, 0.0)) {
                             Spacer(modifier = Modifier.weight(1f))
                             FilledIconButton(onClick = {
-                                onMoveToMap(itemData.details.coordinate)
+                                onMoveToMap(itemData.details.coordinate, itemData.details.location.buildingCode)
                             }) {
                                 Icon(
                                     imageVector = Icons.Default.Map,
