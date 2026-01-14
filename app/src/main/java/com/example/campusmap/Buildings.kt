@@ -6,6 +6,8 @@ enum class BuildingCategory(val displayText: String) {
     RESEARCHBUILDING(displayText = "강의·연구동"),
     DORMITORY(displayText = "기숙사"),
     WELFAREFACILITY(displayText = "복지시설"),
+    STUDYPLACE(displayText = "학습공간"),
+    ADMINISTRATIVE(displayText = "행정시설"),
 }
 data class BuildingData(
     val code: String,
@@ -486,6 +488,7 @@ val buildings = mapOf(
     "E9" to BuildingData(
         code = "E9",
         name = "학술문화관",
+        category = BuildingCategory.STUDYPLACE,
         coordinates = LatLng(36.36959433368902, 127.36246419283363),
         polygon = listOf(
             LatLng(36.36992784736996, 127.36243788204352),
@@ -550,6 +553,7 @@ val buildings = mapOf(
     "E14" to BuildingData(
         code = "E14",
         name = "본관",
+        category = BuildingCategory.ADMINISTRATIVE,
         coordinates = LatLng(36.37051486688444, 127.36127892307306),
         polygon = listOf(
             LatLng(36.37080006652372, 127.36158389591286),
@@ -1094,6 +1098,7 @@ val buildings = mapOf(
     "W8" to BuildingData(
         code = "W8",
         name = "교육지원동",
+        category = BuildingCategory.ADMINISTRATIVE,
         coordinates = LatLng(36.37002385228126, 127.35974446809095),
         polygon = listOf(
             LatLng(36.37030155442772, 127.35954795479998),
@@ -1287,7 +1292,7 @@ val buildings = mapOf(
     "N2" to BuildingData(
         code = "N2",
         name = "행정분관",
-        category = BuildingCategory.RESEARCHBUILDING,
+        category = BuildingCategory.ADMINISTRATIVE,
         coordinates = LatLng(36.3729384927955, 127.36368042697042),
         polygon = listOf( // 대충 그림
             LatLng(36.37305214644643, 127.36334943413561),
@@ -1301,6 +1306,7 @@ val buildings = mapOf(
     "N3" to BuildingData(
         code = "N3",
         name = "류근철스포츠컴플렉스",
+        category = BuildingCategory.WELFAREFACILITY,
         coordinates = LatLng(36.37240913398743, 127.36142697572261),
         polygon = listOf( // 대충 그림
             LatLng(36.372820079874465, 127.3611252147186),
@@ -1496,6 +1502,7 @@ val buildings = mapOf(
     "N10" to BuildingData(
         code = "N10",
         name = "교양분관",
+        category = BuildingCategory.STUDYPLACE,
         coordinates = LatLng(36.37416732341235, 127.36038202466077),
         polygon = listOf(
             LatLng(36.37441383859836, 127.36006834978934),
